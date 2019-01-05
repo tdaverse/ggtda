@@ -21,7 +21,7 @@ The development version of ggtda can be installed used the devtools package.
 devtools::install_github("rrrlw/ggtda", vignettes = TRUE)
 ```
 
-We hope to a CRAN-accepted version of ggtda soon.
+We aim to submit ggtda to CRAN soon.
 
 ## Sample code
 
