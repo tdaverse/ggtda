@@ -3,7 +3,7 @@ Type: Package
 Title: ggplot2-compatible Visualization of Persistent Homology
 Version: 0.1.0
 Authors@R: c(
-    person("Cory", "Brunson", role = "aut"),
+    person("Jason Cory", "Brunson", role = "aut"),
     person("Raoul", "Wadhwa", role = "aut"),
     person("Jacob", "Scott", role = "aut"))
 Description: A user-friendly, ggplot2-compatible package to visualize
