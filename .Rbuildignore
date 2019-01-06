@@ -3,3 +3,7 @@
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^README\.md$
+^cran-comments\.md$
+^NEWS\.md$
+LICENSE
