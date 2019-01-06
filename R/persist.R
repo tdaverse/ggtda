@@ -37,7 +37,7 @@ stat_flat <- function(mapping = NULL,
   )
 }
 
-#' @rdname ggplot2-ggproto
+#' @rdname ggtda-ggproto
 #' @format NULL
 #' @usage NULL
 #' @export
@@ -98,7 +98,7 @@ geom_persist <- function(mapping = NULL,
   )
 }
 
-#' @rdname ggplot2-ggproto
+#' @rdname ggtda-ggproto
 #' @format NULL
 #' @usage NULL
 #' @export
