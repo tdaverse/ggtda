@@ -17,7 +17,7 @@
 #'   Defaults to `segment`; pass a string to override the default.
 #' @param stat The The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
-#' @example inst/examples/ex-barcode.r
+#' @example inst/examples/ex-barcode.R
 
 #' @rdname barcode
 #' @export
