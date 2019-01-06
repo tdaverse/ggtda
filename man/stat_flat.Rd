@@ -58,6 +58,7 @@ Plots a flat persistence diagram.
 \seealso{
 [ggplot2::layer()] for additional arguments.
 
-Other TDA plot layers: \code{\link{geom_persist}}
+Other TDA plot layers: \code{\link{barcode}},
+  \code{\link{geom_persist}}
 }
 \concept{TDA plot layers}
