@@ -2,7 +2,7 @@ context("Test visualization via persistence diagrams")
 library("ggplot2")
 library("ggtda")
 
-test_that("Peresistence geom(s) and stat(s) work correctly", {
+test_that("Persistence geom(s) and stat(s) work correctly", {
   # sample dataset
   test.df <- data.frame(start = c(0, 1, 2, 3),
                         end = c(1, 3, 6, 10))
