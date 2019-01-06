@@ -15,4 +15,5 @@ y.val <- y.val + runif(100, -0.2, 0.2)
 
 # create dataset and add to package using devtools
 annulus2d <- cbind(x.val, y.val)
+colnames(annulus2d) <- c("x", "y")
 devtools::use_data(annulus2d)
