@@ -69,8 +69,9 @@ StatFlat <- ggproto(
 #'   if `TRUE`, `NA` values constitute a separate category,
 #'   plotted in grey (regardless of the color scheme)
 #' @param ... additional arguments passed to [ggplot2::layer()]
-#' @param geom The geometric object used to display the data.
-#'   Defaults to `point`; pass a string to override the default.
+#' @param stat The statistical transformation used to display the data.
+#'   Defaults to `identity`; another useful option is `flat`.
+#'   Pass a string to override the default.
 #' @export
 geom_persist <- function(mapping = NULL,
                          data = NULL,
