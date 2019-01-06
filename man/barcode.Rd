@@ -65,6 +65,8 @@ Defaults to `identity`; pass a string to override the default.}
 Plots a topological barcode.
 }
 \examples{
+library("ggplot2")
+
 # toy example
 data <- data.frame(
   birth = c(0, 0, 1, 2),

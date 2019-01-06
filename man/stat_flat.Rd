@@ -56,6 +56,8 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 Plots a flat persistence diagram.
 }
 \examples{
+library("ggplot2")
+
 # toy example
 data <- data.frame(
   birth = c(0, 0, 1, 2),

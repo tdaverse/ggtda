@@ -1,3 +1,5 @@
+library("ggplot2")
+
 # toy example
 data <- data.frame(
   birth = c(0, 0, 1, 2),
