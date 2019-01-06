@@ -13,6 +13,7 @@
 #' @param ... additional arguments passed to [ggplot2::layer()]
 #' @param geom The geometric object used to display the data.
 #'   Defaults to `point`; pass a string to override the default.
+#' @example inst/examples/ex-persist.R
 #' @export
 stat_flat <- function(mapping = NULL,
                       data = NULL,
@@ -74,6 +75,7 @@ StatFlat <- ggproto(
 #' @param stat The statistical transformation used to display the data.
 #'   Defaults to `identity`; another useful option is `flat`.
 #'   Pass a string to override the default.
+#' @example inst/examples/ex-persist.R
 #' @export
 geom_persist <- function(mapping = NULL,
                          data = NULL,
