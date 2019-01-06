@@ -3,8 +3,10 @@ Type: Package
 Title: ggplot2-compatible Visualization of Persistent Homology
 Version: 0.1.0
 Authors@R: c(
-    person("Jason Cory", "Brunson", role = "aut"),
-    person("Raoul", "Wadhwa", role = c("cre", "aut")),
+    person("Jason Cory", "Brunson",
+           role = "aut", email = "cornelioid@gmail.com"),
+    person("Raoul", "Wadhwa",
+           role = c("cre", "aut"), email = "raoulwadhwa@gmail.com"),
     person("Jacob", "Scott", role = "aut"))
 Description: A user-friendly, ggplot2-compatible package to visualize
     persistent homology to complement topological data analysis
