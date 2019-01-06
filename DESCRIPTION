@@ -17,6 +17,7 @@ Description: A user-friendly, ggplot2-compatible package to visualize
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 2.10)
 Imports: ggplot2 (>= 2.2.1)
 URL: https://github.com/rrrlw/ggtda
 BugReports: https://github.com/rrrlw/ggtda/issues
