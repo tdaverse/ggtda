@@ -4,13 +4,16 @@ Title: ggplot2-compatible Visualization of Persistent Homology
 Version: 0.1.0
 Authors@R: c(
     person("Jason Cory", "Brunson",
-           role = "aut", email = "cornelioid@gmail.com"),
+      role = "aut", email = "cornelioid@gmail.com"),
     person("Raoul", "Wadhwa",
-           role = c("cre", "aut"), email = "raoulwadhwa@gmail.com"),
+      role = c("cre", "aut"), email = "raoulwadhwa@gmail.com"),
     person("Jacob", "Scott", role = "aut"))
 Description: A user-friendly, ggplot2-compatible package to visualize
     persistent homology to complement topological data analysis
-    pipelines.
+    pipelines. Once calculation of persistent homology is complete,
+    tidyverse useRs can now effectively visualize the persistent
+    homology within the existing grammar of graphics framework implemented
+    by ggplot2.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
