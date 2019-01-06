@@ -6,7 +6,7 @@
 #' @family TDA plot layers
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
-#' param na.rm Logical:
+#' @param na.rm Logical:
 #'   if `FALSE`, the default, `NA` values are not included
 #'   if `TRUE`, `NA` values constitute a separate category,
 #'   plotted in grey (regardless of the color scheme)
@@ -64,7 +64,7 @@ StatFlat <- ggproto(
 #' @family TDA plot layers
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
-#' param na.rm Logical:
+#' @param na.rm Logical:
 #'   if `FALSE`, the default, `NA` values are not included
 #'   if `TRUE`, `NA` values constitute a separate category,
 #'   plotted in grey (regardless of the color scheme)
