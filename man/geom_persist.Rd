@@ -67,12 +67,18 @@ data <- data.frame(
 )
 # using the stat layer
 ggplot(data,
-       aes(start = birth, end = death)) +
-  stat_flat(geom = "persist")
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  stat_flat()
+
 # using the geom layer
 ggplot(data,
-       aes(start = birth, end = death)) +
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist()
+
+# using the geom layer to get flat diagram
+ggplot(data,
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  geom_persist(stat = "flat")
 }
 \seealso{
 [ggplot2::layer()] for additional arguments.
