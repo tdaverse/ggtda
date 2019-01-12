@@ -1,5 +1,3 @@
-library("ggplot2")
-
 # toy example
 data <- data.frame(
   birth = c(0, 0, 1, 2),
@@ -11,6 +9,7 @@ ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   stat_flat()
 
+\dontrun{
 # using the geom layer
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -20,3 +19,4 @@ ggplot(data,
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist(stat = "flat")
+}

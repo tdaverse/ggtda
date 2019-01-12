@@ -31,7 +31,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
+the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data.
@@ -65,8 +65,6 @@ Defaults to `identity`; pass a string to override the default.}
 Plots a topological barcode.
 }
 \examples{
-library("ggplot2")
-
 # toy example
 data <- data.frame(
   birth = c(0, 0, 1, 2),
