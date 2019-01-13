@@ -5,7 +5,7 @@
 #' @keywords internal
 NULL
 
-#' ggplot2-compatible Visualization of Persistent Homology
+#' ggplot2-Compatible Visualization of Persistent Homology
 #' 
 #' A user-friendly, ggplot2-compatible package to visualize
 #' persistent homology to complement topological data analysis
