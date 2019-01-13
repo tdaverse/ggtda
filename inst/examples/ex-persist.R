@@ -9,7 +9,6 @@ ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   stat_flat()
 
-\dontrun{
 # using the geom layer
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -19,4 +18,3 @@ ggplot(data,
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist(stat = "flat")
-}

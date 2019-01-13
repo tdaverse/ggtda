@@ -25,7 +25,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object used to display the data.
@@ -67,7 +67,6 @@ ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   stat_flat()
 
-\dontrun{
 # using the geom layer
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -77,7 +76,6 @@ ggplot(data,
 ggplot(data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist(stat = "flat")
-}
 }
 \seealso{
 [ggplot2::layer()] for additional arguments.
