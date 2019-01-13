@@ -9,10 +9,13 @@ test_that("Minimalist TDA theme works correctly", {
   
   # build ggplot2 objects without plotting
   test.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    geom_persist() +
-    theme_tda()
+    geom_persist()
+  test.theme1 <- test.gg + theme_persist()
+  test.theme2 <- test.gg + theme_barcode()
   
   # run tests - not doing much, just making sure there's no errors
   #   before this point
   expect_true(is.ggplot(test.gg))
+  expect_true(is.ggplot(test.theme1))
+  expect_true(is.ggplot(test.theme2))
 })
