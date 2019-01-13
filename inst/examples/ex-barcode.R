@@ -11,10 +11,11 @@ ggplot(toy.data,
        aes(xmin = appear, xmax = disappear, colour = dim, shape = dim)) +
   stat_barcode()
 
-# topological barcode using the geom layer
+# topological barcode using the geom layer (and minimalist theme)
 ggplot(toy.data,
        aes(x = appear, xend = disappear, colour = dim, shape = dim)) +
-  geom_barcode()
+  geom_barcode() +
+  theme_tda()
 
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
@@ -29,12 +30,10 @@ circ.phom$dimension <- as.factor(circ.phom$dimension)
 ggplot(circ.phom, aes(xmin = birth, xmax = death,
                       colour = dimension)) +
   stat_barcode() +
-  theme_tda() +
-  xlab("Vietoris-Rips diameter")
+  theme_barcode()
 
 # pretty topological barcode with geom layer
 ggplot(circ.phom, aes(x = birth, xend = death,
                       colour = dimension)) +
   geom_barcode() +
-  theme_tda() +
-  xlab("Vietoris-Rips diameter")
+  theme_barcode()

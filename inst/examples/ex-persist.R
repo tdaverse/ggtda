@@ -16,10 +16,11 @@ ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist()
 
-# flat persistence diagram using the geom layer
+# flat persistence diagram using the geom layer with minimalist theme
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_persist(stat = "flat")
+  geom_persist(stat = "flat") +
+  theme_tda()
 
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
@@ -34,19 +35,16 @@ annulus.phom$dimension <- as.factor(annulus.phom$dimension)
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_flat() +
-  theme_tda() +
-  xlab("Feature appearance") + ylab("Feature disappearance")
+  theme_persist()
 
 # pretty diagonal persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   geom_persist() +
-  theme_tda() +
-  xlab("Feature appearance") + ylab("Feature disappearance")
+  theme_persist()
 
 # another way to get a pretty flat persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   geom_persist(stat = "flat") +
-  theme_tda() +
-  xlab("Feature appearance") + ylab("Feature disappearance")
+  theme_persist()

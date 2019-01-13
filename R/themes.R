@@ -27,10 +27,8 @@ theme_tda <- function() {
 #' @family TDA themes
 #' @export
 theme_persist <- function() {
-  theme_tda() +
-    # add axis labels
-    xlab("Feature appearance") +
-    ylab("Feature disappearance")
+  # no real differences (vertical axis is needed)
+  theme_tda()
 }
 
 #' Theme for Persistence Barcodes
@@ -42,11 +40,13 @@ theme_persist <- function() {
 #' @family TDA themes
 #' @export
 theme_barcode <- function() {
-  theme_tda() +
-    # add horizontal axis label
-    xlab("Simplicial complex diameter") +
-    # remove vertical axis
-    theme(axis.line.y = element_blank(),
-          axis.ticks.y = element_blank(),
-          axis.text.y = element_blank())
+  # same as theme_tda() without the vertical axis
+  theme(axis.line.x = element_line(colour = "black"),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(colour = "black"),
+        axis.text.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
 }
