@@ -4,7 +4,7 @@
 \name{ggtda}
 \alias{ggtda}
 \alias{ggtda-package}
-\title{ggplot2-compatible Visualization of Persistent Homology}
+\title{ggplot2-Compatible Visualization of Persistent Homology}
 \description{
 A user-friendly, ggplot2-compatible package to visualize
 persistent homology to complement topological data analysis

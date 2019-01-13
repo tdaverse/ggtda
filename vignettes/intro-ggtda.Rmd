@@ -1,0 +1,155 @@
+---
+title: "Introduction to the ggtda package"
+author: "Raoul R. Wadhwa, J. Cory Brunson, Jacob G. Scott"
+date: "13 January 2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+references:
+- id: barcode1
+  title: Persistence barcodes for shapes
+  author: 
+  - family: Carlsson
+    given: Gunnar
+  - family: Zomorodian
+    given: Afra
+  - family: Collins
+    given: Anne
+  - family: Guibas
+    given: Leonidas
+  container-title: International Journal of Shape Modeling
+  volume: 11
+  issue: 2
+  page: 149-187
+  type: article-journal
+  issued: 2005
+- id: barcode2
+  title: "Barcodes: The persistent topology of data"
+  author: 
+  - family: Ghrist
+    given: Robert
+  container-title: Bulletin of the American Mathematical Society
+  volume: 45
+  issue: 1
+  page: 61-75
+  type: article-journal
+  issued: 2008
+- id: flatpersist
+  title: A flat persistence diagram for improved visualization of persistent homology
+  author: 
+  - family: Wadhwa
+    given: Raoul
+  - family: Dhawan
+    given: Andrew
+  - family: Williamson
+    given: Drew
+  - family: Scott
+    given: Jacob
+  container-title: arXiv
+  page: 1812.04567
+  type: article-journal
+  issued: 2018
+- id: diagpersist
+  title: Topological persistence and simplification
+  author: 
+  - family: Edelsbrunner
+    given: Herbert
+  - family: Letscher
+    given: David
+  - family: Zomorodian
+    given: Afra
+  container-title: Discrete and Computational Geometry
+  volume: 28
+  issue: 4
+  page: 511-533
+  type: article-journal
+  issued: 2002
+---
+
+```{r setup-orig, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Purpose
+
+The ggtda package provides users with a ggplot2-compatible tool to visualize persistent homology as part of a topological data analysis pipeline.
+This vignette introduces how users can use ggtda to construct publication-quality topological barcodes [@barcode1;@barcode2], flat persistence diagrams [@flatpersist], and diagonal persistence diagrams [@diagpersist].
+
+## Setup and dataset details
+
+We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.
+
+```{r setup, message = FALSE}
+library("ggtda")
+library("TDAstats") # to calculate persistent homology
+
+# load dataset
+data("annulus2d")
+```
+
+The `annulus2d` dataset (visualized below) comes with ggtda, and will be used to demonstrate each form of visualization.
+
+```{r annulus-scatter, echo = FALSE, fig.height = 4, fig.width = 4}
+annulus.df <- as.data.frame(annulus2d)
+ggplot(annulus.df, aes(x = x, y = y)) +
+  geom_point() +
+  theme_bw()
+```
+
+The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
+We will calculate its persistent homology using the TDAstats package (following code block) and then proceed to plot the result with each of the three visualizations using ggtda.
+
+```{r phom}
+# calculate persistent homology of annulus and format
+annulus.phom <- as.data.frame(calculate_homology(annulus2d))
+annulus.phom$dimension <- as.factor(annulus.phom$dimension)
+```
+
+We can take a quick look with `head()` and `tail()` to see what the raw form of `annulus2d`'s persistent homology looks like.
+
+```{r peek}
+# first few features (0-dimensional)
+head(annulus.phom)
+
+# last few features (1-dimensional)
+tail(annulus.phom)
+```
+
+Clearly, graphical visualizations would permit easier and more effective interpretation than printing raw data.
+We will start off by plotting this as a topological barcode.
+
+*N.B.* although TDAstats calculates persistent homology using the Vietoris-Rips complex, persistent homology from another simplicial complex (e.g. Čech complex) can also be visualized with ggtda.
+To account for this, the axes will be labeled in a generic manner that should be adapted by users depending on the specific context.
+
+## Topological barcode (aka persistence barcode)
+
+Topological barcodes plot features as vertically stacked horizontal bars.
+Here, each bar corresponds to a single feature (single row in `annulus.phom`) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in `annulus.phom`).
+Creating a topological barcode with ggtda is straightforward, allowing users to choose between two equivalent options: `geom_barcode` and `stat_barcode`.
+
+```{r barcode, fig.height = 3, fig.width = 5}
+# create topological barcode with geom layer
+ggplot(annulus.phom, aes(x = birth, xend = death, colour = dimension)) +
+  geom_barcode() +
+  xlab("Simplicial complex radius")
+
+# create barcode with stat layer and minimalist theme
+ggplot(annulus.phom, aes(xmin = birth, xmax = death, colour = dimension)) +
+  stat_barcode() +
+  xlab("Simplicial complex radius") +
+  theme_barcode()
+```
+
+Given that an annulus (or a noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected.
+This finding should be replicated in the persistence diagrams as well.
+
+## Flat persistence diagram
+
+## Diagonal persistence diagram
+
+## References
