@@ -1,10 +1,10 @@
 ---
 title: "Introduction to the ggtda package"
 author: "Raoul R. Wadhwa, J. Cory Brunson, Jacob G. Scott"
-date: "13 January 2019"
+date: "14 January 2019"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Introduction to the ggtda package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 references:
