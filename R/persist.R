@@ -1,7 +1,8 @@
-#' Plot Persistent Homology as a Flat Persistence Diagram
+#' Plot Persistent Homology as a Persistence Diagram
 #' 
 #' Plots a flat persistence diagram.
 #' 
+#' @name persistence
 #' @import ggplot2
 #' @family TDA plot layers
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -13,12 +14,19 @@
 #' @param ... additional arguments passed to [ggplot2::layer()]
 #' @param geom The geometric object used to display the data.
 #'   Defaults to `point`; pass a string to override the default.
+#' @param stat The statistical transformation used to display the data.
+#'   Defaults to `identity`; another useful option is `flat`.
+#'   Pass a string to override the default.
 #' @example inst/examples/ex-persist.R
+#' @export
+
+#' @rdname persistence
 #' @export
 stat_flat <- function(mapping = NULL,
                       data = NULL,
-                      geom = "point",
+                      geom = "persistence",
                       position = "identity",
+                      flat = FALSE,
                       na.rm = FALSE,
                       show.legend = NA,
                       inherit.aes = TRUE,
@@ -32,6 +40,7 @@ stat_flat <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      flat = flat,
       na.rm = na.rm,
       ...
     )
@@ -39,7 +48,6 @@ stat_flat <- function(mapping = NULL,
 }
 
 #' @rdname ggtda-ggproto
-#' @format NULL
 #' @usage NULL
 #' @export
 StatFlat <- ggproto(
@@ -47,46 +55,46 @@ StatFlat <- ggproto(
   
   required_aes = c("start", "end"),
   
+  setup_data = function(data, params) {
+    
+    # warn of any nonsense data
+    if (any(data$end - data$start < 0)) {
+      wh <- which(data$end - data$start < 0)
+      if (length(wh) > 6) wh <- c(wh[1:3], "...", wh[length(wh)])
+      warning(
+        "Some persistence data have `start` before `end`: ",
+        paste(wh, collapse = ", ")
+      )
+    }
+    
+    data
+  },
+  
   # statistical transformation into plot-ready data
-  compute_panel = function(data, scales) {
-    # use `start` and `end` as `x` and `y`, respectively
+  compute_panel = function(data, scales,
+                           flat = TRUE) {
+    
+    # switch to flat orientation
     data$end <- data$end - data$start
-    data$x <- data$start
-    data$y <- data$end
     
     # return the transformed data frame
     data
   }
 )
 
-#' Plot Persistent Homology as a Persistence Diagram
-#' 
-#' Plots a flat persistence diagram
-#' 
-#' @import ggplot2
-#' @family TDA plot layers
-#' @seealso [ggplot2::layer()] for additional arguments.
-#' @inheritParams ggplot2::layer
-#' @param na.rm Logical:
-#'   if `FALSE`, the default, `NA` values are not included
-#'   if `TRUE`, `NA` values constitute a separate category,
-#'   plotted in grey (regardless of the color scheme)
-#' @param ... additional arguments passed to [ggplot2::layer()]
-#' @param stat The statistical transformation used to display the data.
-#'   Defaults to `identity`; another useful option is `flat`.
-#'   Pass a string to override the default.
-#' @example inst/examples/ex-persist.R
+#' @rdname persistence
 #' @export
-geom_persist <- function(mapping = NULL,
-                         data = NULL,
-                         stat = "identity",
-                         position = "identity",
-                         na.rm = FALSE,
-                         show.legend = NA,
-                         inherit.aes = TRUE,
-                         ...) {
+geom_persistence <- function(mapping = NULL,
+                             data = NULL,
+                             stat = "identity",
+                             position = "identity",
+                             flat = FALSE,
+                             na.rm = FALSE,
+                             show.legend = NA,
+                             inherit.aes = TRUE,
+                             ...) {
   layer(
-    geom = GeomPersist,
+    geom = GeomPersistence,
     data = data,
     mapping = mapping,
     stat = stat,
@@ -94,6 +102,7 @@ geom_persist <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      flat = flat,
       na.rm = na.rm,
       ...
     )
@@ -104,21 +113,57 @@ geom_persist <- function(mapping = NULL,
 #' @format NULL
 #' @usage NULL
 #' @export
-GeomPersist <- ggproto(
-  "GeomPersist", GeomPoint,
+GeomPersistence <- ggproto(
+  "GeomPersistence", GeomPoint,
   
   required_aes = c("start", "end"),
   
-  # pre-process the dataset
+  # pre-process of the data set
   setup_data = function(data, params) {
     
-    # convert to flat persistence coordinates
+    if (! is.null(data$x) & ! is.null(data$xend) &
+        is.null(data$start) & is.null(data$end)) {
+      
+      warning(
+        "Substituting `x` and `xend` for missing persistence aesthetics ",
+        "`start` and `end`."
+      )
+      
+      # change `x` and `xend` to `start` and `end`
+      data$start <- data$x
+      data$end <- data$xend
+    }
+    
+    # warn of any nonsense data
+    if (any(data$end - data$start < 0)) {
+      wh <- which(data$end - data$start < 0)
+      if (length(wh) > 6) wh <- c(wh[1:3], "...", wh[length(wh)])
+      warning(
+        "Some persistence data have `start` before `end`: ",
+        paste(wh, collapse = ", ")
+      )
+    }
+    
+    # switch to flat orientation
+    if (params$flat) {
+      data$end <- data$end - data$start
+    }
+    
+    # convert to persistence coordinates
     data$x <- data$start
     data$y <- data$end
-    data$start <- NULL
-    data$end <- NULL
     
-    # return pre-processed dataset
+    # return the pre-processed data set
     data
+  },
+  
+  # generate graphical objects for each panel
+  draw_panel = function(data, panel_params, coord,
+                        flat = FALSE) {
+    
+    # point graphical object with new name
+    grob <- GeomPoint$draw_panel(data, panel_params, coord)
+    grob$name <- grid::grobName(grob, "geom_persistence")
+    grob
   }
 )
