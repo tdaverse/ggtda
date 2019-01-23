@@ -24,7 +24,7 @@
 #' @export
 stat_flat <- function(mapping = NULL,
                       data = NULL,
-                      geom = "persistence",
+                      geom = "persist",
                       position = "identity",
                       flat = FALSE,
                       na.rm = FALSE,
