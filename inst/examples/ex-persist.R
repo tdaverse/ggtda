@@ -14,12 +14,12 @@ ggplot(toy.data,
 # diagonal persistence diagram using the `flat = FALSE` parameter method
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_persistence(flat = FALSE)
+  geom_persist(flat = FALSE)
 
 # flat persistence diagram using the geom layer with minimalist theme
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_persistence() +
+  geom_persist() +
   theme_tda()
 
 #####EXAMPLE 2#####
@@ -40,5 +40,5 @@ ggplot(annulus.phom, aes(start = birth, end = death,
 # pretty diagonal persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
-  geom_persistence(flat = FALSE) +
+  geom_persist(flat = FALSE) +
   theme_persist()
