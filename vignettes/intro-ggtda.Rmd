@@ -1,6 +1,6 @@
 ---
 title: "An introduction to ggtda"
-author: "Raoul R. Wadhwa, J. Cory Brunson, Jacob G. Scott"
+author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
 date: "23 January 2019"
 output: rmarkdown::html_vignette
 vignette: >
