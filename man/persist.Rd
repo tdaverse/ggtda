@@ -6,7 +6,7 @@
 \alias{geom_persist}
 \title{Plot Persistent Homology as a Persistence Diagram}
 \usage{
-stat_flat(mapping = NULL, data = NULL, geom = "persistence",
+stat_flat(mapping = NULL, data = NULL, geom = "persist",
   position = "identity", flat = FALSE, na.rm = FALSE,
   show.legend = NA, inherit.aes = TRUE, ...)
 
@@ -39,6 +39,8 @@ Defaults to `point`; pass a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
+
+\item{flat}{determines status of flat vs diagonal persistence diagram}
 
 \item{na.rm}{Logical:
 if `FALSE`, the default, `NA` values are not included

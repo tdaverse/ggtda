@@ -17,6 +17,7 @@
 #' @param stat The statistical transformation used to display the data.
 #'   Defaults to `identity`; another useful option is `flat`.
 #'   Pass a string to override the default.
+#' @param flat determines status of flat vs diagonal persistence diagram
 #' @example inst/examples/ex-persist.R
 #' @export
 
