@@ -52,9 +52,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
-
-\item{geom}{The geometric object to use display the data.
-Defaults to `segment`; pass a string to override the default.}
 }
 \description{
 Plots a topological barcode.

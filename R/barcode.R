@@ -13,8 +13,6 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category,
 #'   plotted in grey (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param geom The geometric object to use display the data.
-#'   Defaults to `segment`; pass a string to override the default.
 #' @param stat The The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
 #' @example inst/examples/ex-barcode.R

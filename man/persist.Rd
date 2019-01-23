@@ -60,9 +60,8 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{...}{additional arguments passed to [ggplot2::layer()]}
 
-\item{stat}{The statistical transformation used to display the data.
-Defaults to `identity`; another useful option is `flat`.
-Pass a string to override the default.}
+\item{stat}{The statistical transformation to use on the data for this
+layer, as a string.}
 }
 \description{
 Plots a flat persistence diagram.
