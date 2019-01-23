@@ -2,14 +2,9 @@
 % Please edit documentation in R/persist.R
 \name{persist}
 \alias{persist}
-\alias{stat_flat}
 \alias{geom_persist}
-\title{Plot Persistent Homology as a Persistence Diagram}
+\title{Plots Persistent Homology as a Persistence Diagram}
 \usage{
-stat_flat(mapping = NULL, data = NULL, geom = "persist",
-  position = "identity", flat = FALSE, na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE, ...)
-
 geom_persist(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", flat = TRUE, na.rm = FALSE,
   show.legend = NA, inherit.aes = TRUE, ...)
@@ -34,18 +29,19 @@ A \code{function} will be called with a single argument,
 the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
-\item{geom}{The geometric object used to display the data.
-Defaults to `point`; pass a string to override the default.}
+\item{stat}{The statistical transformation to use on the data.
+Defaults to `identity`; pass a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
-\item{flat}{determines status of flat vs diagonal persistence diagram}
+\item{flat}{default `TRUE` to plot flat persistence diagram; `FALSE` will
+plot a diagonal persistence diagram.}
 
 \item{na.rm}{Logical:
-if `FALSE`, the default, `NA` values are not included
-if `TRUE`, `NA` values constitute a separate category,
-plotted in grey (regardless of the color scheme)}
+if `FALSE`, the default, `NA` lodes are not included;
+if `TRUE`, `NA` lodes constitute a separate category,
+plotted in grey (regardless of the color scheme).}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -58,13 +54,11 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
-\item{...}{additional arguments passed to [ggplot2::layer()]}
-
-\item{stat}{The statistical transformation to use on the data for this
-layer, as a string.}
+\item{...}{Additional arguments passed to [ggplot2::layer()].}
 }
 \description{
-Plots a flat persistence diagram.
+Plots a persistence diagram, including flat and diagonal
+persistence diagrams.
 }
 \examples{
 #####EXAMPLE 1#####
@@ -113,8 +107,6 @@ ggplot(annulus.phom, aes(start = birth, end = death,
   theme_persist()
 }
 \seealso{
-[ggplot2::layer()] for additional arguments.
-
 Other TDA plot layers: \code{\link{barcode}}
 }
 \concept{TDA plot layers}

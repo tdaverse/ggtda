@@ -2,10 +2,8 @@
 
 export(GeomBarcode)
 export(GeomPersist)
-export(StatFlat)
 export(geom_barcode)
 export(geom_persist)
-export(stat_flat)
 export(theme_barcode)
 export(theme_persist)
 export(theme_tda)

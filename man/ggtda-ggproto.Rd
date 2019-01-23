@@ -4,7 +4,6 @@
 \name{GeomBarcode}
 \alias{GeomBarcode}
 \alias{ggtda-ggproto}
-\alias{StatFlat}
 \alias{GeomPersist}
 \title{Base ggproto classes for ggtda}
 \format{An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.}

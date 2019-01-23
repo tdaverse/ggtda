@@ -1,85 +1,22 @@
-#' Plot Persistent Homology as a Persistence Diagram
+#' Plots Persistent Homology as a Persistence Diagram
 #' 
-#' Plots a flat persistence diagram.
+#' Plots a persistence diagram, including flat and diagonal
+#' persistence diagrams.
 #' 
 #' @name persist
 #' @import ggplot2
 #' @family TDA plot layers
-#' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical:
-#'   if `FALSE`, the default, `NA` values are not included
-#'   if `TRUE`, `NA` values constitute a separate category,
-#'   plotted in grey (regardless of the color scheme)
-#' @param ... additional arguments passed to [ggplot2::layer()]
-#' @param geom The geometric object used to display the data.
-#'   Defaults to `point`; pass a string to override the default.
-#' @param flat determines status of flat vs diagonal persistence diagram
+#'   if `FALSE`, the default, `NA` lodes are not included;
+#'   if `TRUE`, `NA` lodes constitute a separate category,
+#'   plotted in grey (regardless of the color scheme).
+#' @param ... Additional arguments passed to [ggplot2::layer()].
+#' @param stat The statistical transformation to use on the data.
+#'   Defaults to `identity`; pass a string to override the default.
+#' @param flat default `TRUE` to plot flat persistence diagram; `FALSE` will
+#'   plot a diagonal persistence diagram.
 #' @example inst/examples/ex-persist.R
-#' @export
-
-#' @rdname persist
-#' @export
-stat_flat <- function(mapping = NULL,
-                      data = NULL,
-                      geom = "persist",
-                      position = "identity",
-                      flat = FALSE,
-                      na.rm = FALSE,
-                      show.legend = NA,
-                      inherit.aes = TRUE,
-                      ...) {
-  layer(
-    stat = StatFlat,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      flat = flat,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatFlat <- ggproto(
-  "StatFlat", Stat,
-  
-  required_aes = c("start", "end"),
-  
-  setup_data = function(data, params) {
-    
-    # warn of any nonsense data
-    if (any(data$end - data$start < 0)) {
-      wh <- which(data$end - data$start < 0)
-      if (length(wh) > 6) wh <- c(wh[1:3], "...", wh[length(wh)])
-      warning(
-        "Some persistence data have `start` before `end`: ",
-        paste(wh, collapse = ", ")
-      )
-    }
-    
-    data
-  },
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           flat = TRUE) {
-    
-    # switch to flat orientation
-    data$end <- data$end - data$start
-    
-    # return the transformed data frame
-    data
-  }
-)
-
 #' @rdname persist
 #' @export
 geom_persist <- function(mapping = NULL,
