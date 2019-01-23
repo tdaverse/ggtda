@@ -1,10 +1,10 @@
 ---
-title: "Introduction to the ggtda package"
+title: "An introduction to ggtda"
 author: "Raoul R. Wadhwa, J. Cory Brunson, Jacob G. Scott"
-date: "14 January 2019"
+date: "23 January 2019"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to the ggtda package}
+  %\VignetteIndexEntry{An introduction to ggtda}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 references:
@@ -130,21 +130,70 @@ To account for this, the axes will be labeled in a generic manner that should be
 
 Topological barcodes plot features as vertically stacked horizontal bars.
 Here, each bar corresponds to a single feature (single row in `annulus.phom`) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in `annulus.phom`).
-Creating a topological barcode with ggtda is straightforward, allowing users to choose between two equivalent options: `geom_barcode` and `stat_barcode`.
+Creating a topological barcode with ggtda is straightforward using `geom_barcode`.
 
 ```{r barcode, fig.height = 3, fig.width = 5}
-# create topological barcode with geom layer and appropriate theme
-ggplot(annulus.phom, aes(start = birth, end = death, group = dimension)) +
+# create topological barcode with appropriate theme
+ggplot(annulus.phom, aes(start = birth, end = death,
+                         group = dimension, colour = dimension)) +
   geom_barcode() +
   xlab("Simplicial complex radius") +
   theme_barcode()
 ```
 
-Given that an annulus (or a noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected.
+The `group` aesthetic orders features by dimension ensuring that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on.
+The `color` aesthetic allows for explicit discrimination between features of different dimensions.
+
+Given that an annulus (aka noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected.
 This finding should be replicated in the persistence diagrams as well.
 
-## Flat persistence diagram
+## Persistence diagrams
 
-## Diagonal persistence diagram
+Flat persistence diagrams plot features as points on a scatterplot.
+Each point corresponds to a single feature (one row in `annulus.phom`), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in `annulus.phom`).
+Flat persistence diagrams are generated using `geom_persist` as follows.
+
+```{r flatpersist, fig.height=3.5, fig.width = 4.5}
+# create flat persistence diagram with appropriate theme
+ggplot(annulus.phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  geom_persist() +
+  xlab("Feature appearance") +
+  ylab("Feature persistence") +
+  theme_persist()
+```
+
+The `shape` and `colour` aesthetics redundantly discriminate between features of different dimensions.
+This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. due to color-blind readers).
+
+Diagonal persistence diagrams can also be generated with `geom_persist` by setting the `flat` parameter to `FALSE`.
+
+```{r diagpersist, fig.height = 3.5, fig.width = 4.5}
+# create diagonal persistence diagram
+ggplot(annulus.phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  geom_persist(flat = FALSE) +
+  xlab("Feature appearance") +
+  ylab("Feature persistence") +
+  theme_persist()
+```
+
+A reference line often helps interpretation of diagonal persistence diagrams.
+Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range.
+
+```{r diagadjust, fig.height = 3.5, fig.width = 4.5}
+# create diagonal persistence diagrams with adjustments
+ggplot(annulus.phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  geom_persist(flat = FALSE) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlim(c(0, 1.5)) +
+  ylim(c(0, 1.5)) +
+  xlab("Feature appearance") +
+  ylab("Feature disappearance") +
+  theme_persist()
+```
+
+`ggplot2::ggsave` can be used to save plots produced by ggtda.
 
 ## References
