@@ -14,12 +14,8 @@ test_that("Persistence barcode geom(s) and stat(s) work correctly", {
   test.geom <- ggplot(data = test.df,
                       aes(xmin = birth, xmax = death, group = dim, color = dim)) +
     geom_barcode()
-  test.stat <- ggplot(data = test.df,
-                      aes(xmin = birth, xmax = death, group = dim, color = dim)) +
-    stat_barcode()
   
   # run tests - not doing much, just making sure there's no errors
   #   before this point
   expect_true(is.ggplot(test.geom))
-  expect_true(is.ggplot(test.stat))
 })
