@@ -133,14 +133,9 @@ Here, each bar corresponds to a single feature (single row in `annulus.phom`) wi
 Creating a topological barcode with ggtda is straightforward, allowing users to choose between two equivalent options: `geom_barcode` and `stat_barcode`.
 
 ```{r barcode, fig.height = 3, fig.width = 5}
-# create topological barcode with geom layer
-ggplot(annulus.phom, aes(x = birth, xend = death, colour = dimension)) +
+# create topological barcode with geom layer and appropriate theme
+ggplot(annulus.phom, aes(start = birth, end = death, group = dimension)) +
   geom_barcode() +
-  xlab("Simplicial complex radius")
-
-# create barcode with stat layer and minimalist theme
-ggplot(annulus.phom, aes(xmin = birth, xmax = death, colour = dimension)) +
-  stat_barcode() +
   xlab("Simplicial complex radius") +
   theme_barcode()
 ```

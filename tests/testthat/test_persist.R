@@ -10,16 +10,13 @@ test_that("Persistence diagram geom(s) and stat(s) work correctly", {
                         end = c(1, 2, 4, 7))
   
   # build ggplot2 objects without plotting
-  test.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    geom_persist()
   flat.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    geom_persist(stat = "flat")
-  flat2.gg<- ggplot(data = test.df, aes(start = start, end = end)) +
-    stat_flat()
+    geom_persist()
+  diag.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
+    geom_persist(flat = FALSE)
   
   # run tests - not doing much, just making sure there's no errors
   #   before this point
-  expect_true(is.ggplot(test.gg))
+  expect_true(is.ggplot(diag.gg))
   expect_true(is.ggplot(flat.gg))
-  expect_true(is.ggplot(flat2.gg))
 })

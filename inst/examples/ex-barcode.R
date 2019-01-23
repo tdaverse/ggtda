@@ -6,14 +6,9 @@ toy.data <- data.frame(
   dim = c("0", "0", "2", "1")
 )
 
-# topological barcode using the stat layer
-ggplot(toy.data,
-       aes(xmin = appear, xmax = disappear, colour = dim, shape = dim)) +
-  stat_barcode()
-
 # topological barcode using the geom layer (and minimalist theme)
 ggplot(toy.data,
-       aes(x = appear, xend = disappear, colour = dim, shape = dim)) +
+       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
   theme_tda()
 
@@ -26,14 +21,8 @@ data("circle2d") # unit circle (betti-1 number = 1)
 circ.phom <- as.data.frame(calculate_homology(circle2d))
 circ.phom$dimension <- as.factor(circ.phom$dimension)
 
-# pretty topological barcode with stat layer
-ggplot(circ.phom, aes(xmin = birth, xmax = death,
-                      colour = dimension)) +
-  stat_barcode() +
-  theme_barcode()
-
 # pretty topological barcode with geom layer
-ggplot(circ.phom, aes(x = birth, xend = death,
+ggplot(circ.phom, aes(start = birth, end = death,
                       colour = dimension)) +
   geom_barcode() +
   theme_barcode()

@@ -2,14 +2,9 @@
 % Please edit documentation in R/barcode.R
 \name{barcode}
 \alias{barcode}
-\alias{stat_barcode}
 \alias{geom_barcode}
 \title{Plot Persistent Homology as Topological Barcode}
 \usage{
-stat_barcode(mapping = NULL, data = NULL, geom = "segment",
-  position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
-
 geom_barcode(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE, ...)
@@ -34,8 +29,8 @@ A \code{function} will be called with a single argument,
 the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
-\item{geom}{The geometric object to use display the data.
-Defaults to `segment`; pass a string to override the default.}
+\item{stat}{The The statistical transformation to use on the data.
+Defaults to `identity`; pass a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
@@ -57,9 +52,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
-
-\item{stat}{The The statistical transformation to use on the data.
-Defaults to `identity`; pass a string to override the default.}
 }
 \description{
 Plots a topological barcode.
@@ -73,14 +65,9 @@ toy.data <- data.frame(
   dim = c("0", "0", "2", "1")
 )
 
-# topological barcode using the stat layer
-ggplot(toy.data,
-       aes(xmin = appear, xmax = disappear, colour = dim, shape = dim)) +
-  stat_barcode()
-
 # topological barcode using the geom layer (and minimalist theme)
 ggplot(toy.data,
-       aes(x = appear, xend = disappear, colour = dim, shape = dim)) +
+       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
   theme_tda()
 
@@ -93,14 +80,8 @@ data("circle2d") # unit circle (betti-1 number = 1)
 circ.phom <- as.data.frame(calculate_homology(circle2d))
 circ.phom$dimension <- as.factor(circ.phom$dimension)
 
-# pretty topological barcode with stat layer
-ggplot(circ.phom, aes(xmin = birth, xmax = death,
-                      colour = dimension)) +
-  stat_barcode() +
-  theme_barcode()
-
 # pretty topological barcode with geom layer
-ggplot(circ.phom, aes(x = birth, xend = death,
+ggplot(circ.phom, aes(start = birth, end = death,
                       colour = dimension)) +
   geom_barcode() +
   theme_barcode()
@@ -108,7 +89,6 @@ ggplot(circ.phom, aes(x = birth, xend = death,
 \seealso{
 [ggplot2::layer()] for additional arguments.
 
-Other TDA plot layers: \code{\link{geom_persist}},
-  \code{\link{stat_flat}}
+Other TDA plot layers: \code{\link{persist}}
 }
 \concept{TDA plot layers}
