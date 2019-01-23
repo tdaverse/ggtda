@@ -92,6 +92,6 @@ ggplot(circ.phom, aes(start = birth, end = death,
 \seealso{
 [ggplot2::layer()] for additional arguments.
 
-Other TDA plot layers: \code{\link{persistence}}
+Other TDA plot layers: \code{\link{persist}}
 }
 \concept{TDA plot layers}

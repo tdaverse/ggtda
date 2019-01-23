@@ -2,7 +2,7 @@
 #' 
 #' Plots a flat persistence diagram.
 #' 
-#' @name persistence
+#' @name persist
 #' @import ggplot2
 #' @family TDA plot layers
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -20,7 +20,7 @@
 #' @example inst/examples/ex-persist.R
 #' @export
 
-#' @rdname persistence
+#' @rdname persist
 #' @export
 stat_flat <- function(mapping = NULL,
                       data = NULL,
