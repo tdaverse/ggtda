@@ -7,6 +7,7 @@
 \alias{ggtda-ggproto}
 \alias{StatFlat}
 \alias{GeomPersist}
+\alias{GeomDisk}
 \alias{StatVietoris1}
 \alias{StatVietoris2}
 \title{Base ggproto classes for ggtda}

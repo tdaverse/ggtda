@@ -2,10 +2,15 @@
 % Please edit documentation in R/vietoris.R
 \name{vietoris}
 \alias{vietoris}
+\alias{geom_disk}
 \alias{stat_vietoris1}
 \alias{stat_vietoris2}
 \title{The 1- and 2-skeletons of the Vietoris complex of a 2-dimensional point cloud}
 \usage{
+geom_disk(mapping = NULL, data = NULL, stat = "identity",
+  position = "identity", na.rm = FALSE, radius = 0, segments = 60,
+  show.legend = NA, inherit.aes = TRUE, ...)
+
 stat_vietoris1(mapping = NULL, data = NULL, geom = "segment",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
@@ -31,20 +36,21 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
-\item{geom}{The geometric object to use display the data; defaults to
-`segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
-a string to override the default.}
+\item{stat}{The statistical transformation to use on the data for this
+layer, as a string.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
 \item{na.rm}{Logical; ignored.}
 
-\item{diameter}{A positive number; the distance between points at which
-segments will not be included.}
+\item{radius}{A positive number; the radius of the disk to render around each
+point.}
+
+\item{segments}{The number of segments to be used in drawing each disk.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -58,6 +64,13 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
+
+\item{geom}{The geometric object to use display the data; defaults to
+`segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
+a string to override the default.}
+
+\item{diameter}{A positive number; the distance between points at which
+segments will not be included.}
 }
 \description{
 The *Vietoris complex* of a point cloud is a simplicial complex consisting of a
@@ -84,14 +97,11 @@ set.seed(1)
 d <- as.data.frame(make_noisy_circle(n = 36, sd = .05))
 
 # plot balls beneath points
-ggplot(d) +
+ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  ggforce::geom_circle(
-    aes(x0 = x, y0 = y, r = .35),
-    fill = "aquamarine3", color = NA, alpha = .2
-  ) +
-  geom_point(aes(x = x, y = y))
+  geom_disk(radius = .35, fill = "aquamarine3") +
+  geom_point()
 
 # plot 1-skeleton
 ggplot(d, aes(x = x, y = y)) +
@@ -109,34 +119,21 @@ ggplot(d, aes(x = x, y = y)) +
   geom_point()
 
 # plot 1-skeleton atop balls
-ggplot(d) +
+ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  ggforce::geom_circle(
-    aes(x0 = x, y0 = y, r = .35),
-    fill = "aquamarine3", color = NA, alpha = .2
-  ) +
-  stat_vietoris1(aes(x = x, y = y), diameter = .7, size = .2) +
-  geom_point(aes(x = x, y = y), size = .3)
+  geom_disk(radius = .35, fill = "aquamarine3") +
+  stat_vietoris1(diameter = .7, size = .2) +
+  geom_point(size = .3)
 
 # plot 2-skeleton atop balls
-ggplot(d) +
+ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  ggforce::geom_circle(
-    aes(x0 = x, y0 = y, r = .35),
-    fill = "aquamarine3", color = NA, alpha = .2
-  ) +
-  stat_vietoris2(aes(x = x, y = y), diameter = .7, fill = "darkgoldenrod", alpha = .1) +
-  stat_vietoris1(aes(x = x, y = y), diameter = .7, size = .2) +
-  geom_point(aes(x = x, y = y), size = .3)
-
-# `geom_circle()` confuses aesthetics
-ggplot(d, aes(x = x, y = y, x0 = x, y0 = y, r = .35)) +
-  theme_bw() +
-  coord_fixed() +
-  ggforce::geom_circle(fill = "aquamarine3", color = NA, alpha = .2) +
-  geom_point()
+  geom_disk(radius = .35, fill = "aquamarine3") +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris1(diameter = .7, size = .2) +
+  geom_point(size = .3)
 }
 \seealso{
 [ggplot2::layer()] for additional arguments.

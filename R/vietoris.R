@@ -22,9 +22,101 @@
 #' @param geom The geometric object to use display the data; defaults to
 #'   `segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
 #'   a string to override the default.
+#' @param radius A positive number; the radius of the disk to render around each
+#'   point.
+#' @param segments The number of segments to be used in drawing each disk.
 #' @param diameter A positive number; the distance between points at which
 #'   segments will not be included.
 #' @example inst/examples/ex-vietoris.R
+
+#' @rdname vietoris
+#' @export
+geom_disk <- function(mapping = NULL,
+                      data = NULL,
+                      stat = "identity",
+                      position = "identity",
+                      na.rm = FALSE,
+                      radius = 0,
+                      segments = 60,
+                      show.legend = NA,
+                      inherit.aes = TRUE,
+                      ...) {
+  layer(
+    geom = GeomDisk,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius,
+      segments = segments,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+GeomDisk <- ggproto(
+  "GeomDisk", GeomPolygon,
+  
+  required_aes = c("x", "y"),
+  
+  default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
+                    size = 0.5, linetype = 1),
+  
+  setup_data = function(data, params) {
+    
+    # calculate a polygon that approximates a circle
+    angles <- (0:params$segments) * 2 * pi / params$segments
+    disk <- params$radius * cbind(cos(angles), sin(angles))
+    disk <- as.data.frame(disk)
+    names(disk) <- c("x.offset", "y.offset")
+    
+    # copy the circle at each point
+    disks <- tidyr::crossing(data[, c("x", "y")], disk)
+    data$.id <- 1:nrow(data)
+    data <- merge(data, disks, by = c("x", "y"))
+    data <- transform(data,
+                      x = x + x.offset, y = y + y.offset,
+                      group = interaction(group, .id))
+    data$group <- match(data$group, unique(data$group))
+    data <- data[, setdiff(names(data), c("x.offset", "y.offset", ".id"))]
+    
+    # return circles data
+    data
+  },
+  
+  draw_panel = function(data, panel_params, coord,
+                        radius = 0, segments = 60) {
+    if (radius == 0 || segments == 0) return(zeroGrob())
+    
+    # mimic `GeomPolygon$draw_panel`
+    
+    munched <- coord_munch(coord, data, panel_params)
+    munched <- munched[order(munched$group), ]
+    
+    first_idx <- ! duplicated(munched$group)
+    first_rows <- munched[first_idx, ]
+    
+    grob <- grid::polygonGrob(
+      munched$x, munched$y, default.units = "native",
+      id = munched$group,
+      gp = grid::gpar(
+        col = first_rows$colour,
+        fill = alpha(first_rows$fill, first_rows$alpha),
+        lwd = first_rows$size * .pt,
+        lty = first_rows$linetype
+      )
+    )
+    grob$name <- grid::grobName(grob, "geom_disk")
+    grob
+  }
+)
 
 #' @rdname vietoris
 #' @export
@@ -61,19 +153,7 @@ StatVietoris1 <- ggproto(
   
   required_aes = c("x", "y"),
   
-  # pre-process of the parameters
-  setup_params = function(data, params) {
-    
-    # return the pre-processed parameters
-    params
-  },
-  
-  # pre-process of the data set
-  setup_data = function(data, params) {
-    
-    # return the pre-processed data set
-    data
-  },
+  default_aes = aes(alpha = .25),
   
   # statistical transformation into plot-ready data
   compute_panel = function(data, scales,
@@ -131,19 +211,7 @@ StatVietoris2 <- ggproto(
   
   required_aes = c("x", "y"),
   
-  # pre-process of the parameters
-  setup_params = function(data, params) {
-    
-    # return the pre-processed parameters
-    params
-  },
-  
-  # pre-process of the data set
-  setup_data = function(data, params) {
-    
-    # return the pre-processed data set
-    data
-  },
+  default_aes = aes(alpha = .1),
   
   # statistical transformation into plot-ready data
   compute_panel = function(data, scales,
