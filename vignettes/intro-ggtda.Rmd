@@ -167,18 +167,7 @@ The `shape` and `colour` aesthetics redundantly discriminate between features of
 This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. due to color-blind readers).
 
 Diagonal persistence diagrams can also be generated with `geom_persist` by setting the `flat` parameter to `FALSE`.
-
-```{r diagpersist, fig.height = 3.5, fig.width = 4.5}
-# create diagonal persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  geom_persist(flat = FALSE) +
-  xlab("Feature appearance") +
-  ylab("Feature persistence") +
-  theme_persist()
-```
-
-A reference line often helps interpretation of diagonal persistence diagrams.
+A reference line often helps interpretation of diagonal persistence diagrams so we add one with `geom_abline`.
 Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range.
 
 ```{r diagadjust, fig.height = 3.5, fig.width = 4.5}
