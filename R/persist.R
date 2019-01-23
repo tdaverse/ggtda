@@ -82,19 +82,19 @@ StatFlat <- ggproto(
   }
 )
 
-#' @rdname persistence
+#' @rdname persist
 #' @export
-geom_persistence <- function(mapping = NULL,
-                             data = NULL,
-                             stat = "identity",
-                             position = "identity",
-                             flat = TRUE,
-                             na.rm = FALSE,
-                             show.legend = NA,
-                             inherit.aes = TRUE,
-                             ...) {
+geom_persist <- function(mapping = NULL,
+                         data = NULL,
+                         stat = "identity",
+                         position = "identity",
+                         flat = TRUE,
+                         na.rm = FALSE,
+                         show.legend = NA,
+                         inherit.aes = TRUE,
+                         ...) {
   layer(
-    geom = GeomPersistence,
+    geom = GeomPersist,
     data = data,
     mapping = mapping,
     stat = stat,
@@ -113,8 +113,8 @@ geom_persistence <- function(mapping = NULL,
 #' @format NULL
 #' @usage NULL
 #' @export
-GeomPersistence <- ggproto(
-  "GeomPersistence", GeomPoint,
+GeomPersist <- ggproto(
+  "GeomPersist", GeomPoint,
   
   required_aes = c("start", "end"),
   
@@ -163,7 +163,7 @@ GeomPersistence <- ggproto(
     
     # point graphical object with new name
     grob <- GeomPoint$draw_panel(data, panel_params, coord)
-    grob$name <- grid::grobName(grob, "geom_persistence")
+    grob$name <- grid::grobName(grob, "geom_persist")
     grob
   }
 )
