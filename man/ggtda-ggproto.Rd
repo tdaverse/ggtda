@@ -5,7 +5,7 @@
 \alias{GeomBarcode}
 \alias{ggtda-ggproto}
 \alias{GeomPersist}
-\alias{GeomDisk}
+\alias{StatDisk}
 \alias{StatVietoris1}
 \alias{StatVietoris2}
 \title{Base ggproto classes for ggtda}

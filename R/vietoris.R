@@ -31,9 +31,9 @@
 
 #' @rdname vietoris
 #' @export
-geom_disk <- function(mapping = NULL,
+stat_disk <- function(mapping = NULL,
                       data = NULL,
-                      stat = "identity",
+                      geom = "polygon",
                       position = "identity",
                       na.rm = FALSE,
                       radius = 0,
@@ -42,10 +42,10 @@ geom_disk <- function(mapping = NULL,
                       inherit.aes = TRUE,
                       ...) {
   layer(
-    geom = GeomDisk,
+    stat = StatDisk,
     data = data,
     mapping = mapping,
-    stat = stat,
+    geom = geom,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
@@ -61,19 +61,21 @@ geom_disk <- function(mapping = NULL,
 #' @rdname ggtda-ggproto
 #' @usage NULL
 #' @export
-GeomDisk <- ggproto(
-  "GeomDisk", GeomPolygon,
+StatDisk <- ggproto(
+  "StatDisk", Stat,
   
   required_aes = c("x", "y"),
   
   default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
                     size = 0.5, linetype = 1),
   
-  setup_data = function(data, params) {
+  compute_panel = function(data, scales,
+                           radius = 0, segments = 60) {
+    if (radius == 0 || segments == 0) return(data[NULL, ])
     
     # calculate a polygon that approximates a circle
-    angles <- (0:params$segments) * 2 * pi / params$segments
-    disk <- params$radius * cbind(cos(angles), sin(angles))
+    angles <- (0:segments) * 2 * pi / segments
+    disk <- radius * cbind(cos(angles), sin(angles))
     disk <- as.data.frame(disk)
     names(disk) <- c("x.offset", "y.offset")
     
@@ -89,32 +91,6 @@ GeomDisk <- ggproto(
     
     # return circles data
     data
-  },
-  
-  draw_panel = function(data, panel_params, coord,
-                        radius = 0, segments = 60) {
-    if (radius == 0 || segments == 0) return(zeroGrob())
-    
-    # mimic `GeomPolygon$draw_panel`
-    
-    munched <- coord_munch(coord, data, panel_params)
-    munched <- munched[order(munched$group), ]
-    
-    first_idx <- ! duplicated(munched$group)
-    first_rows <- munched[first_idx, ]
-    
-    grob <- grid::polygonGrob(
-      munched$x, munched$y, default.units = "native",
-      id = munched$group,
-      gp = grid::gpar(
-        col = first_rows$colour,
-        fill = alpha(first_rows$fill, first_rows$alpha),
-        lwd = first_rows$size * .pt,
-        lty = first_rows$linetype
-      )
-    )
-    grob$name <- grid::grobName(grob, "geom_disk")
-    grob
   }
 )
 

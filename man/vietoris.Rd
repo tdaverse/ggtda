@@ -2,12 +2,12 @@
 % Please edit documentation in R/vietoris.R
 \name{vietoris}
 \alias{vietoris}
-\alias{geom_disk}
+\alias{stat_disk}
 \alias{stat_vietoris1}
 \alias{stat_vietoris2}
 \title{The 1- and 2-skeletons of the Vietoris complex of a 2-dimensional point cloud}
 \usage{
-geom_disk(mapping = NULL, data = NULL, stat = "identity",
+stat_disk(mapping = NULL, data = NULL, geom = "polygon",
   position = "identity", na.rm = FALSE, radius = 0, segments = 60,
   show.legend = NA, inherit.aes = TRUE, ...)
 
@@ -39,8 +39,9 @@ A \code{function} will be called with a single argument,
 the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
-\item{stat}{The statistical transformation to use on the data for this
-layer, as a string.}
+\item{geom}{The geometric object to use display the data; defaults to
+`segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
+a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
@@ -64,10 +65,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
-
-\item{geom}{The geometric object to use display the data; defaults to
-`segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
-a string to override the default.}
 
 \item{diameter}{A positive number; the distance between points at which
 segments will not be included.}
@@ -100,7 +97,7 @@ d <- as.data.frame(make_noisy_circle(n = 36, sd = .05))
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  geom_disk(radius = .35, fill = "aquamarine3") +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   geom_point()
 
 # plot 1-skeleton
@@ -122,7 +119,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  geom_disk(radius = .35, fill = "aquamarine3") +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   stat_vietoris1(diameter = .7, size = .2) +
   geom_point(size = .3)
 
@@ -130,7 +127,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  geom_disk(radius = .35, fill = "aquamarine3") +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
   stat_vietoris1(diameter = .7, size = .2) +
   geom_point(size = .3)
