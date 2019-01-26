@@ -4,12 +4,11 @@
 \name{ggtda}
 \alias{ggtda}
 \alias{ggtda-package}
-\title{ggplot2-Compatible Visualization of Persistent Homology}
+\title{A *ggplot2* Extension for Persistence Data}
 \description{
-A user-friendly, ggplot2-compatible package to visualize
-persistent homology to complement topological data analysis
-pipelines. Once calculation of persistent homology is complete,
-tidyverse useRs can now effectively visualize the persistent
-homology within the existing grammar of graphics framework implemented
-by ggplot2.
+*ggtda* is a user-friendly *ggplot2* extension for visualizing data arising
+from topological data analysis pipelines, in particular persistence data.
+Once persistent homology as been computed, *tidyverse* useRs can efficiently
+visualize the persistence of features within the "layered grammar of
+graphics" framework of *ggplot2*.
 }

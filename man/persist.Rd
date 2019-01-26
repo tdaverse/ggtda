@@ -3,10 +3,10 @@
 \name{persist}
 \alias{persist}
 \alias{geom_persist}
-\title{Plots Persistent Homology as a Persistence Diagram}
+\title{Persistence diagrams}
 \usage{
 geom_persist(mapping = NULL, data = NULL, stat = "identity",
-  position = "identity", flat = TRUE, na.rm = FALSE,
+  position = "identity", diag = FALSE, na.rm = FALSE,
   show.legend = NA, inherit.aes = TRUE, ...)
 }
 \arguments{
@@ -26,7 +26,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
+the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{stat}{The statistical transformation to use on the data.
@@ -35,7 +35,7 @@ Defaults to `identity`; pass a string to override the default.}
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
-\item{flat}{default `TRUE` to plot flat persistence diagram; `FALSE` will
+\item{diag}{default `FALSE` to plot flat persistence diagram; `TRUE` will
 plot a diagonal persistence diagram.}
 
 \item{na.rm}{Logical:
@@ -57,8 +57,7 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
 }
 \description{
-Plots a persistence diagram, including flat and diagonal
-persistence diagrams.
+Visualize persistence data in a (flat or diagonal) persistence diagram.
 }
 \examples{
 #####EXAMPLE 1#####
@@ -68,17 +67,14 @@ toy.data <- data.frame(
   death = c(5, 3, 5, 3, 6),
   dim = c("0", "0", "2", "1", "1")
 )
-
 # flat persistence diagram
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_persist()
-
-# diagonal persistence diagram using the `flat = FALSE` parameter method
+# diagonal persistence diagram using the `diag = TRUE` parameter method
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_persist(flat = FALSE)
-
+  geom_persist(diag = TRUE)
 # flat persistence diagram using the geom layer with minimalist theme
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -88,22 +84,19 @@ ggplot(toy.data,
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
 library("TDAstats")
-data("annulus2d")  # noisy unit circle (betti-1 number = 1)
-
+data("annulus2d")  # noisy unit circle (Betti-1 number = 1)
 # calculate persistence homology and format
 annulus.phom <- as.data.frame(calculate_homology(annulus2d))
 annulus.phom$dimension <- as.factor(annulus.phom$dimension)
-
 # pretty flat persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   geom_persist() +
   theme_persist()
-
 # pretty diagonal persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
-  geom_persist(flat = FALSE) +
+  geom_persist(diag = TRUE) +
   theme_persist()
 }
 \seealso{

@@ -5,10 +5,10 @@
 \alias{GeomBarcode}
 \alias{ggtda-ggproto}
 \alias{GeomPersist}
-\title{Base ggproto classes for ggtda}
+\title{Base `ggproto` classes for *ggtda*}
 \format{An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.}
 \description{
-Base ggproto classes for ggtda
+Base `ggproto` classes for *ggtda*
 }
 \seealso{
 [`ggplot2::ggplot2-ggproto`]

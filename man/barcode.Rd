@@ -3,7 +3,7 @@
 \name{barcode}
 \alias{barcode}
 \alias{geom_barcode}
-\title{Plot Persistent Homology as Topological Barcode}
+\title{Barcodes}
 \usage{
 geom_barcode(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
@@ -26,7 +26,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
+the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{stat}{The The statistical transformation to use on the data.
@@ -54,7 +54,7 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 \item{...}{Additional arguments passed to [ggplot2::layer()].}
 }
 \description{
-Plots a topological barcode.
+Visualize persistence data in a barcode diagram.
 }
 \examples{
 #####EXAMPLE 1#####
@@ -64,7 +64,6 @@ toy.data <- data.frame(
   disappear = c(5, 3, 5, 3),
   dim = c("0", "0", "2", "1")
 )
-
 # topological barcode using the geom layer (and minimalist theme)
 ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
@@ -74,12 +73,10 @@ ggplot(toy.data,
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
 library("TDAstats")
-data("circle2d") # unit circle (betti-1 number = 1)
-
+data("circle2d") # unit circle (Betti-1 number = 1)
 # calculate persistence homology and format
 circ.phom <- as.data.frame(calculate_homology(circle2d))
 circ.phom$dimension <- as.factor(circ.phom$dimension)
-
 # pretty topological barcode with geom layer
 ggplot(circ.phom, aes(start = birth, end = death,
                       colour = dimension)) +
