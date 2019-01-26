@@ -1,8 +1,8 @@
-#' Plots Persistent Homology as a Persistence Diagram
+#' Persistence diagrams
 #' 
-#' Plots a persistence diagram, including flat and diagonal
-#' persistence diagrams.
+#' Visualize persistence data in a (flat or diagonal) persistence diagram.
 #' 
+
 #' @name persist
 #' @import ggplot2
 #' @family TDA plot layers
@@ -14,7 +14,7 @@
 #' @param ... Additional arguments passed to [ggplot2::layer()].
 #' @param stat The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
-#' @param flat default `TRUE` to plot flat persistence diagram; `FALSE` will
+#' @param diag default `FALSE` to plot flat persistence diagram; `TRUE` will
 #'   plot a diagonal persistence diagram.
 #' @example inst/examples/ex-persist.R
 #' @rdname persist
@@ -23,7 +23,7 @@ geom_persist <- function(mapping = NULL,
                          data = NULL,
                          stat = "identity",
                          position = "identity",
-                         flat = TRUE,
+                         diag = FALSE,
                          na.rm = FALSE,
                          show.legend = NA,
                          inherit.aes = TRUE,
@@ -37,7 +37,7 @@ geom_persist <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      flat = flat,
+      diag = diag,
       na.rm = na.rm,
       ...
     )
@@ -80,7 +80,7 @@ GeomPersist <- ggproto(
     }
     
     # switch to flat orientation
-    if (params$flat) {
+    if (! params$diag) {
       data$end <- data$end - data$start
     }
     
@@ -94,7 +94,7 @@ GeomPersist <- ggproto(
   
   # generate graphical objects for each panel
   draw_panel = function(data, panel_params, coord,
-                        flat = FALSE) {
+                        diag = TRUE) {
     
     # point graphical object with new name
     grob <- GeomPoint$draw_panel(data, panel_params, coord)

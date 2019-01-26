@@ -13,7 +13,7 @@ test_that("Persistence diagram geom(s) and stat(s) work correctly", {
   flat.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
     geom_persist()
   diag.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    geom_persist(flat = FALSE)
+    geom_persist(diag = TRUE)
   
   # run tests - not doing much, just making sure there's no errors
   #   before this point

@@ -1,6 +1,6 @@
-#' Plot Persistent Homology as Topological Barcode
+#' Barcodes
 #'
-#' Plots a topological barcode.
+#' Visualize persistence data in a barcode diagram.
 #'
 
 #' @name barcode
