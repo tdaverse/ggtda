@@ -1,5 +1,4 @@
 context("Test visualization via persistence barcodes")
-library("ggplot2")
 library("ggtda")
 
 test_that("Persistence barcode geom(s) and stat(s) work correctly", {

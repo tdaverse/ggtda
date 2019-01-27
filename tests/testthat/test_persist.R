@@ -1,5 +1,4 @@
 context("Test visualization via persistence diagrams")
-library("ggplot2")
 library("ggtda")
 
 test_that("Persistence diagram geom(s) and stat(s) work correctly", {

@@ -1,5 +1,4 @@
 context("Test visualization theme(s)")
-library("ggplot2")
 library("ggtda")
 
 test_that("Minimalist TDA theme works correctly", {
