@@ -85,8 +85,8 @@ layers encode only the simplices of fixed dimension; to render the 1- or
 # function to generate noisy 2D circles
 make_noisy_circle <- function(n, sd = .01) {
   theta <- stats::runif(n = n, min = 0, max = 2 * pi)
-  cbind(x = cos(theta), y = sin(theta)) +
-    MASS::mvrnorm(n = n, mu = c(0, 0), Sigma = diag(x = sd, nrow = 2))
+  cbind(x = cos(theta) + stats::rnorm(n, 0, sd),
+        y = sin(theta) + stats::rnorm(n, 0, sd))
 }
 
 # generate a noisy 2D circle
