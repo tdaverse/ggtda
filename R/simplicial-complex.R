@@ -1,18 +1,28 @@
-#' The 1- and 2-skeletons of the Vietoris complex of a 2-dimensional point cloud
+#' Skeletons of Vietoris and Čech complexes of a 2-dimensional point cloud
 #'
-#' The *Vietoris complex* of a point cloud is a simplicial complex consisting of a
-#' simplex for each subset of points within a fixed diameter of each other. The
-#' *1-skeleton* consists of all points (0-simplices) and edges between pairs
-#' (1-simplices), and the *2-skeleton* additionally faces among all triples
-#' (2-simplices), of a simplicial complex. Given `x` and `y` coordinates,
-#' `stat_vietoris1()` encodes the edges of the Vietoris complex using `x`, `y`,
-#' `xend`, and `yend` for `geom_segment()`, and `stat_vietoris2()` encodes the
-#' faces using `x`, `y`, and `group` for `geom_polygon()`. Note that these stat
-#' layers encode only the simplices of fixed dimension; to render the 1- or
-#' 2-skeleton, they can be combined with `geom_point()`.
+#' The *Vietoris complex* of a point cloud is a simplicial complex consisting of
+#' a simplex for each subset of points within a fixed diameter of each other.
+#' The *Čech complex* consists of a simplex for each subset that lies within a
+#' circle of fixed diameter. (This means that the Čech complex relies on the
+#' ambient geometry of the point cloud, while the Vietoris complex relies only
+#' on the inter-point distances.)
+#'
+#' The *1-skeleton* of a complex consists of all points (0-simplices) and edges
+#' between pairs (1-simplices), and the *2-skeleton* additionally faces among
+#' triples (2-simplices), of the complex.
+#'
+#' Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
+#' Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
+#' `stat_vietoris2()` encodes the faces using `x`, `y`, and `group` for
+#' `geom_polygon()`. The edges of a Čech complex are exactly those of the
+#' Vietoris complex, so `stat_cech1()` is an alias for `stat_vietoris1()`, while
+#' `stat_cech2()` encodes the faces of the Čech complex in the same way as
+#' `stat_vietoris2()` those of the Vietoris complex. Note that these stat layers
+#' encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
+#' they can be combined with `geom_point()`.
 #' 
 
-#' @name vietoris
+#' @name simplicial-complex
 #' @import ggplot2
 #' @family point cloud plot layers
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -29,7 +39,7 @@
 #'   segments will not be included.
 #' @example inst/examples/ex-vietoris.R
 
-#' @rdname vietoris
+#' @rdname simplicial-complex
 #' @export
 stat_disk <- function(mapping = NULL,
                       data = NULL,
@@ -94,7 +104,7 @@ StatDisk <- ggproto(
   }
 )
 
-#' @rdname vietoris
+#' @rdname simplicial-complex
 #' @export
 stat_vietoris1 <- function(mapping = NULL,
                           data = NULL,
@@ -152,7 +162,7 @@ StatVietoris1 <- ggproto(
   }
 )
 
-#' @rdname vietoris
+#' @rdname simplicial-complex
 #' @export
 stat_vietoris2 <- function(mapping = NULL,
                            data = NULL,
@@ -203,6 +213,69 @@ StatVietoris2 <- ggproto(
       by = "b", all = FALSE,
       sort = FALSE
     )
+    faces <- merge(
+      faces,
+      transform(edges, c = b, b = NULL),
+      by = c("a", "c"), all = FALSE,
+      sort = FALSE
+    )
+    faces <- t(as.matrix(faces))[c("a", "b", "c"), ]
+    
+    # data frame of faces' perimeter coordinates
+    res <- data.frame(
+      x = data$x[as.vector(faces)],
+      y = data$y[as.vector(faces)],
+      group = rep(1:ncol(faces), each = 3)
+    )
+    
+    # return the faces data
+    res
+  }
+)
+
+#' @rdname simplicial-complex
+#' @export
+stat_cech1 <- stat_vietoris1
+
+#' @rdname simplicial-complex
+#' @export
+stat_cech2 <- function(mapping = NULL,
+                       data = NULL,
+                       geom = "polygon",
+                       position = "identity",
+                       na.rm = FALSE,
+                       diameter = Inf,
+                       show.legend = NA,
+                       inherit.aes = TRUE,
+                       ...) {
+  layer(
+    stat = StatCech2,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      diameter = diameter,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatCech2 <- ggproto(
+  "StatCech2", StatVietoris2,
+  
+  # statistical transformation into plot-ready data
+  compute_panel = function(data, scales,
+                           diameter = Inf) {
+    
+    # indices of triples of data points that are within `diameter` of some point
+    faces <- as.data.frame(proximate_triples(data, diameter))
     faces <- t(as.matrix(faces))[c("a", "b", "c"), ]
     
     # data frame of faces' perimeter coordinates
@@ -222,4 +295,55 @@ proximate_pairs <- function(data, diameter) {
   pairs <- which(distances < diameter & upper.tri(distances), arr.ind = TRUE)
   dimnames(pairs) <- list(NULL, c("a", "b"))
   pairs
+}
+
+proximate_triples <- function(data, diameter) {
+  # distances between pairs
+  distances <- data.frame(
+    a = rep(1:(nrow(data) - 1), rep((nrow(data) - 1):1)),
+    b = unlist(lapply(2:nrow(data), function(k) k:nrow(data))),
+    d = as.vector(stats::dist(data))
+  )
+  distances <- distances[distances$d < diameter, ]
+  # distances among triples
+  triples <- merge(
+    distances,
+    transform(distances, c = distances$b, b = distances$a, a = NULL),
+    by = "b", suffixes = c("_ab", "_bc")
+  )
+  triples <- merge(
+    triples,
+    transform(distances, c = distances$b, b = NULL, d_ac = distances$d, d = NULL),
+    by = c("a", "c")
+  )
+  # triples within `diameter` of each other -> circumdiameter
+  triples$s <- (triples$d_ab + triples$d_bc + triples$d_ac) / 2
+  triples$cd <- 2 * triples$d_ab * triples$d_bc * triples$d_ac / sqrt(
+    triples$s * (triples$s - triples$d_ab) *
+      (triples$s - triples$d_bc) * (triples$s - triples$d_ac)
+  )
+  # vectors between pairs
+  triples$x_ab <- data$x[triples$b] - data$x[triples$a]
+  triples$y_ab <- data$y[triples$b] - data$y[triples$a]
+  triples$x_bc <- data$x[triples$c] - data$x[triples$b]
+  triples$y_bc <- data$y[triples$c] - data$y[triples$b]
+  triples$x_ac <- data$x[triples$c] - data$x[triples$a]
+  triples$y_ac <- data$y[triples$c] - data$y[triples$a]
+  # inner products of vectors within triples
+  triples$d_a <- triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac
+  triples$d_b = triples$x_ab * triples$x_bc + triples$y_ab * triples$y_bc
+  triples$d_c = triples$x_ac * triples$x_bc + triples$y_ac * triples$y_bc
+  # angles among triples
+  triples$t_a = acos(triples$d_a / (triples$d_ab * triples$d_ac))
+  triples$t_b = acos(triples$d_b / (triples$d_ab * triples$d_bc))
+  triples$t_c = acos(triples$d_c / (triples$d_ac * triples$d_bc))
+  # if any angle is obtuse, longest side length; otherwise, circumdiameter
+  triples$diam <- ifelse(
+    pmax(triples$t_a, triples$t_b, triples$t_c) > pi/2,
+    pmax(triples$d_ab, triples$d_bc, triples$d_ac),
+    triples$cd
+  )
+  triples <- triples[triples$diam < diameter, c("a", "b", "c")]
+  rownames(triples) <- NULL
+  triples
 }
