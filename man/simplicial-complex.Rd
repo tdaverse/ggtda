@@ -7,7 +7,7 @@
 \alias{stat_vietoris2}
 \alias{stat_cech1}
 \alias{stat_cech2}
-\title{Skeletons of Vietoris and Čech complexes of a 2-dimensional point cloud}
+\title{Skeletons of Vietoris and Čech complexes}
 \usage{
 stat_disk(mapping = NULL, data = NULL, geom = "polygon",
   position = "identity", na.rm = FALSE, radius = 0, segments = 60,
@@ -50,7 +50,7 @@ the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data; defaults to
-`segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
+\code{segment} in \code{geom_vietoris1()} and to \code{polygon} in \code{geom_vietoris2}. Pass
 a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
@@ -74,35 +74,40 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
-\item{...}{Additional arguments passed to [ggplot2::layer()].}
+\item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
 \item{diameter}{A positive number; the distance between points at which
 segments will not be included.}
 }
 \description{
-The *Vietoris complex* of a point cloud is a simplicial complex consisting of
-a simplex for each subset of points within a fixed diameter of each other.
-The *Čech complex* consists of a simplex for each subset that lies within a
-circle of fixed diameter. (This means that the Čech complex relies on the
-ambient geometry of the point cloud, while the Vietoris complex relies only
-on the inter-point distances.)
+Annotate 2-dimensional point clouds with TDA constructions.
 }
 \details{
-The *1-skeleton* of a complex consists of all points (0-simplices) and edges
-between pairs (1-simplices), and the *2-skeleton* additionally faces among
+These plot layers are useful for exposition and education; they illustrate
+constructions used by TDA methods but cannot be pipelined into those methods.
+
+The \emph{Vietoris complex} of a point cloud is a simplicial complex consisting of
+a simplex for each subset of points within a fixed diameter of each other.
+The \emph{Čech complex} consists of a simplex for each subset that lies within a
+circle of fixed diameter. (This means that the Čech complex depends on the
+geometry of the ambient space containing the point cloud, while the Vietoris
+complex depends only on the inter-point distances.)
+
+The \emph{1-skeleton} of a complex consists of all points (0-simplices) and edges
+between pairs (1-simplices), and the \emph{2-skeleton} additionally faces among
 triples (2-simplices), of the complex.
 
-Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
-Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
-`stat_vietoris2()` encodes the faces using `x`, `y`, and `group` for
-`geom_polygon()`. The edges of a Čech complex are exactly those of the
-Vietoris complex, so `stat_cech1()` is an alias for `stat_vietoris1()`, while
-`stat_cech2()` encodes the faces of the Čech complex in the same way as
-`stat_vietoris2()` those of the Vietoris complex. Note that these stat layers
+Given \code{x} and \code{y} coordinates, \code{stat_vietoris1()} encodes the edges of the
+Vietoris complex using \code{x}, \code{y}, \code{xend}, and \code{yend} for \code{geom_segment()}, and
+\code{stat_vietoris2()} encodes the faces using \code{x}, \code{y}, and \code{group} for
+\code{geom_polygon()}. The edges of a Čech complex are exactly those of the
+Vietoris complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}, while
+\code{stat_cech2()} encodes the faces of the Čech complex in the same way as
+\code{stat_vietoris2()} those of the Vietoris complex. Note that these stat layers
 encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
-they can be combined with `geom_point()`.
+they can be combined with \code{geom_point()}.
 }
 \seealso{
-[ggplot2::layer()] for additional arguments.
+\code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 }
 \concept{point cloud plot layers}

@@ -4,11 +4,11 @@
 \name{ggtda}
 \alias{ggtda}
 \alias{ggtda-package}
-\title{A *ggplot2* Extension for Persistence Data}
+\title{A \emph{ggplot2} Extension for Persistence Data}
 \description{
-*ggtda* is a user-friendly *ggplot2* extension for visualizing data arising
+\emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing data arising
 from topological data analysis pipelines, in particular persistence data.
-Once persistent homology as been computed, *tidyverse* useRs can efficiently
+Once persistent homology as been computed, \emph{tidyverse} useRs can efficiently
 visualize the persistence of features within the "layered grammar of
-graphics" framework of *ggplot2*.
+graphics" framework of \emph{ggplot2}.
 }

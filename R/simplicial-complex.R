@@ -1,11 +1,18 @@
-#' Skeletons of Vietoris and Čech complexes of a 2-dimensional point cloud
+#' @title Skeletons of Vietoris and Čech complexes
+#'
+#' @description Annotate 2-dimensional point clouds with TDA constructions.
+#'
+#' @details
+#'
+#' These plot layers are useful for exposition and education; they illustrate
+#' constructions used by TDA methods but cannot be pipelined into those methods.
 #'
 #' The *Vietoris complex* of a point cloud is a simplicial complex consisting of
 #' a simplex for each subset of points within a fixed diameter of each other.
 #' The *Čech complex* consists of a simplex for each subset that lies within a
-#' circle of fixed diameter. (This means that the Čech complex relies on the
-#' ambient geometry of the point cloud, while the Vietoris complex relies only
-#' on the inter-point distances.)
+#' circle of fixed diameter. (This means that the Čech complex depends on the
+#' geometry of the ambient space containing the point cloud, while the Vietoris
+#' complex depends only on the inter-point distances.)
 #'
 #' The *1-skeleton* of a complex consists of all points (0-simplices) and edges
 #' between pairs (1-simplices), and the *2-skeleton* additionally faces among
@@ -299,21 +306,21 @@ proximate_pairs <- function(data, diameter) {
 
 proximate_triples <- function(data, diameter) {
   # distances between pairs
-  distances <- data.frame(
+  dists <- data.frame(
     a = rep(1:(nrow(data) - 1), rep((nrow(data) - 1):1)),
     b = unlist(lapply(2:nrow(data), function(k) k:nrow(data))),
     d = as.vector(stats::dist(data))
   )
-  distances <- distances[distances$d < diameter, ]
+  dists <- dists[dists$d < diameter, ]
   # distances among triples
   triples <- merge(
-    distances,
-    transform(distances, c = distances$b, b = distances$a, a = NULL),
+    dists,
+    transform(dists, c = dists$b, b = dists$a, a = NULL),
     by = "b", suffixes = c("_ab", "_bc")
   )
   triples <- merge(
     triples,
-    transform(distances, c = distances$b, b = NULL, d_ac = distances$d, d = NULL),
+    transform(dists, c = dists$b, b = NULL, d_ac = dists$d, d = NULL),
     by = c("a", "c")
   )
   # triples within `diameter` of each other -> circumdiameter
@@ -323,20 +330,29 @@ proximate_triples <- function(data, diameter) {
       (triples$s - triples$d_bc) * (triples$s - triples$d_ac)
   )
   # vectors between pairs
-  triples$x_ab <- data$x[triples$b] - data$x[triples$a]
-  triples$y_ab <- data$y[triples$b] - data$y[triples$a]
-  triples$x_bc <- data$x[triples$c] - data$x[triples$b]
-  triples$y_bc <- data$y[triples$c] - data$y[triples$b]
-  triples$x_ac <- data$x[triples$c] - data$x[triples$a]
-  triples$y_ac <- data$y[triples$c] - data$y[triples$a]
+  triples <- transform(
+    triples,
+    x_ab = data$x[triples$b] - data$x[triples$a],
+    y_ab = data$y[triples$b] - data$y[triples$a],
+    x_bc = data$x[triples$c] - data$x[triples$b],
+    y_bc = data$y[triples$c] - data$y[triples$b],
+    x_ac = data$x[triples$c] - data$x[triples$a],
+    y_ac = data$y[triples$c] - data$y[triples$a]
+  )
   # inner products of vectors within triples
-  triples$d_a <- triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac
-  triples$d_b = triples$x_ab * triples$x_bc + triples$y_ab * triples$y_bc
-  triples$d_c = triples$x_ac * triples$x_bc + triples$y_ac * triples$y_bc
+  triples <- transform(
+    triples,
+    d_a <- triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac,
+    d_b = triples$x_ab * triples$x_bc + triples$y_ab * triples$y_bc,
+    d_c = triples$x_ac * triples$x_bc + triples$y_ac * triples$y_bc
+  )
   # angles among triples
-  triples$t_a = acos(triples$d_a / (triples$d_ab * triples$d_ac))
-  triples$t_b = acos(triples$d_b / (triples$d_ab * triples$d_bc))
-  triples$t_c = acos(triples$d_c / (triples$d_ac * triples$d_bc))
+  triples <- transform(
+    triples,
+    t_a = acos(triples$d_a / (triples$d_ab * triples$d_ac)),
+    t_b = acos(triples$d_b / (triples$d_ab * triples$d_bc)),
+    t_c = acos(triples$d_c / (triples$d_ac * triples$d_bc))
+  )
   # if any angle is obtuse, longest side length; otherwise, circumdiameter
   triples$diam <- ifelse(
     pmax(triples$t_a, triples$t_b, triples$t_c) > pi/2,

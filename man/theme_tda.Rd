@@ -11,7 +11,7 @@ A simple theme to clearly display persistent homology.
 This minimalistic theme omits plot components that are
 unnecessary in the context of persistent homology
 (e.g. gridlines, background color).
-The `theme_tda` function should get you close to a publication-quality
+The \code{theme_tda} function should get you close to a publication-quality
 plot
 }
 \seealso{

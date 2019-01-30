@@ -30,14 +30,14 @@ the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{stat}{The The statistical transformation to use on the data.
-Defaults to `identity`; pass a string to override the default.}
+Defaults to \code{identity}; pass a string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
 \item{na.rm}{Logical:
-if `FALSE`, the default, `NA` lodes are not included;
-if `TRUE`, `NA` lodes constitute a separate category,
+if \code{FALSE}, the default, \code{NA} lodes are not included;
+if \code{TRUE}, \code{NA} lodes constitute a separate category,
 plotted in grey (regardless of the color scheme).}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
@@ -51,7 +51,7 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
-\item{...}{Additional arguments passed to [ggplot2::layer()].}
+\item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 }
 \description{
 Visualize persistence data in a barcode diagram.
@@ -84,7 +84,7 @@ ggplot(circ.phom, aes(start = birth, end = death,
   theme_barcode()
 }
 \seealso{
-[ggplot2::layer()] for additional arguments.
+\code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other TDA plot layers: \code{\link{persist}}
 }
