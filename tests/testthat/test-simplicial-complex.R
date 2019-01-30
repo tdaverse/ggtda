@@ -19,6 +19,27 @@ test_that("Vietoris-Rips distance calculations run fine", {
   expect_equal(expected, output)
 })
 
+test_that("Cech geom(s) and stat(s) work correctly", {
+  # sample dataset - noisy circle
+  angles <- runif(100, 0, 2 * pi)
+  annulus <- cbind(x = cos(angles) + rnorm(100, 0, 0.2),
+                   y = sin(angles) + rnorm(100, 0, 0.2))
+  
+  # build ggplot2 objects without plotting
+  annulus_df <- as.data.frame(annulus)
+  cech1.gg <- ggplot(annulus_df, aes(x = x, y = y)) +
+    stat_cech1(diameter = 0.7, alpha = 0.25) +
+    geom_point()
+  cech2.gg <- ggplot(annulus_df, aes(x = x, y = y)) +
+    stat_cech2(diameter = 0.7, alpha = 0.1) +
+    geom_point()
+  
+  # run tests - not doing much, just making sure there's no errors
+  #   before this point
+  expect_true(is.ggplot(cech1.gg))
+  expect_true(is.ggplot(cech2.gg))
+})
+
 test_that("Vietoris-Rips geom(s) and stat(s) work correctly", {
   # sample dataset - noisy circle
   angles <- runif(100, 0, 2 * pi)
