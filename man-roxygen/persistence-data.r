@@ -9,11 +9,6 @@
 #'
 #'   **ggtda** expects persistence data to have at least three columns: birth,
 #'   death, and dimension.
-#'   
-
-#' @references
 #'
-#' F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
-#' fundamental and practical aspects for data scientists.
-#' \url{https://arxiv.org/abs/1710.04019}
-#' 
+#' @template ref-chazal2017
+#'   

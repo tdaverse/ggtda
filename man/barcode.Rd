@@ -113,16 +113,12 @@ ggplot(circ.phom, aes(start = birth, end = death,
   theme_barcode()
 }
 \references{
-F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
-fundamental and practical aspects for data scientists.
-\url{https://arxiv.org/abs/1710.04019}
-
 G Carlsson, A Zomorodian, A Collins, and L Guibas (2004) Persistence barcodes
 for shapes. \emph{Proceedings of the 2004 Eurographics/ACM SIGGRAPH symposium on
 Geometry processing}, 124--135. \doi{10.1145/1057432.1057449}
 
-G Carlsson (2014) Topological pattern recognition for point cloud data.
-\emph{Acta Numerica} \strong{23}, 289--368. \doi{10.1017/S0962492914000051}
+G Carlsson (2014) Topological pattern recognition for point cloud data. \emph{Acta
+Numerica} \strong{23}, 289--368. \doi{10.1017/S0962492914000051}
 
 F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
 fundamental and practical aspects for data scientists.

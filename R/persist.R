@@ -21,16 +21,9 @@
 #'   diagrams, often with a diagonal line indicating zero persistence.
 #'   
 
-#' @references
-#'
-#' H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
-#' and simplification. *Proceedings 41st Annual Symposium on Foundations of
-#' Computer Science*, 454--463. \doi{10.1109/SFCS.2000.892133}
-#'
-#' F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
-#' fundamental and practical aspects for data scientists.
-#' \url{https://arxiv.org/abs/1710.04019}
-#' 
+#' @template ref-edelsbrunner2000
+#' @template ref-chazal2017
+#'   
 
 #' @name persist
 #' @import ggplot2
