@@ -26,7 +26,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{stat}{The The statistical transformation to use on the data.
@@ -56,6 +56,35 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 \description{
 Visualize persistence data in a barcode diagram.
 }
+\details{
+\emph{Barcodes} or \emph{barcode diagrams} are \href{https://ggplot2.tidyverse.org/reference/geom_linerange.html}{vertical interval plots} of
+persistence data.
+}
+\section{Persistence data}{
+
+
+\emph{Persistence data} encode the values of an underlying parameter
+\eqn{\epsilon} at which topological features appear ("birth") and disappear
+("death"). The difference between the birth and the death of a feature is
+called its \emph{persistence}. Whereas topological features may be of different
+dimensions, persistence data sets usually also include the dimension of
+each feature.
+
+\strong{ggtda} expects persistence data to have at least three columns: birth,
+death, and dimension.
+}
+
+\section{Barcodes}{
+
+
+Barcodes traditionally extend along the horizontal axis and are arranged
+vertically in order of group (e.g. dimension) and birth. They may also be
+transposed and juxtaposed with \href{persist}{persistence diagrams}. While
+topological features of different dimensions are usually plotted together
+in persistence diagrams, barcodes often separate segments corresponding to
+features of different dimension, by vertical grouping or by faceting.
+}
+
 \examples{
 #####EXAMPLE 1#####
 # toy example
@@ -83,9 +112,25 @@ ggplot(circ.phom, aes(start = birth, end = death,
   geom_barcode() +
   theme_barcode()
 }
+\references{
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
+
+G Carlsson, A Zomorodian, A Collins, and L Guibas (2004) Persistence barcodes
+for shapes. \emph{Proceedings of the 2004 Eurographics/ACM SIGGRAPH symposium on
+Geometry processing}, 124--135. \doi{10.1145/1057432.1057449}
+
+G Carlsson (2014) Topological pattern recognition for point cloud data.
+\emph{Acta Numerica} \strong{23}, 289--368. \doi{10.1017/S0962492914000051}
+
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
+}
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
-Other TDA plot layers: \code{\link{persist}}
+Other plot layers for persistence data: \code{\link{persist}}
 }
-\concept{TDA plot layers}
+\concept{plot layers for persistence data}

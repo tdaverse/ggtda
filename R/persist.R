@@ -1,11 +1,40 @@
-#' Persistence diagrams
+#' @title Persistence diagrams
+#'
+#' @description Visualize persistence data in a (flat or diagonal) persistence
+#'   diagram.
+#'
+
+#' @details
+#'
+#' *Persistence diagrams* are
+#' [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
+#' persistence data.
 #' 
-#' Visualize persistence data in a (flat or diagonal) persistence diagram.
+
+#' @template persistence-data
+#'
+
+#' @section Persistence diagrams:
+#'
+#'   The original persistence diagrams plotted persistence against birth in what
+#'   we call "flat" diagrams, but most plot death against birth in "diagonal"
+#'   diagrams, often with a diagonal line indicating zero persistence.
+#'   
+
+#' @references
+#'
+#' H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
+#' and simplification. *Proceedings 41st Annual Symposium on Foundations of
+#' Computer Science*, 454--463. \doi{10.1109/SFCS.2000.892133}
+#'
+#' F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+#' fundamental and practical aspects for data scientists.
+#' \url{https://arxiv.org/abs/1710.04019}
 #' 
 
 #' @name persist
 #' @import ggplot2
-#' @family TDA plot layers
+#' @family plot layers for persistence data
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical:
 #'   if `FALSE`, the default, `NA` lodes are not included;

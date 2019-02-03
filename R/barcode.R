@@ -1,11 +1,45 @@
-#' Barcodes
+#' @title Barcodes
 #'
-#' Visualize persistence data in a barcode diagram.
+#' @description Visualize persistence data in a barcode diagram.
 #'
+
+#' @details
+#'
+#' *Barcodes* or *barcode diagrams* are [vertical interval
+#' plots](https://ggplot2.tidyverse.org/reference/geom_linerange.html) of
+#' persistence data.
+#' 
+
+#' @template persistence-data
+#' 
+
+#' @section Barcodes:
+#'
+#'   Barcodes traditionally extend along the horizontal axis and are arranged
+#'   vertically in order of group (e.g. dimension) and birth. They may also be
+#'   transposed and juxtaposed with [persistence diagrams](persist). While
+#'   topological features of different dimensions are usually plotted together
+#'   in persistence diagrams, barcodes often separate segments corresponding to
+#'   features of different dimension, by vertical grouping or by faceting.
+#'   
+
+#' @references
+#'
+#' G Carlsson, A Zomorodian, A Collins, and L Guibas (2004) Persistence barcodes
+#' for shapes. *Proceedings of the 2004 Eurographics/ACM SIGGRAPH symposium on
+#' Geometry processing*, 124--135. \doi{10.1145/1057432.1057449}
+#' 
+#' G Carlsson (2014) Topological pattern recognition for point cloud data.
+#' *Acta Numerica* **23**, 289--368. \doi{10.1017/S0962492914000051}
+#' 
+#' F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+#' fundamental and practical aspects for data scientists.
+#' \url{https://arxiv.org/abs/1710.04019}
+#' 
 
 #' @name barcode
 #' @import ggplot2
-#' @family TDA plot layers
+#' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical:

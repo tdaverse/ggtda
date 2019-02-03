@@ -26,7 +26,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{stat}{The statistical transformation to use on the data.
@@ -57,8 +57,36 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 }
 \description{
-Visualize persistence data in a (flat or diagonal) persistence diagram.
+Visualize persistence data in a (flat or diagonal) persistence
+diagram.
 }
+\details{
+\emph{Persistence diagrams} are
+\href{https://ggplot2.tidyverse.org/reference/geom_point.html}{scatterplots} of
+persistence data.
+}
+\section{Persistence data}{
+
+
+\emph{Persistence data} encode the values of an underlying parameter
+\eqn{\epsilon} at which topological features appear ("birth") and disappear
+("death"). The difference between the birth and the death of a feature is
+called its \emph{persistence}. Whereas topological features may be of different
+dimensions, persistence data sets usually also include the dimension of
+each feature.
+
+\strong{ggtda} expects persistence data to have at least three columns: birth,
+death, and dimension.
+}
+
+\section{Persistence diagrams}{
+
+
+The original persistence diagrams plotted persistence against birth in what
+we call "flat" diagrams, but most plot death against birth in "diagonal"
+diagrams, often with a diagonal line indicating zero persistence.
+}
+
 \examples{
 #####EXAMPLE 1#####
 # toy example
@@ -99,7 +127,20 @@ ggplot(annulus.phom, aes(start = birth, end = death,
   geom_persist(diag = TRUE) +
   theme_persist()
 }
-\seealso{
-Other TDA plot layers: \code{\link{barcode}}
+\references{
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
+
+H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
+and simplification. \emph{Proceedings 41st Annual Symposium on Foundations of
+Computer Science}, 454--463. \doi{10.1109/SFCS.2000.892133}
+
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
 }
-\concept{TDA plot layers}
+\seealso{
+Other plot layers for persistence data: \code{\link{barcode}}
+}
+\concept{plot layers for persistence data}

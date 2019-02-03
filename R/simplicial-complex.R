@@ -31,7 +31,7 @@
 
 #' @name simplicial-complex
 #' @import ggplot2
-#' @family point cloud plot layers
+#' @family plot layers for point cloud
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical; ignored.

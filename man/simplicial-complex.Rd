@@ -46,7 +46,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data; defaults to
@@ -110,4 +110,4 @@ they can be combined with \code{geom_point()}.
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 }
-\concept{point cloud plot layers}
+\concept{plot layers for point cloud}
