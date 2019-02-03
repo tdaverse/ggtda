@@ -127,6 +127,7 @@ fundamental and practical aspects for data scientists.
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
-Other plot layers for persistence data: \code{\link{persist}}
+Other plot layers for persistence data: \code{\link{landscape}},
+  \code{\link{persist}}
 }
 \concept{plot layers for persistence data}

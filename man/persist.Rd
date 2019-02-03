@@ -137,6 +137,7 @@ fundamental and practical aspects for data scientists.
 \url{https://arxiv.org/abs/1710.04019}
 }
 \seealso{
-Other plot layers for persistence data: \code{\link{barcode}}
+Other plot layers for persistence data: \code{\link{barcode}},
+  \code{\link{landscape}}
 }
 \concept{plot layers for persistence data}

@@ -196,4 +196,4 @@ fundamental and practical aspects for data scientists.
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 }
-\concept{plot layers for point cloud}
+\concept{plot layers for point clouds}
