@@ -103,9 +103,10 @@ circle of fixed diameter. (This means that the Čech complex depends on the
 geometry of the ambient space containing the point cloud, while the Vietoris
 complex depends only on the inter-point distances.)
 
-The \emph{1-skeleton} of a complex consists of all points (0-simplices) and edges
-between pairs (1-simplices), and the \emph{2-skeleton} additionally faces among
-triples (2-simplices), of the complex.
+The \emph{0-skeleton} of a complex consists of its vertices (0-simplices), the
+\emph{1-skeleton} additionally the edges between pairs of vertices (1-simplices),
+and the \emph{2-skeleton} additionally faces among triples of vertices
+(2-simplices).
 
 Given \code{x} and \code{y} coordinates, \code{stat_vietoris1()} encodes the edges of the
 Vietoris complex using \code{x}, \code{y}, \code{xend}, and \code{yend} for \code{geom_segment()}, and
@@ -115,7 +116,9 @@ Vietoris complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}
 \code{stat_cech2()} encodes the faces of the Čech complex in the same way as
 \code{stat_vietoris2()} those of the Vietoris complex. Note that these stat layers
 encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
-they can be combined with \code{geom_point()}.
+they can be combined with \code{geom_vietoris0()} or \code{geom_cech0()}, which are
+aliases for \code{\link[ggplot2:stat_identity]{ggplot2::stat_identity()}} that default to
+\code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.
 }
 \examples{
 # function to generate noisy 2D circles
