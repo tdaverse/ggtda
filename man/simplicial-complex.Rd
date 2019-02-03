@@ -107,6 +107,11 @@ Vietoris complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}
 encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
 they can be combined with \code{geom_point()}.
 }
+\references{
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
+}
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 }
