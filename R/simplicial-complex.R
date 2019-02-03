@@ -29,9 +29,12 @@
 #' they can be combined with `geom_point()`.
 #' 
 
+#' @template ref-chazal2017
+#' 
+
 #' @name simplicial-complex
 #' @import ggplot2
-#' @family point cloud plot layers
+#' @family plot layers for point cloud
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical; ignored.
@@ -44,7 +47,7 @@
 #' @param segments The number of segments to be used in drawing each disk.
 #' @param diameter A positive number; the distance between points at which
 #'   segments will not be included.
-#' @example inst/examples/ex-vietoris.R
+#' @example inst/examples/ex-simplicial-complex.R
 
 #' @rdname simplicial-complex
 #' @export
@@ -109,6 +112,40 @@ StatDisk <- ggproto(
     # return circles data
     data
   }
+)
+
+#' @rdname simplicial-complex
+#' @export
+stat_vietoris0 <- function(mapping = NULL,
+                           data = NULL,
+                           geom = "point",
+                           position = "identity",
+                           na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE,
+                           ...) {
+  layer(
+    stat = StatVietoris0,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatVietoris0 <- ggproto(
+  "StatVietoris0", StatIdentity,
+  
+  required_aes = c("x", "y")
 )
 
 #' @rdname simplicial-complex
@@ -238,6 +275,40 @@ StatVietoris2 <- ggproto(
     # return the faces data
     res
   }
+)
+
+#' @rdname simplicial-complex
+#' @export
+stat_cech0 <- function(mapping = NULL,
+                       data = NULL,
+                       geom = "point",
+                       position = "identity",
+                       na.rm = FALSE,
+                       show.legend = NA,
+                       inherit.aes = TRUE,
+                       ...) {
+  layer(
+    stat = StatCech0,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatCech0 <- ggproto(
+  "StatCech0", StatIdentity,
+  
+  required_aes = c("x", "y")
 )
 
 #' @rdname simplicial-complex

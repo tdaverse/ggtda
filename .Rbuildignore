@@ -1,10 +1,16 @@
+# package infrastructure
+^README\.md$
+^LICENSE$
+data-raw
+man-roxygen
+^NEWS\.md$
+^cran-comments\.md$
+
+# R project metadata
+^.*\.Rproj$
+^\.Rproj\.user$
+
+# hosting metadata
 ^codecov\.yml$
 ^appveyor\.yml$
 ^\.travis\.yml$
-^.*\.Rproj$
-^\.Rproj\.user$
-^README\.md$
-^cran-comments\.md$
-^NEWS\.md$
-^LICENSE$
-data-raw

@@ -1,11 +1,36 @@
-#' Barcodes
+#' @title Barcodes
 #'
-#' Visualize persistence data in a barcode diagram.
+#' @description Visualize persistence data in a barcode diagram.
 #'
+
+#' @details
+#'
+#' *Barcodes* or *barcode diagrams* are [vertical interval
+#' plots](https://ggplot2.tidyverse.org/reference/geom_linerange.html) of
+#' persistence data.
+#' 
+
+#' @template persistence-data
+#' 
+
+#' @section Barcodes:
+#'
+#'   Barcodes traditionally extend along the horizontal axis and are arranged
+#'   vertically in order of group (e.g. dimension) and birth. They may also be
+#'   transposed and juxtaposed with [persistence diagrams](persist). While
+#'   topological features of different dimensions are usually plotted together
+#'   in persistence diagrams, barcodes often separate segments corresponding to
+#'   features of different dimension, by vertical grouping or by faceting.
+#'   
+
+#' @template ref-carlsson2004
+#' @template ref-carlsson2014
+#' @template ref-chazal2017
+#'   
 
 #' @name barcode
 #' @import ggplot2
-#' @family TDA plot layers
+#' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical:

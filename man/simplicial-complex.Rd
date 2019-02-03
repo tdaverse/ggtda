@@ -3,8 +3,10 @@
 \name{simplicial-complex}
 \alias{simplicial-complex}
 \alias{stat_disk}
+\alias{stat_vietoris0}
 \alias{stat_vietoris1}
 \alias{stat_vietoris2}
+\alias{stat_cech0}
 \alias{stat_cech1}
 \alias{stat_cech2}
 \title{Skeletons of Vietoris and Čech complexes}
@@ -13,6 +15,10 @@ stat_disk(mapping = NULL, data = NULL, geom = "polygon",
   position = "identity", na.rm = FALSE, radius = 0, segments = 60,
   show.legend = NA, inherit.aes = TRUE, ...)
 
+stat_vietoris0(mapping = NULL, data = NULL, geom = "point",
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
+
 stat_vietoris1(mapping = NULL, data = NULL, geom = "segment",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
@@ -20,6 +26,10 @@ stat_vietoris1(mapping = NULL, data = NULL, geom = "segment",
 stat_vietoris2(mapping = NULL, data = NULL, geom = "polygon",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
+
+stat_cech0(mapping = NULL, data = NULL, geom = "point",
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 
 stat_cech1(mapping = NULL, data = NULL, geom = "segment",
   position = "identity", na.rm = FALSE, diameter = Inf,
@@ -46,7 +56,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data; defaults to
@@ -107,7 +117,80 @@ Vietoris complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}
 encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
 they can be combined with \code{geom_point()}.
 }
+\examples{
+# function to generate noisy 2D circles
+make_noisy_circle <- function(n, sd = .01) {
+  theta <- stats::runif(n = n, min = 0, max = 2*pi)
+  cbind(x = cos(theta) + stats::rnorm(n, 0, sd),
+        y = sin(theta) + stats::rnorm(n, 0, sd))
+}
+
+# generate a noisy 2D circle
+set.seed(1)
+d <- as.data.frame(make_noisy_circle(n = 40, sd = .15))
+
+# plot balls beneath points
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  geom_point()
+
+# plot Vietoris 1-skeleton
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_vietoris1(diameter = .7, alpha = .25) +
+  stat_vietoris0()
+
+# plot Vietoris 2-skeleton
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris1(diameter = .7, alpha = .25) +
+  stat_vietoris0()
+
+# plot Čech 2-skeleton
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_cech1(diameter = .7, alpha = .25) +
+  stat_cech0()
+
+# plot Vietoris 1-skeleton atop balls
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_vietoris1(diameter = .7, size = .2) +
+  stat_vietoris0(size = .3)
+
+# plot Vietoris 2-skeleton atop balls
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris1(diameter = .7, size = .2) +
+  stat_vietoris0(size = .3)
+
+# plot Čech 2-skeleton atop balls
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_cech1(diameter = .7, size = .2) +
+  stat_cech0(size = .3)
+}
+\references{
+F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
+fundamental and practical aspects for data scientists.
+\url{https://arxiv.org/abs/1710.04019}
+}
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 }
-\concept{point cloud plot layers}
+\concept{plot layers for point cloud}
