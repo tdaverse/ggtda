@@ -17,6 +17,7 @@
 #' @param diag default `FALSE` to plot flat persistence diagram; `TRUE` will
 #'   plot a diagonal persistence diagram.
 #' @example inst/examples/ex-persist.R
+
 #' @rdname persist
 #' @export
 geom_persist <- function(mapping = NULL,
