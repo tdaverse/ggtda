@@ -14,9 +14,10 @@
 #' geometry of the ambient space containing the point cloud, while the Vietoris
 #' complex depends only on the inter-point distances.)
 #'
-#' The *1-skeleton* of a complex consists of all points (0-simplices) and edges
-#' between pairs (1-simplices), and the *2-skeleton* additionally faces among
-#' triples (2-simplices), of the complex.
+#' The *0-skeleton* of a complex consists of its vertices (0-simplices), the
+#' *1-skeleton* additionally the edges between pairs of vertices (1-simplices),
+#' and the *2-skeleton* additionally faces among triples of vertices
+#' (2-simplices).
 #'
 #' Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
 #' Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
@@ -26,7 +27,9 @@
 #' `stat_cech2()` encodes the faces of the Čech complex in the same way as
 #' `stat_vietoris2()` those of the Vietoris complex. Note that these stat layers
 #' encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
-#' they can be combined with `geom_point()`.
+#' they can be combined with `geom_vietoris0()` or `geom_cech0()`, which are
+#' aliases for [ggplot2::stat_identity()] that default to
+#' [ggplot2::geom_point()].
 #' 
 
 #' @template ref-chazal2017
@@ -151,14 +154,14 @@ StatVietoris0 <- ggproto(
 #' @rdname simplicial-complex
 #' @export
 stat_vietoris1 <- function(mapping = NULL,
-                          data = NULL,
-                          geom = "segment",
-                          position = "identity",
-                          na.rm = FALSE,
-                          diameter = Inf,
-                          show.legend = NA,
-                          inherit.aes = TRUE,
-                          ...) {
+                           data = NULL,
+                           geom = "segment",
+                           position = "identity",
+                           na.rm = FALSE,
+                           diameter = Inf,
+                           show.legend = NA,
+                           inherit.aes = TRUE,
+                           ...) {
   layer(
     stat = StatVietoris1,
     data = data,
@@ -279,37 +282,7 @@ StatVietoris2 <- ggproto(
 
 #' @rdname simplicial-complex
 #' @export
-stat_cech0 <- function(mapping = NULL,
-                       data = NULL,
-                       geom = "point",
-                       position = "identity",
-                       na.rm = FALSE,
-                       show.legend = NA,
-                       inherit.aes = TRUE,
-                       ...) {
-  layer(
-    stat = StatCech0,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatCech0 <- ggproto(
-  "StatCech0", StatIdentity,
-  
-  required_aes = c("x", "y")
-)
+stat_cech0 <- stat_vietoris0
 
 #' @rdname simplicial-complex
 #' @export

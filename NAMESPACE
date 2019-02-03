@@ -2,7 +2,6 @@
 
 export(GeomBarcode)
 export(GeomPersist)
-export(StatCech0)
 export(StatCech2)
 export(StatDisk)
 export(StatVietoris0)
