@@ -7,8 +7,10 @@
 \alias{ggtda-ggproto}
 \alias{GeomPersist}
 \alias{StatDisk}
+\alias{StatVietoris0}
 \alias{StatVietoris1}
 \alias{StatVietoris2}
+\alias{StatCech0}
 \alias{StatCech2}
 \title{Base \code{ggproto} classes for \emph{ggtda}}
 \format{An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.}

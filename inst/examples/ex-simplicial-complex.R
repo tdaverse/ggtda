@@ -21,7 +21,7 @@ ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
   stat_vietoris1(diameter = .7, alpha = .25) +
-  geom_point()
+  stat_vietoris0()
 
 # plot Vietoris 2-skeleton
 ggplot(d, aes(x = x, y = y)) +
@@ -29,7 +29,7 @@ ggplot(d, aes(x = x, y = y)) +
   coord_fixed() +
   stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
   stat_vietoris1(diameter = .7, alpha = .25) +
-  geom_point()
+  stat_vietoris0()
 
 # plot Čech 2-skeleton
 ggplot(d, aes(x = x, y = y)) +
@@ -37,7 +37,7 @@ ggplot(d, aes(x = x, y = y)) +
   coord_fixed() +
   stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
   stat_cech1(diameter = .7, alpha = .25) +
-  geom_point()
+  stat_cech0()
 
 # plot Vietoris 1-skeleton atop balls
 ggplot(d, aes(x = x, y = y)) +
@@ -45,7 +45,7 @@ ggplot(d, aes(x = x, y = y)) +
   coord_fixed() +
   stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   stat_vietoris1(diameter = .7, size = .2) +
-  geom_point(size = .3)
+  stat_vietoris0(size = .3)
 
 # plot Vietoris 2-skeleton atop balls
 ggplot(d, aes(x = x, y = y)) +
@@ -54,7 +54,7 @@ ggplot(d, aes(x = x, y = y)) +
   stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
   stat_vietoris1(diameter = .7, size = .2) +
-  geom_point(size = .3)
+  stat_vietoris0(size = .3)
 
 # plot Čech 2-skeleton atop balls
 ggplot(d, aes(x = x, y = y)) +
@@ -63,4 +63,4 @@ ggplot(d, aes(x = x, y = y)) +
   stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
   stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
   stat_cech1(diameter = .7, size = .2) +
-  geom_point(size = .3)
+  stat_cech0(size = .3)
