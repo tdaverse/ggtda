@@ -3,9 +3,14 @@
 \name{landscape}
 \alias{landscape}
 \alias{stat_landscape}
+\alias{stat_frontier}
 \title{Persistent landscapes}
 \usage{
 stat_landscape(mapping = NULL, data = NULL, geom = "segment",
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
+
+stat_frontier(mapping = NULL, data = NULL, geom = "line",
   position = "identity", na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE, ...)
 }
@@ -26,7 +31,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
+the plot data. The return value must be a \code{data.frame.}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data; defaults to
@@ -65,11 +70,31 @@ toy.data <- data.frame(
   dim = c("0", "0", "2", "1", "1")
 )
 
+# compare the plots below to their analogues using `geom_persist()`
+
 # persistence landscape for each dimension
 ggplot(toy.data, aes(start = birth, end = death)) +
   coord_fixed() +
   facet_wrap(~ dim) +
   stat_landscape()
+
+# combined persistence frontier
+ggplot(toy.data, aes(start = birth, end = death)) +
+  coord_fixed() +
+  stat_frontier()
+
+# grouped persistence frontier
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  coord_fixed() +
+  stat_frontier()
+
+# overlay landscape with frontier
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  coord_fixed() +
+  stat_landscape(linetype = "dashed") +
+  stat_frontier()
+
+# SUGGESTION: `stat_identity/landscape()` w/ `geom_point/segment()`
 }
 \references{
 H Edelsbrunner and D Morozov (2012) Persistent Homology: Theory and Practice.

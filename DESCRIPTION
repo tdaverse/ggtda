@@ -26,7 +26,8 @@ Suggests:
     knitr (>= 1.20),
     rmarkdown (>= 1.10),
     covr (>= 3.1.0),
-    TDAstats (>= 0.4.0)
+    TDAstats (>= 0.4.0),
+    rPref (>= 1.2)
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)

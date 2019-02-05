@@ -5,8 +5,28 @@ toy.data <- data.frame(
   dim = c("0", "0", "2", "1", "1")
 )
 
+# compare the plots below to their analogues using `geom_persist()`
+
 # persistence landscape for each dimension
 ggplot(toy.data, aes(start = birth, end = death)) +
   coord_fixed() +
   facet_wrap(~ dim) +
   stat_landscape()
+
+# combined persistence frontier
+ggplot(toy.data, aes(start = birth, end = death)) +
+  coord_fixed() +
+  stat_frontier()
+
+# grouped persistence frontier
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  coord_fixed() +
+  stat_frontier()
+
+# overlay landscape with frontier
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  coord_fixed() +
+  stat_landscape(linetype = "dashed") +
+  stat_frontier()
+
+# SUGGESTION: `stat_identity/landscape()` w/ `geom_point/segment()`

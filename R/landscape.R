@@ -87,3 +87,76 @@ StatLandscape <- ggproto(
     data
   }
 )
+
+#' @rdname landscape
+#' @export
+stat_frontier <- function(mapping = NULL,
+                          data = NULL,
+                          geom = "line",
+                          position = "identity",
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE,
+                          ...) {
+  layer(
+    stat = StatFrontier,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatFrontier <- ggproto(
+  "StatFrontier", Stat,
+  
+  required_aes = c("start", "end"),
+  
+  compute_group = function(data, scales) {
+    
+    # first row (for aesthetics)
+    first_row <- data[1, setdiff(names(data), c("start", "end")), drop = FALSE]
+    rownames(first_row) <- NULL
+    
+    # Pareto frontier
+    data <- pareto_persistence(data)
+    
+    # data frame of segments
+    data <- data[order(data$start), ]
+    if (! all(data$end == cummax(data$end))) {
+      warning("`start` and `end` are not anti-sorted.")
+    }
+    data <- data.frame(
+      x = c(rep(data$start, each = 2), data$end[nrow(data)]),
+      y = c(data$start[1], rep(data$end, each = 2))
+    )
+    
+    # rotation transform
+    data <- transform(
+      data,
+      x = (data$x + data$y) / 2,
+      y = (data$y - data$x) / 2
+    )
+    
+    # return frontier data
+    cbind(data, first_row)
+  }
+)
+
+pareto_persistence <- function(data) {
+  if ("rPref" %in% rownames(utils::installed.packages())) {
+    rPref::psel(data, rPref::low("start") * rPref::high("end"))
+  } else {
+    pd <- data[order(data$start, -data$end), ]
+    pd[! duplicated(cummax(pd$end)), ]
+  }
+}

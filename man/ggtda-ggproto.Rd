@@ -6,6 +6,7 @@
 \alias{GeomBarcode}
 \alias{ggtda-ggproto}
 \alias{StatLandscape}
+\alias{StatFrontier}
 \alias{GeomPersist}
 \alias{StatDisk}
 \alias{StatVietoris0}
