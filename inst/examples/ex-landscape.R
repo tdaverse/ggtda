@@ -29,4 +29,7 @@ ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
   stat_landscape(linetype = "dashed") +
   stat_frontier()
 
-# SUGGESTION: `stat_identity/landscape()` w/ `geom_point/segment()`
+# SUGGESTION:
+# `stat_persistence()` & `stat_frontier()`
+# w/ `type = "diagonal"/"flat"/"landscape"`
+# either defaulting to `geom_point/segment()`

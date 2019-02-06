@@ -31,7 +31,7 @@ data. All objects will be fortified to produce a data frame. See
 \code{\link[=fortify]{fortify()}} for which variables will be created.
 
 A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame.}, and
+the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data.}
 
 \item{geom}{The geometric object to use display the data; defaults to
@@ -62,6 +62,31 @@ Visualize persistence data in a persistence landscape.
 \details{
 \emph{Persistence landscapes} can be understood as rotated diagonal \href{persist}{persistence diagrams}.
 }
+\section{Persistence data}{
+
+
+\emph{Persistence data} encode the values of an underlying parameter
+\eqn{\epsilon} at which topological features appear ("birth") and disappear
+("death"). The difference between the birth and the death of a feature is
+called its \emph{persistence}. Whereas topological features may be of different
+dimensions, persistence data sets usually also include the dimension of
+each feature.
+
+\strong{ggtda} expects persistence data to have at least three columns: birth,
+death, and dimension.
+}
+
+\section{Persistence landscapes}{
+
+
+Persistence landscapes, anticipated by some alternative coordinatizations
+of persistence diagrams, were proposed as Lipschitz functions that
+demarcate the Pareto frontiers of persistence diagrams. They can be
+averaged over the diagrams obtained from multiple data sets designed or
+hypothesized to have been generated from the same underlying topological
+structure.
+}
+
 \examples{
 # toy example
 toy.data <- data.frame(
@@ -94,7 +119,10 @@ ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
   stat_landscape(linetype = "dashed") +
   stat_frontier()
 
-# SUGGESTION: `stat_identity/landscape()` w/ `geom_point/segment()`
+# SUGGESTION:
+# `stat_persistence()` & `stat_frontier()`
+# w/ `type = "diagonal"/"flat"/"landscape"`
+# either defaulting to `geom_point/segment()`
 }
 \references{
 H Edelsbrunner and D Morozov (2012) Persistent Homology: Theory and Practice.

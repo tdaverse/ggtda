@@ -9,6 +9,19 @@
 #' diagrams](persist).
 #' 
 
+#' @template persistence-data
+#'
+
+#' @section Persistence landscapes:
+#'
+#'   Persistence landscapes, anticipated by some alternative coordinatizations
+#'   of persistence diagrams, were proposed as Lipschitz functions that
+#'   demarcate the Pareto frontiers of persistence diagrams. They can be
+#'   averaged over the diagrams obtained from multiple data sets designed or
+#'   hypothesized to have been generated from the same underlying topological
+#'   structure.
+#'   
+
 #' @template ref-edelsbrunner2012
 #' @template ref-bubenik2015
 #'   
