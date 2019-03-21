@@ -151,13 +151,13 @@ This finding should be replicated in the persistence diagrams as well.
 
 Flat persistence diagrams plot features as points on a scatterplot.
 Each point corresponds to a single feature (one row in `annulus.phom`), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in `annulus.phom`).
-Flat persistence diagrams are generated using `geom_persist` as follows.
+Flat persistence diagrams are generated using `stat_persistence` as follows.
 
 ```{r flatpersist, fig.height=3.5, fig.width = 4.5}
 # create flat persistence diagram with appropriate theme
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
-  geom_persist() +
+  stat_persistence() +
   xlab("Feature appearance") +
   ylab("Feature persistence") +
   theme_persist()
@@ -166,7 +166,7 @@ ggplot(annulus.phom, aes(start = birth, end = death,
 The `shape` and `colour` aesthetics redundantly discriminate between features of different dimensions.
 This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. due to color-blind readers).
 
-Diagonal persistence diagrams can also be generated with `geom_persist` by setting the `diag` parameter to `TRUE`.
+Diagonal persistence diagrams can also be generated with `stat_persistence` by setting the `diagram` parameter to `"diagonal"`.
 A reference line often helps interpretation of diagonal persistence diagrams so we add one with `geom_abline`.
 Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range.
 
@@ -174,7 +174,7 @@ Aesthetically, it is also generally pleasing to have the vertical and horizontal
 # create diagonal persistence diagrams with adjustments
 ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
-  geom_persist(diag = TRUE) +
+  stat_persistence(diagram = "diagonal") +
   geom_abline(slope = 1, intercept = 0) +
   xlim(c(0, 1.5)) +
   ylim(c(0, 1.5)) +

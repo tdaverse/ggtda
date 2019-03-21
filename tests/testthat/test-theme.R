@@ -8,7 +8,7 @@ test_that("Minimalist TDA theme works correctly", {
   
   # build ggplot2 objects without plotting
   test.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    geom_persist()
+    stat_persistence()
   test.theme1 <- test.gg + theme_persist()
   test.theme2 <- test.gg + theme_barcode()
   
