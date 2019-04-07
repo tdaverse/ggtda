@@ -1,6 +1,22 @@
 context("Test visualization of Vietoris-Rips diagrams")
 library("ggtda")
 
+test_that("Proximate functions work as expected on equilateral triangle", {
+  # equilateral triangle
+  et <- data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
+  # small perturbations from key values
+  eps <- .01
+  
+  # proximate pairs at diameter ~ sqrt(3)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
+  
+  # proximate triples at diameter ~ sqrt(3)
+  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) + eps)), 1)
+  
+})
+
 test_that("Vietoris-Rips distance calculations run fine", {
   # set seed for reproducibility
   set.seed(42)
@@ -10,7 +26,7 @@ test_that("Vietoris-Rips distance calculations run fine", {
   annulus <- cbind(x = cos(angles) + rnorm(10, 0, 0.1),
                    y = sin(angles) + rnorm(10, 0, 0.1))
   
-  # correct output and check for match (row permutation irrelevant so sort first)
+  # correct output and check (row permutation irrelevant so sort first)
   expected <- matrix(c(1, 2, 5, 9, 9, 10), ncol = 2, byrow = TRUE)
   colnames(expected) <- c("a", "b")
   output <- proximate_pairs(annulus, diameter = 0.3)
@@ -19,7 +35,7 @@ test_that("Vietoris-Rips distance calculations run fine", {
   expect_equal(expected, output)
 })
 
-test_that("Cech geom(s) and stat(s) work correctly", {
+test_that("Čech geom(s) and stat(s) work correctly", {
   # sample dataset - noisy circle
   angles <- runif(100, 0, 2 * pi)
   annulus <- cbind(x = cos(angles) + rnorm(100, 0, 0.2),

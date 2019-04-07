@@ -386,7 +386,7 @@ proximate_triples <- function(data, diameter) {
   # inner products of vectors within triples
   triples <- transform(
     triples,
-    d_a <- triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac,
+    d_a = triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac,
     d_b = triples$x_ab * triples$x_bc + triples$y_ab * triples$y_bc,
     d_c = triples$x_ac * triples$x_bc + triples$y_ac * triples$y_bc
   )
