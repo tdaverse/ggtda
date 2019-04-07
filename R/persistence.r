@@ -38,7 +38,7 @@
 #' @template ref-chazal2017
 #'   
 
-#' @name reorganize
+#' @name persistence
 #' @import ggplot2
 #' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -52,10 +52,9 @@
 #'   a string to override the default.
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take
-#' @example inst/examples/ex-persist.R
-#' @example inst/examples/ex-landscape.R
+#' @example inst/examples/ex-persistence.R
 
-#' @rdname reorganize
+#' @rdname persistence
 #' @export
 stat_persistence <- function(mapping = NULL,
                              data = NULL,
@@ -106,7 +105,7 @@ StatPersistence <- ggproto(
   }
 )
 
-#' @rdname reorganize
+#' @rdname persistence
 #' @export
 stat_frontier <- function(mapping = NULL,
                           data = NULL,
