@@ -9,15 +9,15 @@ test_that("Proximate functions work as expected on equilateral triangle", {
   eps <- .01
   
   # proximate pairs at diameter ~ sqrt(3)
-  expect_equal(nrow(ggtda:::proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(ggtda:::proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
   
   # proximate triples at diameter ~ sqrt(3)
-  expect_equal(nrow(ggtda:::proximate_triples(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(ggtda:::proximate_triples(et, diameter = sqrt(3) + eps)), 1)
+  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) + eps)), 1)
 })
 
-test_that("Proximate functions work as expected on noisy circle data", {
+test_that("Vietoris-Rips distance calculations run as expected", {
   
   # pseudorandom dataset (points from noisy circle) w/ seed for reproducibility
   set.seed(42)
@@ -49,7 +49,7 @@ test_that("Ball layer works as expected", {
   expect_is(p, "ggplot")
   expect_is(p$layer[[1]], "ggproto")
   expect_equal(c(p$labels$x, p$labels$y), c("x", "y"))
-  expect_equal(nrow(ggplot_build(p)$data[[1]]), nrow(d) * (60 + 1))
+  expect_equal(nrow(layer_data(p)), nrow(d) * (60 + 1))
 })
 
 test_that("Čech layers work as expected", {
@@ -60,7 +60,7 @@ test_that("Čech layers work as expected", {
   expect_is(p0, "ggplot")
   expect_is(p0$layer[[1]], "ggproto")
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
-  expect_equal(nrow(ggplot_build(p0)$data[[1]]), nrow(d))
+  expect_equal(nrow(layer_data(p0)), nrow(d))
   
   # Čech 1-skeleton stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
@@ -68,7 +68,7 @@ test_that("Čech layers work as expected", {
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(ggplot_build(p1)$data[[1]]), 1097)
+  expect_equal(nrow(layer_data(p1)), 1097)
   
   # Čech 2-skeleton stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
@@ -76,7 +76,7 @@ test_that("Čech layers work as expected", {
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(ggplot_build(p2)$data[[1]]), 12651)
+  expect_equal(nrow(layer_data(p2)), 12651)
 })
 
 test_that("Vietoris layers work as expected", {
