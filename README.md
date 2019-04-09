@@ -61,7 +61,7 @@ d <- data.frame(
 )
 # compute the persistent homology
 ph <- as.data.frame(TDAstats::calculate_homology(as.matrix(d), dim = 1))
-ph <- transform(ph, dimension = as.factor(dimension))
+ph <- transform(ph, dim = as.factor(dimension))
 ```
 
 Second, pick an example proximity, or diameter, at which to recognize
@@ -88,14 +88,24 @@ p_sc <- ggplot(d, aes(x = x, y = y)) +
   stat_cech2(diameter = prox, fill = "darkgoldenrod", alpha = .1) +
   stat_cech1(diameter = prox, alpha = .25) +
   stat_cech0()
+# combine the plots
+gridExtra::grid.arrange(
+  p_d, p_sc,
+  layout_matrix = matrix(c(1, 2), nrow = 1)
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+``` r
 # visualize the persistence data, indicating cutoffs at this proximity
 p_bc <- ggplot(ph,
-       aes(start = birth, end = death, colour = dimension)) +
+       aes(start = birth, end = death, colour = dim)) +
   theme_tda() +
   geom_barcode() +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
 p_pd <- ggplot(ph,
-       aes(start = birth, end = death, colour = dimension)) +
+       aes(start = birth, end = death, colour = dim)) +
   theme_tda() +
   stat_persistence() +
   lims(x = c(0, NA), y = c(0, NA)) +
@@ -105,12 +115,12 @@ p_pd <- ggplot(ph,
   )
 # combine the plots
 gridExtra::grid.arrange(
-  p_d, p_sc, p_bc, p_pd,
-  layout_matrix = matrix(c(1,3, 2,4), nrow = 2)
+  p_bc, p_pd,
+  layout_matrix = matrix(c(1, 2), nrow = 1)
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
 
 ## Contribute
 
