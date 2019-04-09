@@ -45,10 +45,11 @@ We aim to submit ggtda to [CRAN](https://CRAN.R-project.org) soon.
 ## Example
 
 **ggtda** visualizes persistence data but also includes stat layers for
-common TDA constructions. This example illustrates them together. First,
-generate an artificial “noisy circle” data set and calculate its
-persistent homology (PH) using the **TDAstats** package, which ports the
-`ripser` implementation into R:
+common TDA constructions. This example illustrates them together. For
+some artificial data, generate a “noisy circle” and calculate its
+persistent homology (PH) using [the **TDAstats**
+package](https://github.com/rrrlw/TDAstats), which ports [the `ripser`
+implementation](https://github.com/Ripser/ripser) into R:
 
 ``` r
 # generate a noisy circle
@@ -61,22 +62,45 @@ d <- data.frame(
 )
 # compute the persistent homology
 ph <- as.data.frame(TDAstats::calculate_homology(as.matrix(d), dim = 1))
+print(head(ph, n = 12))
+#>    dimension birth      death
+#> 1          0     0 0.02903148
+#> 2          0     0 0.05579919
+#> 3          0     0 0.05754819
+#> 4          0     0 0.06145429
+#> 5          0     0 0.10973364
+#> 6          0     0 0.11006440
+#> 7          0     0 0.11076601
+#> 8          0     0 0.12968679
+#> 9          0     0 0.14783527
+#> 10         0     0 0.15895889
+#> 11         0     0 0.16171041
+#> 12         0     0 0.16548606
 ph <- transform(ph, dim = as.factor(dimension))
 ```
 
-Second, pick an example proximity, or diameter, at which to recognize
-features in the persistence data. This choice corresponds to a specific
-Čech complex in the filtration underlying the calculation of PH. It is
-not the best way to identify features (it ignores persistence), but it
-is easy to link back to the geometric construction.
+Now pick an example proximity at which to recognize features in the
+persistence data. This choice corresponds to a specific Vietoris complex
+in the filtration underlying the PH calculation. (This is not a good way
+to identify features, since it ignores persistence entirely, but it
+intuitively links back to the geometric construction.)
+
+``` r
+# fix a proximity for a Vietoris complex
+prox <- 2/3
+```
+
+Geometrically, the Vietoris complex is constructed based on balls of
+fixed radius around the data points — in the 2-dimensional setting,
+disks (left). The simplicial complex itself consists of a simplex at
+each subset of points having diameter at most `prox` — that is, each
+pair of which are within `prox` of each other.
 
 ``` r
 # attach *ggtda*
 library(ggtda)
 #> Loading required package: ggplot2
-# fix a proximity for a Čech complex
-prox <- 2/3
-# visualize disks of fixed radii and the Čech complex for this proximity
+# visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
@@ -85,9 +109,9 @@ p_d <- ggplot(d, aes(x = x, y = y)) +
 p_sc <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_cech2(diameter = prox, fill = "darkgoldenrod", alpha = .1) +
-  stat_cech1(diameter = prox, alpha = .25) +
-  stat_cech0()
+  stat_vietoris2(diameter = prox, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris1(diameter = prox, alpha = .25) +
+  stat_vietoris0()
 # combine the plots
 gridExtra::grid.arrange(
   p_d, p_sc,
@@ -95,7 +119,11 @@ gridExtra::grid.arrange(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+We can visualize the persistence data using a barcode (left) and a flat
+persistence diagram (right). In each plot, the dashed line indicates the
+cutoff at the proximity `prox` (= 0.6666667).
 
 ``` r
 # visualize the persistence data, indicating cutoffs at this proximity
@@ -103,11 +131,14 @@ p_bc <- ggplot(ph,
        aes(start = birth, end = death, colour = dim)) +
   theme_tda() +
   geom_barcode() +
+  labs(x = "Diameter", y = "Homological features") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
 p_pd <- ggplot(ph,
-       aes(start = birth, end = death, colour = dim)) +
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_tda() +
+  coord_fixed() +
   stat_persistence() +
+  labs(x = "Birth", y = "Persistence") +
   lims(x = c(0, NA), y = c(0, NA)) +
   geom_abline(
     intercept = prox, slope = - 1,
@@ -120,7 +151,20 @@ gridExtra::grid.arrange(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+The barcode shows red lines of varying persistence for the 0-dimensional
+features, i.e. the gaps between connected components, and one blue line
+for the 1-dimensional feature, i.e. the loop. These groups of lines do
+not overlap, which means that the loop exists only in the persistence
+domain where all the data points are part of the same connected
+component. Because our choice of `prox` is between the birth and death
+of the loop, the simplicial complex above recovers it.
+
+The persistence diagram clearly shows that the loop persists for longer
+than any of the gaps. This is consistent with the gaps being artifacts
+of the sampling procedure while the loop being an intrinsic property of
+the underlying distribution.
 
 ## Contribute
 
