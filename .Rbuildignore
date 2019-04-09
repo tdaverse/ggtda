@@ -1,5 +1,6 @@
 # package infrastructure
 ^README\.md$
+^README\.Rmd$
 ^LICENSE$
 data-raw
 man-roxygen
@@ -9,7 +10,6 @@ man-roxygen
 # R project metadata
 ^.*\.Rproj$
 ^\.Rproj\.user$
-
 # hosting metadata
 ^codecov\.yml$
 ^appveyor\.yml$
