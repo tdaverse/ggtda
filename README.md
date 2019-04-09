@@ -31,49 +31,6 @@ The development version of **ggtda** can be installed used the
 ``` r
 # install from GitHub
 remotes::install_github("rrrlw/ggtda", vignettes = TRUE)
-#> Downloading GitHub repo rrrlw/ggtda@master
-#> ggplot2 (3.1.0 -> 3.1.1) [CRAN]
-#> rlang   (0.3.3 -> 0.3.4) [CRAN]
-#> Installing 2 packages: ggplot2, rlang
-#> Installing packages into '/private/var/folders/gf/zt09cmj52pn18v2vlp_2d3w80000gp/T/Rtmp3WUAdL/temp_libpath4a0b49092ea9'
-#> (as 'lib' is unspecified)
-#> 
-#> The downloaded binary packages are in
-#>  /var/folders/gf/zt09cmj52pn18v2vlp_2d3w80000gp/T//Rtmp3WUAdL/downloaded_packages
-#>   
-   checking for file ‘/private/var/folders/gf/zt09cmj52pn18v2vlp_2d3w80000gp/T/Rtmp3WUAdL/remotes4a0b55e62924/rrrlw-ggtda-1e1744e/DESCRIPTION’ ...
-  
-✔  checking for file ‘/private/var/folders/gf/zt09cmj52pn18v2vlp_2d3w80000gp/T/Rtmp3WUAdL/remotes4a0b55e62924/rrrlw-ggtda-1e1744e/DESCRIPTION’
-#> 
-  
-─  preparing ‘ggtda’:
-#> 
-  
-   checking DESCRIPTION meta-information ...
-  
-✔  checking DESCRIPTION meta-information
-#> 
-  
-─  installing the package to process help pages
-#> 
-  
-─  saving partial Rd database (1.6s)
-#> 
-  
-─  checking for LF line-endings in source and make files and shell scripts
-#> 
-  
-─  checking for empty or unneeded directories
-#> ─  looking to see if a ‘data/datalist’ file should be added
-#> 
-  
-   
-#> 
-  
-─  building ‘ggtda_0.1.0.tar.gz’
-#> 
-#> Installing package into '/private/var/folders/gf/zt09cmj52pn18v2vlp_2d3w80000gp/T/Rtmp3WUAdL/temp_libpath4a0b49092ea9'
-#> (as 'lib' is unspecified)
 ```
 
 For an introduction to **ggtda** functionality, read the vignettes:
@@ -81,7 +38,6 @@ For an introduction to **ggtda** functionality, read the vignettes:
 ``` r
 # read vignettes
 vignette(topic = "intro-ggtda", package = "ggtda")
-#> Warning: vignette 'intro-ggtda' not found
 ```
 
 We aim to submit ggtda to [CRAN](https://CRAN.R-project.org) soon.
@@ -154,7 +110,7 @@ gridExtra::grid.arrange(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
 ## Contribute
 

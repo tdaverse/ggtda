@@ -31,14 +31,14 @@ The **ggtda** package provides **ggplot2** layers for the visualization of persi
 
 The development version of **ggtda** can be installed used the **remotes** package:
 
-```{r}
+```r
 # install from GitHub
 remotes::install_github("rrrlw/ggtda", vignettes = TRUE)
 ```
 
 For an introduction to **ggtda** functionality, read the vignettes:
 
-```{r}
+```r
 # read vignettes
 vignette(topic = "intro-ggtda", package = "ggtda")
 ```
