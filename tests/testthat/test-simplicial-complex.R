@@ -9,15 +9,15 @@ test_that("Proximate functions work as expected on equilateral triangle", {
   eps <- .01
   
   # proximate pairs at diameter ~ sqrt(3)
-  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
+  expect_equal(nrow(ggtda:::proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(ggtda:::proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
   
   # proximate triples at diameter ~ sqrt(3)
-  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) + eps)), 1)
+  expect_equal(nrow(ggtda:::proximate_triples(et, diameter = sqrt(3) - eps)), 0)
+  expect_equal(nrow(ggtda:::proximate_triples(et, diameter = sqrt(3) + eps)), 1)
 })
 
-test_that("Vietoris-Rips distance calculations run as expected", {
+test_that("Proximate functions work as expected on noisy circle data", {
   
   # pseudorandom dataset (points from noisy circle) w/ seed for reproducibility
   set.seed(42)
