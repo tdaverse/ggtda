@@ -52,6 +52,10 @@ test_that("Disk layer works as expected", {
   # throws error when tested by CI tools
   #expect_equal(nrow(layer_data(p, 2)), nrow(d) * (60 + 1))
   
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
+  
   # visual regression test
   vdiffr::expect_doppelganger(
     "Fixed-radius disks around annulus data set", p, "simplicial-complex"
@@ -83,6 +87,10 @@ test_that("Čech layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p2)), 12651)
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
   
   # visual regression tests
   vdiffr::expect_doppelganger(
@@ -121,6 +129,10 @@ test_that("Vietoris layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p2)), 16977)
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
   
   # visual regression tests
   vdiffr::expect_doppelganger(
