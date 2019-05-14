@@ -19,7 +19,7 @@ test_that("Proximate functions work as expected on equilateral triangle", {
 
 test_that("Vietoris-Rips distance calculations run as expected", {
   
-  # pseudorandom dataset (points from noisy circle) w/ seed for reproducibility
+  # pseudorandom data (points from noisy circle) w/ seed for reproducibility
   set.seed(42)
   angles <- runif(10, 0, 2 * pi)
   annulus <- cbind(x = cos(angles) + rnorm(10, 0, 0.1),
@@ -37,7 +37,7 @@ test_that("Vietoris-Rips distance calculations run as expected", {
   expect_equal(expected, output)
 })
 
-# sample dataset
+# sample data set
 d <- as.data.frame(ggtda::annulus2d)
 
 test_that("Disk layer works as expected", {
