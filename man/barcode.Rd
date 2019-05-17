@@ -89,9 +89,9 @@ features of different dimension, by vertical grouping or by faceting.
 #####EXAMPLE 1#####
 # toy example
 toy.data <- data.frame(
-  appear = c(0, 0, 1, 2),
-  disappear = c(5, 3, 5, 3),
-  dim = c("0", "0", "2", "1")
+  appear = c(0, 0, 0, 1, 2),
+  disappear = c(5, 3, 3, 5, 3),
+  dim = c("0", "0", "0", "2", "1")
 )
 # topological barcode using the geom layer (and minimalist theme)
 ggplot(toy.data,

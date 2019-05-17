@@ -95,12 +95,15 @@ GeomBarcode <- ggproto(
     data$x <- data$start
     data$xend <- data$end
     
-    # introduce categorical y-values in order of `group`, `x`, and `xend`
+    # introduce categorical -> integer y-values
+    # in order of `group`, `x`, and `xend`
     grp <- if (is.null(data$group)) NA_character_ else data$group
-    data$y <- as.integer(interaction(
+    data$y <- interaction(
       grp, data$start, data$end,
       drop = TRUE, lex.order = TRUE
-    ))
+    )
+    # re-distinguish duplicates
+    data$y <- order(order(data$y))
     
     # return the pre-processed data set
     data
