@@ -1,4 +1,4 @@
-context("Test visualization of Vietoris-Rips diagrams")
+context("Test generation and visualization of simplicial complexes")
 library("ggtda")
 
 test_that("Proximate functions work as expected on equilateral triangle", {
@@ -19,7 +19,7 @@ test_that("Proximate functions work as expected on equilateral triangle", {
 
 test_that("Vietoris-Rips distance calculations run as expected", {
   
-  # pseudorandom dataset (points from noisy circle) w/ seed for reproducibility
+  # pseudorandom data (points from noisy circle) w/ seed for reproducibility
   set.seed(42)
   angles <- runif(10, 0, 2 * pi)
   annulus <- cbind(x = cos(angles) + rnorm(10, 0, 0.1),
@@ -37,20 +37,29 @@ test_that("Vietoris-Rips distance calculations run as expected", {
   expect_equal(expected, output)
 })
 
-# sample dataset
-data("annulus2d")
-d <- as.data.frame(annulus2d)
+# sample data set
+d <- as.data.frame(ggtda::annulus2d)
 
-test_that("Ball layer works as expected", {
+test_that("Disk layer works as expected", {
   
-  # balls of specified radius and resolution (segments)
+  # disks of specified radius and resolution (segments)
   p <- ggplot(d, aes(x = x, y = y)) +
+    geom_point() +
     stat_disk(radius = 0.35, segments = 60, fill = "aquamarine3", alpha = 0.15)
   expect_is(p, "ggplot")
   expect_is(p$layer[[1]], "ggproto")
   expect_equal(c(p$labels$x, p$labels$y), c("x", "y"))
   # throws error when tested by CI tools
-  #expect_equal(nrow(layer_data(p)), nrow(d) * (60 + 1))
+  #expect_equal(nrow(layer_data(p, 2)), nrow(d) * (60 + 1))
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
+  
+  # visual regression test
+  vdiffr::expect_doppelganger(
+    "Fixed-radius disks around annulus data set", p, "simplicial-complex"
+  )
 })
 
 test_that("Čech layers work as expected", {
@@ -78,6 +87,21 @@ test_that("Čech layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p2)), 12651)
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
+  
+  # visual regression tests
+  vdiffr::expect_doppelganger(
+    "Čech 0-skeleton on annulus data set", p0, "simplicial-complex"
+  )
+  vdiffr::expect_doppelganger(
+    "Čech 1-skeleton on annulus data set", p1, "simplicial-complex"
+  )
+  vdiffr::expect_doppelganger(
+    "Čech 2-skeleton on annulus data set", p2, "simplicial-complex"
+  )
 })
 
 test_that("Vietoris layers work as expected", {
@@ -105,4 +129,19 @@ test_that("Vietoris layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p2)), 16977)
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
+  
+  # visual regression tests
+  vdiffr::expect_doppelganger(
+    "Vietoris 0-skeleton on annulus data set", p0, "simplicial-complex"
+  )
+  vdiffr::expect_doppelganger(
+    "Vietoris 1-skeleton on annulus data set", p1, "simplicial-complex"
+  )
+  vdiffr::expect_doppelganger(
+    "Vietoris 2-skeleton on annulus data set", p2, "simplicial-complex"
+  )
 })
