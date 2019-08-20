@@ -9,9 +9,10 @@
 \alias{stat_cech0}
 \alias{stat_cech1}
 \alias{stat_cech2}
-\title{Skeletons of Vietoris and Čech complexes}
+\alias{geom_face}
+\title{Disks about data points and skeletons of Vietoris and Čech complexes}
 \usage{
-stat_disk(mapping = NULL, data = NULL, geom = "polygon",
+stat_disk(mapping = NULL, data = NULL, geom = "face",
   position = "identity", na.rm = FALSE, radius = 0, segments = 60,
   show.legend = NA, inherit.aes = TRUE, ...)
 
@@ -23,7 +24,7 @@ stat_vietoris1(mapping = NULL, data = NULL, geom = "segment",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
 
-stat_vietoris2(mapping = NULL, data = NULL, geom = "polygon",
+stat_vietoris2(mapping = NULL, data = NULL, geom = "face",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
 
@@ -35,9 +36,13 @@ stat_cech1(mapping = NULL, data = NULL, geom = "segment",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
 
-stat_cech2(mapping = NULL, data = NULL, geom = "polygon",
+stat_cech2(mapping = NULL, data = NULL, geom = "face",
   position = "identity", na.rm = FALSE, diameter = Inf,
   show.legend = NA, inherit.aes = TRUE, ...)
+
+geom_face(mapping = NULL, data = NULL, stat = "identity",
+  position = "identity", na.rm = FALSE, show.legend = NA,
+  inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
@@ -57,11 +62,12 @@ data. All objects will be fortified to produce a data frame. See
 
 A \code{function} will be called with a single argument,
 the plot data. The return value must be a \code{data.frame}, and
-will be used as the layer data.}
+will be used as the layer data. A \code{function} can be created
+from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
 \item{geom}{The geometric object to use display the data; defaults to
-\code{segment} in \code{geom_vietoris1()} and to \code{polygon} in \code{geom_vietoris2}. Pass
-a string to override the default.}
+\code{segment} in \code{geom_vietoris1()} and to \code{face} in \code{geom_vietoris2}. Pass a
+string to override the default.}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
@@ -88,6 +94,9 @@ the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
 
 \item{diameter}{A positive number; the distance between points at which
 segments will not be included.}
+
+\item{stat}{The statistical transformation to use on the data for this
+layer, as a string.}
 }
 \description{
 Annotate 2-dimensional point clouds with TDA constructions.
@@ -95,6 +104,12 @@ Annotate 2-dimensional point clouds with TDA constructions.
 \details{
 These plot layers are useful for exposition and education; they illustrate
 constructions used by TDA methods but cannot be pipelined into those methods.
+}
+\section{Definitions}{
+
+
+A \emph{ball} of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
+of all points whose distances from \eqn{x} are less than \eqn{r}.
 
 The \emph{Vietoris complex} of a point cloud is a simplicial complex consisting of
 a simplex for each subset of points within a fixed diameter of each other.
@@ -107,6 +122,14 @@ The \emph{0-skeleton} of a complex consists of its vertices (0-simplices), the
 \emph{1-skeleton} additionally the edges between pairs of vertices (1-simplices),
 and the \emph{2-skeleton} additionally faces among triples of vertices
 (2-simplices).
+}
+
+\section{Layers}{
+
+
+\code{geom_face()} is a convenience geom that is equivalent to \code{geom_polygon()}
+except that its default aesthetics are more appropriate for the overlapping
+elements produced by the stat layers.
 
 Given \code{x} and \code{y} coordinates, \code{stat_vietoris1()} encodes the edges of the
 Vietoris complex using \code{x}, \code{y}, \code{xend}, and \code{yend} for \code{geom_segment()}, and
@@ -120,6 +143,7 @@ they can be combined with \code{geom_vietoris0()} or \code{geom_cech0()}, which 
 aliases for \code{\link[ggplot2:stat_identity]{ggplot2::stat_identity()}} that default to
 \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.
 }
+
 \examples{
 # function to generate noisy 2D circles
 make_noisy_circle <- function(n, sd = .01) {
@@ -136,7 +160,7 @@ d <- as.data.frame(make_noisy_circle(n = 40, sd = .15))
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
   geom_point()
 
 # plot Vietoris 1-skeleton
@@ -150,7 +174,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod") +
   stat_vietoris1(diameter = .7, alpha = .25) +
   stat_vietoris0()
 
@@ -158,7 +182,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod") +
   stat_cech1(diameter = .7, alpha = .25) +
   stat_cech0()
 
@@ -166,7 +190,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
@@ -174,8 +198,8 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
-  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod") +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
@@ -183,8 +207,8 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
-  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod") +
   stat_cech1(diameter = .7, size = .2) +
   stat_cech0(size = .3)
 }

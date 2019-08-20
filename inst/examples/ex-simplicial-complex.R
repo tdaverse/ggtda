@@ -13,7 +13,7 @@ d <- as.data.frame(make_noisy_circle(n = 40, sd = .15))
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
   geom_point()
 
 # plot Vietoris 1-skeleton
@@ -27,7 +27,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod") +
   stat_vietoris1(diameter = .7, alpha = .25) +
   stat_vietoris0()
 
@@ -35,7 +35,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod") +
   stat_cech1(diameter = .7, alpha = .25) +
   stat_cech0()
 
@@ -43,7 +43,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
@@ -51,8 +51,8 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
-  stat_vietoris2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
+  stat_vietoris2(diameter = .7, fill = "darkgoldenrod") +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
@@ -60,7 +60,7 @@ ggplot(d, aes(x = x, y = y)) +
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = .35, fill = "aquamarine3", alpha = .15) +
-  stat_cech2(diameter = .7, fill = "darkgoldenrod", alpha = .1) +
+  stat_disk(radius = .35, fill = "aquamarine3") +
+  stat_cech2(diameter = .7, fill = "darkgoldenrod") +
   stat_cech1(diameter = .7, size = .2) +
   stat_cech0(size = .3)

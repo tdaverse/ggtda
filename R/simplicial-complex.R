@@ -1,4 +1,4 @@
-#' @title Skeletons of Vietoris and Čech complexes
+#' @title Disks about data points and skeletons of Vietoris and Čech complexes
 #'
 #' @description Annotate 2-dimensional point clouds with TDA constructions.
 #'
@@ -6,6 +6,13 @@
 #'
 #' These plot layers are useful for exposition and education; they illustrate
 #' constructions used by TDA methods but cannot be pipelined into those methods.
+#'
+
+#' @section Definitions:
+#'   
+
+#' A *ball* of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
+#' of all points whose distances from \eqn{x} are less than \eqn{r}.
 #'
 #' The *Vietoris complex* of a point cloud is a simplicial complex consisting of
 #' a simplex for each subset of points within a fixed diameter of each other.
@@ -18,6 +25,14 @@
 #' *1-skeleton* additionally the edges between pairs of vertices (1-simplices),
 #' and the *2-skeleton* additionally faces among triples of vertices
 #' (2-simplices).
+#' 
+
+#' @section Layers:
+#'   
+
+#' `geom_face()` is a convenience geom that is equivalent to `geom_polygon()`
+#' except that its default aesthetics are more appropriate for the overlapping
+#' elements produced by the stat layers.
 #'
 #' Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
 #' Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
@@ -43,8 +58,8 @@
 #' @param na.rm Logical; ignored.
 #' @param ... Additional arguments passed to [ggplot2::layer()].
 #' @param geom The geometric object to use display the data; defaults to
-#'   `segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
-#'   a string to override the default.
+#'   `segment` in `geom_vietoris1()` and to `face` in `geom_vietoris2`. Pass a
+#'   string to override the default.
 #' @param radius A positive number; the radius of the disk to render around each
 #'   point.
 #' @param segments The number of segments to be used in drawing each disk.
@@ -56,7 +71,7 @@
 #' @export
 stat_disk <- function(mapping = NULL,
                       data = NULL,
-                      geom = "polygon",
+                      geom = "face",
                       position = "identity",
                       na.rm = FALSE,
                       radius = 0,
@@ -65,9 +80,9 @@ stat_disk <- function(mapping = NULL,
                       inherit.aes = TRUE,
                       ...) {
   layer(
-    stat = StatDisk,
     data = data,
     mapping = mapping,
+    stat = StatDisk,
     geom = geom,
     position = position,
     show.legend = show.legend,
@@ -88,9 +103,6 @@ StatDisk <- ggproto(
   "StatDisk", Stat,
   
   required_aes = c("x", "y"),
-  
-  default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
-                    size = 0.5, linetype = 1),
   
   compute_panel = function(data, scales,
                            radius = 0, segments = 60) {
@@ -128,9 +140,9 @@ stat_vietoris0 <- function(mapping = NULL,
                            inherit.aes = TRUE,
                            ...) {
   layer(
-    stat = StatVietoris0,
     data = data,
     mapping = mapping,
+    stat = StatVietoris0,
     geom = geom,
     position = position,
     show.legend = show.legend,
@@ -163,9 +175,9 @@ stat_vietoris1 <- function(mapping = NULL,
                            inherit.aes = TRUE,
                            ...) {
   layer(
-    stat = StatVietoris1,
     data = data,
     mapping = mapping,
+    stat = StatVietoris1,
     geom = geom,
     position = position,
     show.legend = show.legend,
@@ -213,7 +225,7 @@ StatVietoris1 <- ggproto(
 #' @export
 stat_vietoris2 <- function(mapping = NULL,
                            data = NULL,
-                           geom = "polygon",
+                           geom = "face",
                            position = "identity",
                            na.rm = FALSE,
                            diameter = Inf,
@@ -221,9 +233,9 @@ stat_vietoris2 <- function(mapping = NULL,
                            inherit.aes = TRUE,
                            ...) {
   layer(
-    stat = StatVietoris2,
     data = data,
     mapping = mapping,
+    stat = StatVietoris2,
     geom = geom,
     position = position,
     show.legend = show.legend,
@@ -292,7 +304,7 @@ stat_cech1 <- stat_vietoris1
 #' @export
 stat_cech2 <- function(mapping = NULL,
                        data = NULL,
-                       geom = "polygon",
+                       geom = "face",
                        position = "identity",
                        na.rm = FALSE,
                        diameter = Inf,
@@ -300,9 +312,9 @@ stat_cech2 <- function(mapping = NULL,
                        inherit.aes = TRUE,
                        ...) {
   layer(
-    stat = StatCech2,
     data = data,
     mapping = mapping,
+    stat = StatCech2,
     geom = geom,
     position = position,
     show.legend = show.legend,
@@ -407,3 +419,38 @@ proximate_triples <- function(data, diameter) {
   rownames(triples) <- NULL
   triples
 }
+
+#' @rdname simplicial-complex
+#' @export
+geom_face <- function(mapping = NULL,
+                      data = NULL,
+                      stat = "identity",
+                      position = "identity",
+                      na.rm = FALSE,
+                      show.legend = NA,
+                      inherit.aes = TRUE,
+                      ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomFace,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+GeomFace <- ggproto(
+  "GeomFace", GeomPolygon,
+  
+  default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
+                    size = 0.5, linetype = 1)
+)
