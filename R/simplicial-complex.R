@@ -103,7 +103,7 @@ StatDisk <- ggproto(
     names(disk) <- c("x.offset", "y.offset")
     
     # copy the circle at each point
-    disks <- tidyr::crossing(data[, c("x", "y")], disk)
+    disks <- tidyr::expand_grid(data[, c("x", "y")], disk)
     data$.id <- 1:nrow(data)
     data <- merge(data, disks, by = c("x", "y"))
     data <- transform(data,
