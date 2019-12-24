@@ -18,7 +18,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10),
-    ggplot2 (>= 2.2.1)
+    ggplot2 (>= 3.2.1)
 URL: https://github.com/rrrlw/ggtda
 BugReports: https://github.com/rrrlw/ggtda/issues
 Suggests: 
@@ -27,7 +27,7 @@ Suggests:
     knitr (>= 1.20),
     rmarkdown (>= 1.10),
     covr (>= 3.1.0),
-    TDAstats (>= 0.4.0),
+    TDAstats (>= 0.4.1),
     rPref (>= 1.2)
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
