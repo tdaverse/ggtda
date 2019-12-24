@@ -11,7 +11,8 @@ A simple theme to clearly display persistent homology in
 the form of flat persistence diagrams or diagonal persistence diagrams.
 }
 \seealso{
-Other TDA themes: \code{\link{theme_barcode}},
-  \code{\link{theme_tda}}
+Other TDA themes: 
+\code{\link{theme_barcode}()},
+\code{\link{theme_tda}()}
 }
 \concept{TDA themes}

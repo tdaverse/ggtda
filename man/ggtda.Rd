@@ -3,7 +3,6 @@
 \docType{package}
 \name{ggtda}
 \alias{ggtda}
-\alias{ggtda-package}
 \title{A \emph{ggplot2} Extension for Persistence Data}
 \description{
 \emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing data arising

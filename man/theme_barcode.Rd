@@ -11,7 +11,8 @@ A simple theme to clearly display persistent homology in
 the form of persistence barcodes (aka topological barcodes).
 }
 \seealso{
-Other TDA themes: \code{\link{theme_persist}},
-  \code{\link{theme_tda}}
+Other TDA themes: 
+\code{\link{theme_persist}()},
+\code{\link{theme_tda}()}
 }
 \concept{TDA themes}
