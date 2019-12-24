@@ -1,7 +1,7 @@
 ---
 title: "Plotting persistent homology with ggtda"
 author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
-date: "23 January 2019"
+date: "1 January 2020"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{An introduction to ggtda}
