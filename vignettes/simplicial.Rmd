@@ -1,8 +1,10 @@
 ---
 title: "Visualizing a simplicial complex with ggtda"
+author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
+date: "1 January 2020"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualizing a simplicial complex with ggtda}
+  %\VignetteIndexEntry{An introduction to ggtda}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +16,61 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(ggtda)
+## Purpose
+
+In addition to visualizing persistent homology with topological barcodes and persistence diagrams, ggtda allows useRs to visualize the underlying simplicial complices for 2-dimensional data.
+This feature is particularly valuable in an educational setting, when selecting a radius and plotting a corresponding simplicial complex side-by-side with a topological barcode eases understanding of persistent homology.
+This vignette explains how ggtda can be used to quickly and easily plot a simplicial complex.
+
+## Setup and dataset details
+
+We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.
+
+```{r setup, message = FALSE}
+library("ggtda")
+library("TDAstats") # to calculate persistent homology
+
+# load dataset
+data("annulus2d")
 ```
+
+The `annulus2d` dataset (visualized below) is included with ggtda, and will be used to demonstrate each form of visualization.
+
+```{r annulus-scatter, echo = FALSE, fig.height = 4, fig.width = 4}
+annulus_df <- as.data.frame(annulus2d)
+ggplot(annulus_df, aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
+We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.
+
+```{r phom}
+# calculate persistent homology of annulus and format correctly
+annulus_phom <- as.data.frame(calculate_homology(annulus2d))
+annulus_phom$dimension <- as.factor(annulus_phom$dimension)
+```
+
+## Visualizing a simplicial complex
+
+```{r disk}
+
+```
+
+```{r vietoris0}
+ggplot(annulus_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = 0.25, fill = "blue", alpha = 0.15) +
+  theme_minimal()
+```
+
+```{r vietoris1}
+
+```
+
+```{r vietoris2}
+
+```
+
+## Illustrative example
