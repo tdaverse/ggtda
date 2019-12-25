@@ -108,8 +108,9 @@ ggplot(unif_df, aes(x = x, y = y)) +
 ```
 
 Since `stat_disk` sometimes requires close evaluation to determine if two points are connected, `stat_vietoris1` can be used to add clarity.
-Note that the two stats are parameterized differently; thus, correct values must be provided with care.
-The reason behind this is that the radius is more intuitive to understand `stat_disk`, but topological barcodes and persistence diagrams are generally plotted with the diameter on the relevant axes.
+The radius is more intuitive to understand `stat_disk`, but topological barcodes and persistence diagrams are generally plotted with the diameter on the relevant axes.
+Accordingly, we've parameterized disks using `radius` and complexes using `diameter`.
+Note that either parameter can be passed to each stat, and correct values must be provided with care.
 
 ```{r vietoris1-disk, fig.height = 5, fig.width = 5}
 # combine stat_vietoris1 with stat_disk
