@@ -151,29 +151,40 @@ ggplot(unif_df, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-*ADD NOTE ABOUT CECH AND V-R COMPLEX HERE; show difference with equilateral triangle*
 In addition to the Vietoris-Rips complex, ggtda permits visualization of the Čech complex with the `stat_cech0` (identical to `stat_vietoris0`), `stat_cech1` (identical to `stat_vietoris1`), and `stat_cech2` (distinct from `stat_vietoris2`) functions.
 We plot an equilateral triangle using the `stat_vietoris*` functions and `stat_cech*` functions to showcase the difference.
+With a diameter of `1.1`, the three points are all pairwise connected, but the three corresponding circles do not all share a single point of overlap (bottom left panel).
+Thus, while the Vietoris-Rips complex and the Čech complex share the same 1-skeleton, only the Vietoris-Rips complex has a face between the three points.
 
 ```{r cech, fig.height = 3.45, fig.width = 3.45, fig.show = 'hold'}
 # create equilateral triangle point cloud
 eq_tri <- data.frame(x = c(0, 1, 0.5),
                      y = c(0, 0, sqrt(3)/2))
+diam <- 1.1
 
-# left panel: VR complex
+# top left panel: VR with stat_vietoris*
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = 2, fill = "darkgoldenrod", alpha = 0.1) +
-  stat_vietoris1(diameter = 2, alpha = 0.25) +
+  stat_vietoris2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
+  stat_vietoris1(diameter = diam, alpha = 0.25) +
   stat_vietoris0() +
+  ggtitle("Vietoris-Rips complex") +
   theme_minimal()
 
-# right panel: Čech complex
+# top right panel: Čech with stat_cech*
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_cech2(diameter = 2) +
-  stat_cech1(diameter = 2, alpha = 0.25) +
+  stat_cech2(diameter = diam, fill = "darkgoldenrold", alpha = 0.1) +
+  stat_cech1(diameter = diam, alpha = 0.25) +
   stat_cech0() +
+  ggtitle("Čech complex") +
+  theme_minimal()
+
+# bottom left panel: equilateral triangle with stat_disk
+ggplot(eq_tri, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_disk(radius = diam / 2, fill = "blue", alpha = 0.1) +
+  geom_point() +
   theme_minimal()
 ```
 
