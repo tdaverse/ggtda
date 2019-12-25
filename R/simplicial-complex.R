@@ -115,7 +115,7 @@ StatDisk <- ggproto(
     names(disk) <- c("x.offset", "y.offset")
     
     # copy the circle at each point
-    disks <- tidyr::crossing(data[, c("x", "y")], disk)
+    disks <- tidyr::expand_grid(data[, c("x", "y")], disk)
     data$.id <- 1:nrow(data)
     data <- merge(data, disks, by = c("x", "y"))
     data <- transform(data,
@@ -278,13 +278,13 @@ StatVietoris2 <- ggproto(
       by = c("a", "c"), all = FALSE,
       sort = FALSE
     )
-    faces <- t(as.matrix(faces))[c("a", "b", "c"), ]
+    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
     
     # data frame of faces' perimeter coordinates
     res <- data.frame(
       x = data$x[as.vector(faces)],
       y = data$y[as.vector(faces)],
-      group = rep(1:ncol(faces), each = 3)
+      group = rep(seq_len(ncol(faces)), each = 3)
     )
     
     # return the faces data
@@ -339,13 +339,13 @@ StatCech2 <- ggproto(
     
     # indices of triples of data points that are within `diameter` of some point
     faces <- as.data.frame(proximate_triples(data, diameter))
-    faces <- t(as.matrix(faces))[c("a", "b", "c"), ]
+    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
     
     # data frame of faces' perimeter coordinates
     data <- data.frame(
       x = data$x[as.vector(faces)],
       y = data$y[as.vector(faces)],
-      group = rep(1:ncol(faces), each = 3)
+      group = rep(seq_len(ncol(faces)), each = 3)
     )
     
     # return the faces data
