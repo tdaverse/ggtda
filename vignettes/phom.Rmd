@@ -137,7 +137,7 @@ Creating a topological barcode with ggtda is straightforward using `geom_barcode
 ggplot(annulus_phom, aes(start = birth, end = death,
                          group = dimension, colour = dimension)) +
   geom_barcode() +
-  xlab("Simplicial complex radius") +
+  xlab("Simplicial complex diameter") +
   theme_barcode()
 ```
 
