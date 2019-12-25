@@ -4,7 +4,7 @@ author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
 date: "1 January 2020"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{An introduction to ggtda}
+  %\VignetteIndexEntry{Visualizing a simplicial complex with ggtda}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
