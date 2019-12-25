@@ -58,7 +58,7 @@
 #' @param na.rm Logical; ignored.
 #' @param ... Additional arguments passed to [ggplot2::layer()].
 #' @param geom The geometric object to use display the data; defaults to
-#'   `segment` in `geom_vietoris1()` and to `face` in `geom_vietoris2`. Pass a
+#'   `segment` in `stat_vietoris1()` and to `face` in `stat_vietoris2`. Pass a
 #'   string to override the default.
 #' @param radius A positive number; the radius of the disk to render around each
 #'   point.

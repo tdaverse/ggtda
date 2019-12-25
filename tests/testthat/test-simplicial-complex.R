@@ -45,7 +45,7 @@ test_that("Disk layer works as expected", {
   # disks of specified radius and resolution (segments)
   p <- ggplot(d, aes(x = x, y = y)) +
     geom_point() +
-    stat_disk(radius = 0.35, segments = 60, fill = "aquamarine3", alpha = 0.15)
+    stat_disk(radius = 0.35, segments = 60, fill = "aquamarine3")
   expect_is(p, "ggplot")
   expect_is(p$layer[[1]], "ggproto")
   expect_equal(c(p$labels$x, p$labels$y), c("x", "y"))
@@ -62,7 +62,7 @@ test_that("Disk layer works as expected", {
   )
 })
 
-test_that("Čech layers work as expected", {
+test_that("Cech layers work as expected", {
   
   # Čech 0-skeleton stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
@@ -94,13 +94,13 @@ test_that("Čech layers work as expected", {
   
   # visual regression tests
   vdiffr::expect_doppelganger(
-    "Čech 0-skeleton on annulus data set", p0, "simplicial-complex"
+    "Cech 0-skeleton on annulus data set", p0, "simplicial-complex"
   )
   vdiffr::expect_doppelganger(
-    "Čech 1-skeleton on annulus data set", p1, "simplicial-complex"
+    "Cech 1-skeleton on annulus data set", p1, "simplicial-complex"
   )
   vdiffr::expect_doppelganger(
-    "Čech 2-skeleton on annulus data set", p2, "simplicial-complex"
+    "Cech 2-skeleton on annulus data set", p2, "simplicial-complex"
   )
 })
 

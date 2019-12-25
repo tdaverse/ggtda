@@ -15,7 +15,8 @@ The \code{theme_tda} function should get you close to a publication-quality
 plot
 }
 \seealso{
-Other TDA themes: \code{\link{theme_barcode}},
-  \code{\link{theme_persist}}
+Other TDA themes: 
+\code{\link{theme_barcode}()},
+\code{\link{theme_persist}()}
 }
 \concept{TDA themes}

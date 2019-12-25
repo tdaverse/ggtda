@@ -104,12 +104,12 @@ library(ggtda)
 p_d <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = prox/2, fill = "aquamarine3", alpha = .15) +
+  stat_disk(radius = prox/2, fill = "aquamarine3") +
   geom_point()
 p_sc <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_vietoris2(diameter = prox, fill = "darkgoldenrod", alpha = .1) +
+  stat_vietoris2(diameter = prox, fill = "darkgoldenrod") +
   stat_vietoris1(diameter = prox, alpha = .25) +
   stat_vietoris0()
 # combine the plots

@@ -30,5 +30,5 @@ Suggests:
     TDAstats (>= 0.4.0),
     rPref (>= 1.2)
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
