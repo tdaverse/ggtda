@@ -24,53 +24,372 @@ This vignette explains how ggtda can be used to quickly and easily plot a simpli
 
 ## Setup and dataset details
 
-We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.
+We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required datasets.
 
 ```{r setup, message = FALSE}
 library("ggtda")
 library("TDAstats") # to calculate persistent homology
 
 # load dataset
+data("unif2d")
 data("annulus2d")
 ```
 
-The `annulus2d` dataset (visualized below) is included with ggtda, and will be used to demonstrate each form of visualization.
+The `unif2d` dataset (visualized below; left) is included with TDAstats, and a subset of 25 points from it will be used to demonstrate how individual ggtda functions work.
+The `annulus2d` dataset (visualized below; right) is included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.
 
-```{r annulus-scatter, echo = FALSE, fig.height = 4, fig.width = 4}
+```{r plots, fig.show = 'hold'}
+unif_df <- as.data.frame(unif2d[1:25, ])
+colnames(unif_df) <- c("x", "y")
 annulus_df <- as.data.frame(annulus2d)
+
+# left panel
+ggplot(unif_df, aes(x = x, y = y)) +
+  geom_point() +
+  coord_fixed() +
+  theme_bw() +
+  xlab("x") + ylab("y")
+
+# right panel
 ggplot(annulus_df, aes(x = x, y = y)) +
   geom_point() +
-  theme_minimal()
-```
-
-The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
-We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.
-
-```{r phom}
-# calculate persistent homology of annulus and format correctly
-annulus_phom <- as.data.frame(calculate_homology(annulus2d))
-annulus_phom$dimension <- as.factor(annulus_phom$dimension)
+  coord_fixed() +
+  theme_bw()
 ```
 
 ## Visualizing a simplicial complex
 
-```{r disk}
+For the sake of simplicity, we will first demonstrate use of the individual simplicial complex visualization functions with a 25-point subset of `unif2d`.
+The [next section](#eg) will use the `annulus2d` dataset to show how the individual functions can work together to create effective visualizations.
+We will use a radius of `0.1` for the visualizations in this section.
+First, we explore `stat_disk` that, in combination with `geom_point` from ggplot2, will draw proximity circles surrounding each point; since `0.1` is the circle radius, any pair of points less than a distance of `0.2` units away from each other will have overlapping circles, indicating an edge should be drawn between them at this radius.
 
-```
+```{r disk, fig.width = 4, fig.height = 4}
+# set radius value
+rad_val <- 0.1
 
-```{r vietoris0}
-ggplot(annulus_df, aes(x = x, y = y)) +
+# use stat_disk to visualize simplicial complex
+ggplot(unif_df, aes(x = x, y = y)) +
+  geom_point() +
+  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   coord_fixed() +
-  stat_vietoris2(diameter = 0.25, fill = "blue", alpha = 0.15) +
   theme_minimal()
 ```
 
-```{r vietoris1}
+To directly visualize the edges and better visualize the features themselves, we can use the `stat_vietoris0`, `stat_vietoris1`, and `stat_vietoris2` functions.
+`stat_vietoris0` is essentially an alias for `geom_point` and represents the 0-dimensional components (points) of a Vietoris-Rips complex, as follows.
+Since the 0-skeleton of a Vietoris-Rips complex is not dependent on a specific radius (`rad_val` above), `stat_vietoris0` requires no parameters.
 
+```{r vietoris0}
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris0() +
+  theme_minimal()
 ```
 
-```{r vietoris2}
+`stat_vietoris1` adds excitement by plotting the 1-dimensional components (edges between point pairs with overlapping circles).
+Since these edges are dependent on a specific radius, we provide a value (double `rad_val`) for the `diameter` parameter.
+The `alpha` parameter is provided solely for aesthetic purposes.
+It is important to note that while `stat_vietoris1` can be used alone (left panel below), it is often most effective when used in conjunction with `stat_vietoris0` (right panel below).
 
+```{r vietoris1, fig.show = 'hold'}
+# left panel: stat_vietoris1 alone
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  theme_minimal()
+
+# right panel: stat_vietoris1 used with stat_vietoris0
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris0() +
+  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  theme_minimal()
 ```
 
-## Illustrative example
+Since `stat_disk` sometimes requires close evaluation to determine if two points are connected, `stat_vietoris1` can be used to add clarity.
+Note that the two stats are parameterized differently; thus, correct values must be provided with care.
+The reason behind this is that the radius is more intuitive to understand `stat_disk`, but topological barcodes and persistence diagrams are generally plotted with the diameter on the relevant axes.
+
+```{r vietoris1-disk, fig.height = 5, fig.width = 5}
+# combine stat_vietoris1 with stat_disk
+ggplot(unif_df, aes(x = x, y = y)) +
+  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  geom_point() +
+  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  theme_minimal()
+```
+
+Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), `stat_vietoris2` adds the faces of the Vietoris-Rips complex to permit more intuitive interpretation.
+`stat_vietoris2` is parameterized similarly to `stat_vietoris1`.
+As was the case with `stat_vietoris1`, while `stat_vietoris2` can be used alone (left panel), it is most effectively used when the lower dimensional components of the Vietoris-Rips complex are also plotted (right panel).
+Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.
+
+```{r vietoris2, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
+# left panel: stat_vietoris2 alone
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
+  theme_minimal()
+
+# right panel: stat_vietoris2 in combination with stat_vietoris1 and stat_vietoris0
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris0() +
+  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  stat_vietoris2(diameter = rad_val * 2, alpha = 0.15) +
+  theme_minimal()
+```
+
+Generally, using `stat_vietoris2` in combination with `stat_disk` creates too much overlap (figure below) and we suggest avoiding use of both in a single panel.
+
+```{r clutter, fig.height = 5, fig.width = 5}
+ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
+  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  theme_minimal()
+```
+
+*ADD NOTE ABOUT CECH AND V-R COMPLEX HERE; show difference with equilateral triangle*
+In addition to the Vietoris-Rips complex, ggtda permits visualization of the Čech complex with the `stat_cech0` (identical to `stat_vietoris0`), `stat_cech1` (identical to `stat_vietoris1`), and `stat_cech2` (distinct from `stat_vietoris2`) functions.
+We plot an equilateral triangle using the `stat_vietoris*` functions and `stat_cech*` functions to showcase the difference.
+
+```{r cech, fig.height = 3.45, fig.width = 3.45, fig.show = 'hold'}
+# create equilateral triangle point cloud
+eq_tri <- data.frame(x = c(0, 1, 0.5),
+                     y = c(0, 0, sqrt(3)/2))
+
+# left panel: VR complex
+ggplot(eq_tri, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = 2, fill = "darkgoldenrod", alpha = 0.1) +
+  stat_vietoris1(diameter = 2, alpha = 0.25) +
+  stat_vietoris0() +
+  theme_minimal()
+
+# right panel: Čech complex
+ggplot(eq_tri, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_cech2(diameter = 2) +
+  stat_cech1(diameter = 2, alpha = 0.25) +
+  stat_cech0() +
+  theme_minimal()
+```
+
+## Illustrative example {#eg}
+
+The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
+We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.
+
+```{r phom, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
+# calculate persistent homology of annulus
+annulus_phom <- as.data.frame(calculate_homology(annulus2d))
+annulus_phom$dimension <- as.factor(annulus_phom$dimension)
+
+# plot topological barcode (left panel)
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         group = dimension, colour = dimension)) +
+  geom_barcode() +
+  xlab("Simplicial complex diameter") +
+  theme_barcode()
+
+# plot diagonal persistence diagram (right panel)
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  stat_persistence(diagram = "diagonal") +
+  geom_abline(slope = 1, intercept = 0) +
+  xlim(c(0, 1.0)) +
+  xlab("Feature appearance") +
+  ylab("Feature disappearance") +
+  coord_fixed() +
+  theme_persist()
+```
+
+The dominant feature in `annulus2d` is a 1-dimensional loop that we identify in the following code block.
+
+```{r annulus-main}
+subset(annulus_phom, dimension == 1)
+```
+
+The feature of interest persists the longest and is listed in row 104 of `annulus_phom` (starts at diameter of `0.29`; ends at diameter of `1.44`).
+Let's explore simplicial complex visualization prior to the start of the dominant feature (diameter `0.25`), during the presence of the dominant feature (diameter `0.75`), and after the end of the dominant feature (diameter `1.5`).
+
+```{r radii}
+diam <- c(0.25, 0.75, 1.5)
+rads <- diam / 2
+```
+
+We use four panels to properly explore each diameter: (1) topological barcode with a vertical dotted line indicating diameter; (2) persistence diagram with horizontal and vertical lines, with points to the top-left of the intersection indicating current features; (3) simplicial complex visualization with `stat_disk`; and (4) simplicial complex visualization with `stat_vietoris0`, `stat_vietoris1`, and `stat_vietoris2`.
+First, we generate the visualization for a diameter of ```r diam[1]```.
+
+```{r before, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+# topological barcode
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         group = dimension, colour = dimension)) +
+  geom_barcode() +
+  geom_vline(xintercept = diam[1], linetype = "dashed") +
+  xlab("Simplicial complex diameter") +
+  labs(colour = "dim") +
+  theme_barcode() +
+  theme(legend.position = c(0.95, 0.5))
+
+# persistence diagram
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  stat_persistence(diagram = "diagonal") +
+  geom_abline(slope = 1, intercept = 0) +
+  
+  xlim(c(0, 1.5)) + ylim(c(0, 1.5)) +
+  xlab("Feature appearance") +
+  ylab("Feature disappearance") +
+  labs(colour = "dim", shape = "dim") +
+  geom_vline(xintercept = diam[1], linetype = "dashed") +
+  geom_hline(yintercept = diam[1], linetype = "dashed") +
+  coord_fixed() +
+  theme_persist() +
+  theme(legend.position = c(0.95, 0.4))
+
+# stat_disk
+ggplot(annulus_df, aes(x = x, y = y)) +
+  geom_point() +
+  coord_fixed() +
+  stat_disk(radius = rads[1], fill = "blue", alpha = 0.1) +
+  theme_minimal()
+
+# stat_vietoris*
+ggplot(annulus_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = diam[1], fill = "darkgoldenrod", alpha = 0.1) +
+  stat_vietoris1(diameter = diam[1], alpha = 0.25) +
+  stat_vietoris0() +
+  theme_minimal()
+```
+
+Interpretation at diameter ```r diam[1]```:
+
+* topological barcode (top-left panel):
+  + the vertical dashed line (current diameter) is to the left of the dominant 1-dimensional (blue) feature, indicating that the dominant feature has not yet started
+  + the dashed line does pass through multiple 1-dimensional features of shorter persistence, indicating the presence of at least a couple 1-loops at the current diameter
+  + the dashed line also passes through multiple 0-dimensional (red) features; if we consider the 1-skeleton of the Vietoris-Rips complex as a graph, this indicates that the graph is not fully connected and instead is composed of multiple components
+* persistence diagram (top-right panel):
+  + the dominant feature is in the top-right (not top-left) quadrant, indicating that it has not yet started
+  + there are multiple 1-dimensional (blue triangle) features in the top-left quadrant, corresponding to the shorter persistence 1-loops seen in the topological barcode
+  + there are multiple 0-dimensional (red circle) features in the top-left quadrant, corresponding to the graph components noted in the topological barcode
+* `stat_disk` visualization (bottom-left panel):
+  + the dominant feature (1-loop involving most, if not all, of the points) has not yet started because the circumference (loosely) of the annulus is not connected and is instead composed of multiple components
+  + there could be 1-loops at this diameter, however, their presence is not clear
+* `stat_vietoris*` visualization (bottom-right panel):
+  + the dominant feature has not yet started because the 1-skeleton has multiple components
+  * there are at least a couple 1-loops at this diameter (adjacent to `(0.0, -1.0)`)
+
+Each of the four panels complement one another by providing overlapping and consistent pieces of information with varying levels of clarity.
+Together, we get a good sense of what's going on in `annulus2d` at a diameter of ```r diam[1]```.
+Next, we look at diameter ```r diam[2]```.
+
+```{r during, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+# topological barcode
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         group = dimension, colour = dimension)) +
+  geom_barcode() +
+  geom_vline(xintercept = diam[2], linetype = "dashed") +
+  xlab("Simplicial complex diameter") +
+  labs(colour = "dim") +
+  theme_barcode() +
+  theme(legend.position = c(0.95, 0.5))
+
+# persistence diagram
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  stat_persistence(diagram = "diagonal") +
+  geom_abline(slope = 1, intercept = 0) +
+  
+  xlim(c(0, 1.5)) + ylim(c(0, 1.5)) +
+  xlab("Feature appearance") +
+  ylab("Feature disappearance") +
+  labs(colour = "dim", shape = "dim") +
+  geom_vline(xintercept = diam[2], linetype = "dashed") +
+  geom_hline(yintercept = diam[2], linetype = "dashed") +
+  coord_fixed() +
+  theme_persist() +
+  theme(legend.position = c(0.95, 0.3))
+
+# stat_disk
+ggplot(annulus_df, aes(x = x, y = y)) +
+  geom_point() +
+  coord_fixed() +
+  stat_disk(radius = rads[2], fill = "blue", alpha = 0.05) +
+  theme_minimal()
+
+# stat_vietoris*
+ggplot(annulus_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = diam[2], fill = "darkgoldenrod", alpha = 0.1) +
+  stat_vietoris1(diameter = diam[2], alpha = 0.25) +
+  stat_vietoris0() +
+  theme_minimal()
+```
+
+Interpretation at diameter ```r diam[2]```:
+
+* topological barcode:
+  + the dominant feature exists at the current diameter (dashed line intersects with the long, blue bar)
+  + no other 1-loop exists at the current diameter (dashed line does not intersect with any other blue bars)
+  + only one 0-dimensional feature exists at the current diameter; although the dashed line does not cross any bars representing 0-dimensional (red) features, this is an artifact of the visualization. In fact, once we reach a simplicial complex diameter in which the 1-skeleton is connected (only one component), there is no further point in calculating or visualizing that single feature as the 1-skeleton will not become unconnected at any higher diameters.
+* persistence diagram:
+  + the dominant feature exists at the current diameter (top-left quadrant in split created by dashed lines)
+  + no other 1-loops exist at the current diameter (all other blue triangles are in the lower-left quadrant)
+  + only one 0-dimensional feature exists at the current diameter (similar visualization artifact as the topological barcode)
+* `stat_disk` visualization:
+  + given the widespread overlap, there is clearly a single 0-dimensional feature at this radius
+  + there is clearly at least one 1-loop composed of most, if not all, of the point cloud
+  + although unlikely based on the plot, it is possible that there exist other 1-loops at this diameter, e.g. at the periphery of the annulus
+* `stat_vietoris*` visualization:
+  + there is clearly a 0-dimensional feature at this radius (faces connect all vertices)
+  + there is clearly at least one 1-loop at this diameter (includes entire annulus)
+  + Given the uniform color, it is possible that there is *only* one 1-loop at this diameter.
+
+Lastly, we plot the four panels for diameter ```r diam[3]```.
+We leave interpretation of these panels as an exercise to the reader.
+
+```{r after, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+# topological barcode
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         group = dimension, colour = dimension)) +
+  geom_barcode() +
+  geom_vline(xintercept = diam[3], linetype = "dashed") +
+  xlab("Simplicial complex diameter") +
+  labs(colour = "dim") +
+  theme_barcode() +
+  theme(legend.position = c(0.85, 0.5))
+
+# persistence diagram
+ggplot(annulus_phom, aes(start = birth, end = death,
+                         shape = dimension, colour = dimension)) +
+  stat_persistence(diagram = "diagonal") +
+  geom_abline(slope = 1, intercept = 0) +
+  
+  xlab("Feature appearance") +
+  ylab("Feature disappearance") +
+  labs(colour = "dim", shape = "dim") +
+  geom_vline(xintercept = diam[3], linetype = "dashed") +
+  geom_hline(yintercept = diam[3], linetype = "dashed") +
+  coord_fixed() +
+  theme_persist() +
+  theme(legend.position = c(0.85, 0.4))
+
+# stat_disk
+ggplot(annulus_df, aes(x = x, y = y)) +
+  geom_point() +
+  coord_fixed() +
+  stat_disk(radius = rads[3], fill = "blue", alpha = 0.05) +
+  theme_minimal()
+
+# stat_vietoris*
+ggplot(annulus_df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_vietoris2(diameter = diam[3], fill = "darkgoldenrod", alpha = 0.1) +
+  stat_vietoris1(diameter = diam[3], alpha = 0.25) +
+  stat_vietoris0() +
+  theme_minimal()
+```
