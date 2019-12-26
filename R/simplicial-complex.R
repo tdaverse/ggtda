@@ -405,9 +405,9 @@ proximate_triples <- function(data, diameter) {
   # angles among triples
   triples <- transform(
     triples,
-    t_a = acos(triples$d_a / (triples$d_ab * triples$d_ac)),
-    t_b = acos(triples$d_b / (triples$d_ab * triples$d_bc)),
-    t_c = acos(triples$d_c / (triples$d_ac * triples$d_bc))
+    t_a = acos_tol(triples$d_a / (triples$d_ab * triples$d_ac), 1e-7),
+    t_b = acos_tol(triples$d_b / (triples$d_ab * triples$d_bc), 1e-7),
+    t_c = acos_tol(triples$d_c / (triples$d_ac * triples$d_bc), 1e-7)
   )
   # if any angle is obtuse, longest side length; otherwise, circumdiameter
   triples$diam <- ifelse(
@@ -454,3 +454,8 @@ GeomFace <- ggproto(
   default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
                     size = 0.5, linetype = 1)
 )
+
+acos_tol <- function(x, tol = sqrt(.Machine$double.eps)) {
+  x <- ifelse(abs(x) > 1 + tol, x, pmin(pmax(x, -1), 1))
+  acos(x)
+}
