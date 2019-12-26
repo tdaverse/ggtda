@@ -17,7 +17,8 @@ stat_disk(
   geom = "polygon",
   position = "identity",
   na.rm = FALSE,
-  radius = 0,
+  radius = NULL,
+  diameter = NULL,
   segments = 60,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -41,7 +42,8 @@ stat_vietoris1(
   geom = "segment",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -53,7 +55,8 @@ stat_vietoris2(
   geom = "polygon",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -76,7 +79,8 @@ stat_cech1(
   geom = "segment",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -88,7 +92,8 @@ stat_cech2(
   geom = "polygon",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -125,7 +130,10 @@ a call to a position adjustment function.}
 \item{na.rm}{Logical; ignored.}
 
 \item{radius}{A positive number; the radius of the disk to render around each
-point.}
+point or to determine simplices from a point cloud.}
+
+\item{diameter}{A positive number; the diameter of the disk to render around
+each point or to determine simplices from a point cloud.}
 
 \item{segments}{The number of segments to be used in drawing each disk.}
 
@@ -141,9 +149,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
-
-\item{diameter}{A positive number; the distance between points at which
-segments will not be included.}
 }
 \description{
 Annotate 2-dimensional point clouds with TDA constructions.
@@ -210,7 +215,7 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = .7, alpha = .25) +
   stat_vietoris0()
 
-# plot ÄŒech 2-skeleton
+# plot Čech 2-skeleton
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
@@ -235,7 +240,7 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
-# plot ÄŒech 2-skeleton atop balls
+# plot Čech 2-skeleton atop balls
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
