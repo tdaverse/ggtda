@@ -189,7 +189,7 @@ ggplot(eq_tri, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-## Illustrative example {#eg}
+## Persistence, Punctuated {#eg}
 
 The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
 We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.
