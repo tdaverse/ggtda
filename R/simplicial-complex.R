@@ -61,10 +61,10 @@
 #'   `segment` in `stat_vietoris1()` and to `face` in `stat_vietoris2`. Pass a
 #'   string to override the default.
 #' @param radius A positive number; the radius of the disk to render around each
-#'   point.
+#'   point or to determine simplices from a point cloud.
+#' @param diameter A positive number; the diameter of the disk to render around
+#'   each point or to determine simplices from a point cloud.
 #' @param segments The number of segments to be used in drawing each disk.
-#' @param diameter A positive number; the distance between points at which
-#'   segments will not be included.
 #' @example inst/examples/ex-simplicial-complex.R
 
 #' @rdname simplicial-complex
@@ -74,7 +74,7 @@ stat_disk <- function(mapping = NULL,
                       geom = "face",
                       position = "identity",
                       na.rm = FALSE,
-                      radius = 0,
+                      radius = NULL, diameter = NULL,
                       segments = 60,
                       show.legend = NA,
                       inherit.aes = TRUE,
@@ -89,7 +89,7 @@ stat_disk <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
-      radius = radius,
+      radius = radius, diameter = diameter,
       segments = segments,
       ...
     )
@@ -105,8 +105,19 @@ StatDisk <- ggproto(
   required_aes = c("x", "y"),
   
   compute_panel = function(data, scales,
-                           radius = 0, segments = 60) {
-    if (radius == 0 || segments == 0) return(data[NULL, ])
+                           radius = NULL, diameter = NULL, segments = 60) {
+    # handle disk dimension
+    if ((is.null(radius) && is.null(diameter)) || segments == 0) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(diameter)) {
+      if (! is.null(radius)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`radius` value will be used.")
+      } else {
+        radius <- diameter / 2
+      }
+    }
     
     # calculate a polygon that approximates a circle
     angles <- (0:segments) * 2 * pi / segments
@@ -170,7 +181,7 @@ stat_vietoris1 <- function(mapping = NULL,
                            geom = "segment",
                            position = "identity",
                            na.rm = FALSE,
-                           diameter = Inf,
+                           radius = NULL, diameter = NULL,
                            show.legend = NA,
                            inherit.aes = TRUE,
                            ...) {
@@ -184,7 +195,7 @@ stat_vietoris1 <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
-      diameter = diameter,
+      radius = radius, diameter = diameter,
       ...
     )
   )
@@ -202,7 +213,19 @@ StatVietoris1 <- ggproto(
   
   # statistical transformation into plot-ready data
   compute_panel = function(data, scales,
-                           diameter = Inf) {
+                           radius = NULL, diameter = NULL) {
+    # handle disk dimension
+    if (is.null(radius) && is.null(diameter)) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(radius)) {
+      if (! is.null(diameter)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`diameter` value will be used.")
+      } else {
+        diameter <- radius * 2
+      }
+    }
     
     # indices of pairs of data points that are within `diameter` of each other
     edges <- proximate_pairs(data, diameter)
@@ -228,7 +251,7 @@ stat_vietoris2 <- function(mapping = NULL,
                            geom = "face",
                            position = "identity",
                            na.rm = FALSE,
-                           diameter = Inf,
+                           radius = NULL, diameter = NULL,
                            show.legend = NA,
                            inherit.aes = TRUE,
                            ...) {
@@ -242,7 +265,7 @@ stat_vietoris2 <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
-      diameter = diameter,
+      radius = radius, diameter = diameter,
       ...
     )
   )
@@ -260,7 +283,19 @@ StatVietoris2 <- ggproto(
   
   # statistical transformation into plot-ready data
   compute_panel = function(data, scales,
-                           diameter = Inf) {
+                           radius = NULL, diameter = NULL) {
+    # handle disk dimension
+    if (is.null(radius) && is.null(diameter)) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(radius)) {
+      if (! is.null(diameter)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`diameter` value will be used.")
+      } else {
+        diameter <- radius * 2
+      }
+    }
     
     # indices of pairs of data points that are within `diameter` of each other
     edges <- as.data.frame(proximate_pairs(data, diameter))
@@ -307,7 +342,7 @@ stat_cech2 <- function(mapping = NULL,
                        geom = "face",
                        position = "identity",
                        na.rm = FALSE,
-                       diameter = Inf,
+                       radius = NULL, diameter = NULL,
                        show.legend = NA,
                        inherit.aes = TRUE,
                        ...) {
@@ -321,7 +356,7 @@ stat_cech2 <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
-      diameter = diameter,
+      radius = radius, diameter = diameter,
       ...
     )
   )
@@ -335,7 +370,19 @@ StatCech2 <- ggproto(
   
   # statistical transformation into plot-ready data
   compute_panel = function(data, scales,
-                           diameter = Inf) {
+                           radius = NULL, diameter = NULL) {
+    # handle disk dimension
+    if (is.null(radius) && is.null(diameter)) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(radius)) {
+      if (! is.null(diameter)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`diameter` value will be used.")
+      } else {
+        diameter <- radius * 2
+      }
+    }
     
     # indices of triples of data points that are within `diameter` of some point
     faces <- as.data.frame(proximate_triples(data, diameter))

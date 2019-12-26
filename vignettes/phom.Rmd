@@ -1,10 +1,10 @@
 ---
-title: "An introduction to ggtda"
+title: "Visualizing persistent homology with ggtda"
 author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
-date: "23 January 2019"
+date: "1 January 2020"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{An introduction to ggtda}
+  %\VignetteIndexEntry{Visualizing persistent homology with ggtda}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 references:
@@ -95,29 +95,29 @@ data("annulus2d")
 The `annulus2d` dataset (visualized below) comes with ggtda, and will be used to demonstrate each form of visualization.
 
 ```{r annulus-scatter, echo = FALSE, fig.height = 4, fig.width = 4}
-annulus.df <- as.data.frame(annulus2d)
-ggplot(annulus.df, aes(x = x, y = y)) +
+annulus_df <- as.data.frame(annulus2d)
+ggplot(annulus_df, aes(x = x, y = y)) +
   geom_point() +
-  theme_bw()
+  theme_minimal()
 ```
 
 The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
-We will calculate its persistent homology using the TDAstats package (following code block) and then proceed to plot the result with each of the three visualizations using ggtda.
+We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with each of the three visualizations using ggtda.
 
 ```{r phom}
 # calculate persistent homology of annulus and format
-annulus.phom <- as.data.frame(calculate_homology(annulus2d))
-annulus.phom$dimension <- as.factor(annulus.phom$dimension)
+annulus_phom <- as.data.frame(calculate_homology(annulus2d))
+annulus_phom$dimension <- as.factor(annulus_phom$dimension)
 ```
 
-We can take a quick look with `head()` and `tail()` to see what the raw form of `annulus2d`'s persistent homology looks like.
+We take a quick peek with `head()` and `tail()` to see what the raw form of `annulus2d`'s persistent homology looks like.
 
 ```{r peek}
 # first few features (0-dimensional)
-head(annulus.phom)
+head(annulus_phom)
 
 # last few features (1-dimensional)
-tail(annulus.phom)
+tail(annulus_phom)
 ```
 
 Clearly, graphical visualizations would permit easier and more effective interpretation than printing raw data.
@@ -129,15 +129,15 @@ To account for this, the axes will be labeled in a generic manner that should be
 ## Topological barcode (aka persistence barcode)
 
 Topological barcodes plot features as vertically stacked horizontal bars.
-Here, each bar corresponds to a single feature (single row in `annulus.phom`) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in `annulus.phom`).
+Here, each bar corresponds to a single feature (single row in `annulus_phom`) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in `annulus_phom`) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in `annulus_phom`).
 Creating a topological barcode with ggtda is straightforward using `geom_barcode`.
 
 ```{r barcode, fig.height = 3, fig.width = 5}
 # create topological barcode with appropriate theme
-ggplot(annulus.phom, aes(start = birth, end = death,
+ggplot(annulus_phom, aes(start = birth, end = death,
                          group = dimension, colour = dimension)) +
   geom_barcode() +
-  xlab("Simplicial complex radius") +
+  xlab("Simplicial complex diameter") +
   theme_barcode()
 ```
 
@@ -145,17 +145,17 @@ The `group` aesthetic orders features by dimension ensuring that all 0-dimension
 The `color` aesthetic allows for explicit discrimination between features of different dimensions.
 
 Given that an annulus (aka noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected.
-This finding should be replicated in the persistence diagrams as well.
+This finding should be replicated in the persistence diagrams below.
 
 ## Persistence diagrams
 
 Flat persistence diagrams plot features as points on a scatterplot.
-Each point corresponds to a single feature (one row in `annulus.phom`), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in `annulus.phom`) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in `annulus.phom`).
+Each point corresponds to a single feature (one row in `annulus_phom`), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in `annulus_phom`) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in `annulus_phom`).
 Flat persistence diagrams are generated using `stat_persistence` as follows.
 
 ```{r flatpersist, fig.height=3.5, fig.width = 4.5}
 # create flat persistence diagram with appropriate theme
-ggplot(annulus.phom, aes(start = birth, end = death,
+ggplot(annulus_phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_persistence() +
   xlab("Feature appearance") +
@@ -172,7 +172,7 @@ Aesthetically, it is also generally pleasing to have the vertical and horizontal
 
 ```{r diagadjust, fig.height = 3.5, fig.width = 4.5}
 # create diagonal persistence diagrams with adjustments
-ggplot(annulus.phom, aes(start = birth, end = death,
+ggplot(annulus_phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_persistence(diagram = "diagonal") +
   geom_abline(slope = 1, intercept = 0) +
@@ -184,5 +184,10 @@ ggplot(annulus.phom, aes(start = birth, end = death,
 ```
 
 `ggplot2::ggsave` can be used to save plots produced by ggtda.
+Thus, running the following line of code will save the most recently plotted diagram (diagonal persistence diagram) as a PNG image file in the local working directory.
+
+```{r save-eg, eval = FALSE}
+ggsave("my-plot.png")
+```
 
 ## References

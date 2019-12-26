@@ -18,7 +18,8 @@ stat_disk(
   geom = "face",
   position = "identity",
   na.rm = FALSE,
-  radius = 0,
+  radius = NULL,
+  diameter = NULL,
   segments = 60,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -42,7 +43,8 @@ stat_vietoris1(
   geom = "segment",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -54,7 +56,8 @@ stat_vietoris2(
   geom = "face",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -77,7 +80,8 @@ stat_cech1(
   geom = "segment",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -89,7 +93,8 @@ stat_cech2(
   geom = "face",
   position = "identity",
   na.rm = FALSE,
-  diameter = Inf,
+  radius = NULL,
+  diameter = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -137,7 +142,10 @@ a call to a position adjustment function.}
 \item{na.rm}{Logical; ignored.}
 
 \item{radius}{A positive number; the radius of the disk to render around each
-point.}
+point or to determine simplices from a point cloud.}
+
+\item{diameter}{A positive number; the diameter of the disk to render around
+each point or to determine simplices from a point cloud.}
 
 \item{segments}{The number of segments to be used in drawing each disk.}
 
@@ -153,9 +161,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
-
-\item{diameter}{A positive number; the distance between points at which
-segments will not be included.}
 
 \item{stat}{The statistical transformation to use on the data for this
 layer, as a string.}

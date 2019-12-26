@@ -4,7 +4,12 @@
 \alias{theme_barcode}
 \title{Theme for Persistence Barcodes}
 \usage{
-theme_barcode()
+theme_barcode(vertical = FALSE)
+}
+\arguments{
+\item{vertical}{defaults to \code{FALSE} (no vertical axis); if \code{TRUE}, allows
+users to more easily count the number of features plotted in barcode
+(if \code{vertical} equals \code{TRUE}, this function is equivalent to \code{theme_tda})}
 }
 \description{
 A simple theme to clearly display persistent homology in
