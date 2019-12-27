@@ -28,6 +28,7 @@ We first setup our environment as follows, attaching the necessary R packages (i
 
 ```{r setup, message = FALSE}
 library("ggtda")
+library("ggplot2")
 library("TDAstats") # to calculate persistent homology
 
 # load dataset
