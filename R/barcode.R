@@ -21,13 +21,11 @@
 #'   topological features of different dimensions are usually plotted together
 #'   in persistence diagrams, barcodes often separate segments corresponding to
 #'   features of different dimension, by vertical grouping or by faceting.
-#'   
-
+#'
 #' @template ref-carlsson2004
 #' @template ref-carlsson2014
 #' @template ref-chazal2017
-#'   
-
+#'
 #' @name barcode
 #' @import ggplot2
 #' @family plot layers for persistence data
@@ -41,7 +39,6 @@
 #' @param stat The The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
 #' @example inst/examples/ex-barcode.R
-
 #' @rdname barcode
 #' @export
 geom_barcode <- function(mapping = NULL,
