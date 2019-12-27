@@ -175,7 +175,7 @@ ggplot(eq_tri, aes(x = x, y = y)) +
 # top right panel: Čech with stat_cech*
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_cech2(diameter = diam, fill = "darkgoldenrold", alpha = 0.1) +
+  stat_cech2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
   stat_cech1(diameter = diam, alpha = 0.25) +
   stat_cech0() +
   ggtitle("Čech complex") +
