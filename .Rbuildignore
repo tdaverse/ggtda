@@ -4,7 +4,6 @@
 ^LICENSE$
 data-raw
 man-roxygen
-^NEWS\.md$
 ^cran-comments\.md$
 
 # R project metadata

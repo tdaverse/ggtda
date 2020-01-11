@@ -1,6 +1,6 @@
 Package: ggtda
 Type: Package
-Title: ggplot2-Compatible Visualization of Persistent Homology
+Title: 'ggplot2'-Compatible Visualization of Persistent Homology
 Version: 0.1.0
 Authors@R: c(
     person("Jason Cory", "Brunson",
