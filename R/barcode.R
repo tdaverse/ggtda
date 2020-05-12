@@ -70,22 +70,21 @@ geom_barcode <- function(mapping = NULL,
 GeomBarcode <- ggproto(
   "GeomBarcode", GeomSegment,
   
-  required_aes = c("start", "end"),
+  required_aes = c("start|xmin", "end|xmax"),
   
   # pre-process of the data set
   setup_data = function(data, params) {
     
-    if (! is.null(data$x) & ! is.null(data$xend) &
-        is.null(data$start) & is.null(data$end)) {
-      
-      warning(
-        "Substituting `x` and `xend` for missing persistence aesthetics ",
-        "`start` and `end`."
-      )
-      
-      # change `x` and `xend` to `start` and `end`
-      data$start <- data$x
-      data$end <- data$xend
+    # reconcile conflicts: prompt for `xmin,xmax` but use `start,end` internally
+    if (is.null(data$start)) {
+      data$start <- data$xmin
+    } else if (! is.null(data$xmin)) {
+      warning("Aesthetic `xmin` was provided, so `start` will be ignored.")
+    }
+    if (is.null(data$end)) {
+      data$end <- data$xmax
+    } else if (! is.null(data$xmax)) {
+      warning("Aesthetic `xmax` was provided, so `end` will be ignored.")
     }
     
     # introduce numerical x-values in order to allow coordinate transforms

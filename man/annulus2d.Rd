@@ -4,7 +4,9 @@
 \name{annulus2d}
 \alias{annulus2d}
 \title{2-dimensional point cloud of an annulus}
-\format{a matrix with 100 rows and 2 columns: the x- and y-coordinates}
+\format{
+a matrix with 100 rows and 2 columns: the x- and y-coordinates
+}
 \source{
 \url{https://github.com/rrrlw/ggtda/blob/master/data-raw/annulus2d.R}
 }

@@ -11,10 +11,22 @@ test_that("Persistence barcode geom(s) and stat(s) work correctly", {
   
   # build ggplot2 objects without plotting
   test.geom <- ggplot(data = test.df,
-                      aes(xmin = birth, xmax = death, group = dim, color = dim)) +
+                      aes(start = birth, end = death,
+                          group = dim, color = dim)) +
     geom_barcode()
+  expect_equal(class(ggplot_build(test.geom)), "ggplot_built")
   
-  # run tests - not doing much, just making sure there's no errors
-  #   before this point
-  expect_true(is.ggplot(test.geom))
+  # use alternative positional aesthetics
+  test.geom <- ggplot(data = test.df,
+                      aes(xmin = birth, xmax = death,
+                          group = dim, color = dim)) +
+    geom_barcode()
+  expect_equal(class(ggplot_build(test.geom)), "ggplot_built")
+  
+  # warn to use correct aesthetics
+  test.geom <- ggplot(data = test.df,
+                      aes(x = birth, xend = death,
+                          group = dim, color = dim)) +
+    geom_barcode()
+  expect_error(ggplot_build(test.geom), "start and end")
 })
