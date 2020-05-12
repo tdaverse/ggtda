@@ -14,7 +14,23 @@
 \alias{StatCech2}
 \alias{GeomFace}
 \title{Base \code{ggproto} classes for \emph{ggtda}}
-\format{An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.}
+\format{
+An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{StatFrontier} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+
+An object of class \code{StatDisk} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+
+An object of class \code{StatVietoris0} (inherits from \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
+
+An object of class \code{StatVietoris1} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{StatVietoris2} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{StatCech2} (inherits from \code{StatVietoris2}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
+
+An object of class \code{GeomFace} (inherits from \code{GeomPolygon}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.
+}
 \description{
 Base \code{ggproto} classes for \emph{ggtda}
 }

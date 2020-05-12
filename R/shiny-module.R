@@ -7,6 +7,7 @@
 #' @import shiny
 #' @importFrom TDAstats calculate_homology
 #' @return shiny object
+#' @export
 interact_phom <- function(dataset) {
   colnames(dataset) <- c("x", "y")
   phom <- as.data.frame(TDAstats::calculate_homology(dataset))
