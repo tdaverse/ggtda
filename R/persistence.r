@@ -97,6 +97,9 @@ StatPersistence <- ggproto(
     data$x <- data$start
     data$y <- data$end
     
+    # computed variables
+    data$persistence <- data$end - data$start
+    
     # diagram transformation
     data <- diagram_transform(data, diagram)
     
@@ -157,6 +160,9 @@ StatFrontier <- ggproto(
     # points in cartesian coordinates
     data$x <- data$start
     data$y <- data$end
+    
+    # computed variables
+    data$persistence <- data$end - data$start
     
     # data frame of segments
     data <- data.frame(
