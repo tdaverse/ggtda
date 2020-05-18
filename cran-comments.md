@@ -1,6 +1,6 @@
 ## testing environments
 
-* local installs: 3.6.1 (Mac OS X); 3.6.2 (Ubuntu 18.04 LTS and Windows 10)
+* local installs: 3.6.1 (Mac OS X); 4.0.0 (Windows 10)
 * Rhub (via `devtools::check_rhub()`)
 * win-builder (devel, release, and oldrelease; via `devtools::check_win_*()`)
 
