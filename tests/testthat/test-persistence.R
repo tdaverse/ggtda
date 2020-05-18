@@ -13,13 +13,13 @@ test_that("Persistence layers work correctly", {
   # build ggplot2 objects without plotting:
   # flat persistence diagram
   p_pf <- ggplot(data = d, aes(start = birth, end = death, color = dim)) +
-    stat_persistence()
+    stat_persistence(diagram = "flat")
   expect_is(p_pf, "ggplot")
   expect_is(p_pf$layer[[1]], "ggproto")
   expect_equal(c(p_pf$labels$start, p_pf$labels$end), c("birth", "death"))
   # diagonal persistence diagram
   p_pd <- ggplot(data = d, aes(start = birth, end = death, color = dim)) +
-    stat_persistence(diagram = "diagonal")
+    stat_persistence()
   expect_is(p_pd, "ggplot")
   expect_is(p_pd$layer[[1]], "ggproto")
   expect_equal(c(p_pd$labels$start, p_pd$labels$end), c("birth", "death"))
@@ -51,13 +51,13 @@ test_that("Frontier layers work correctly", {
   # build ggplot2 objects without plotting:
   # flat frontier diagram
   p_ff <- ggplot(data = d, aes(start = birth, end = death, color = dim)) +
-    stat_frontier()
+    stat_frontier(diagram = "flat")
   expect_is(p_ff, "ggplot")
   expect_is(p_ff$layer[[1]], "ggproto")
   expect_equal(c(p_ff$labels$start, p_ff$labels$end), c("birth", "death"))
   # diagonal frontier diagram
   p_fd <- ggplot(data = d, aes(start = birth, end = death, color = dim)) +
-    stat_frontier(diagram = "diagonal")
+    stat_frontier()
   expect_is(p_fd, "ggplot")
   expect_is(p_fd$layer[[1]], "ggproto")
   expect_equal(c(p_fd$labels$start, p_fd$labels$end), c("birth", "death"))
