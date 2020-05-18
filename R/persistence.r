@@ -60,7 +60,7 @@ stat_persistence <- function(mapping = NULL,
                              data = NULL,
                              geom = "point",
                              position = "identity",
-                             diagram = "flat",
+                             diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
@@ -91,11 +91,14 @@ StatPersistence <- ggproto(
   required_aes = c("start", "end"),
   
   compute_panel = function(data, scales,
-                           diagram = "flat") {
+                           diagram = "diagonal") {
     
     # points in cartesian coordinates
     data$x <- data$start
     data$y <- data$end
+    
+    # computed variables
+    data$persistence <- data$end - data$start
     
     # diagram transformation
     data <- diagram_transform(data, diagram)
@@ -111,7 +114,7 @@ stat_frontier <- function(mapping = NULL,
                           data = NULL,
                           geom = "line",
                           position = "identity",
-                          diagram = "flat",
+                          diagram = "diagonal",
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE,
@@ -141,7 +144,7 @@ StatFrontier <- ggproto(
   required_aes = c("start", "end"),
   
   compute_group = function(data, scales,
-                           diagram = "flat") {
+                           diagram = "diagonal") {
     
     # first row (for aesthetics)
     first_row <- data[1, setdiff(names(data), c("start", "end")), drop = FALSE]
@@ -157,6 +160,9 @@ StatFrontier <- ggproto(
     # points in cartesian coordinates
     data$x <- data$start
     data$y <- data$end
+    
+    # computed variables
+    data$persistence <- data$end - data$start
     
     # data frame of segments
     data <- data.frame(

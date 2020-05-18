@@ -247,7 +247,7 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = .7, alpha = .25) +
   stat_vietoris0()
 
-# plot Čech 2-skeleton
+# plot ÄŒech 2-skeleton
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
@@ -272,7 +272,7 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = .7, size = .2) +
   stat_vietoris0(size = .3)
 
-# plot Čech 2-skeleton atop balls
+# plot ÄŒech 2-skeleton atop balls
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +

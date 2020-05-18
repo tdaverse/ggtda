@@ -12,6 +12,15 @@ ggplot(toy.data,
   theme_tda() +
   stat_persistence() +
   lims(x = c(0, NA), y = c(0, NA))
+# diagonal persistence diagram, coding persistence to transparency
+ggplot(toy.data,
+       aes(start = birth, end = death, colour = dim, shape = dim,
+           alpha = after_stat(persistence))) +
+  theme_tda() + coord_equal() +
+  stat_persistence(diagram = "diagonal", size = 3) +
+  geom_abline(intercept = 0, slope = 1, color = "grey") +
+  lims(x = c(0, 6), y = c(0, 6)) +
+  guides(alpha = FALSE)
 # diagonal persistence diagram with frontier
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
