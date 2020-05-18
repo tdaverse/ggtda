@@ -6,12 +6,6 @@ toy.data <- data.frame(
   death = c(5, 3, 5, 3, 6),
   dim = c("0", "0", "2", "1", "1")
 )
-# flat persistence diagram
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_tda() +
-  stat_persistence() +
-  lims(x = c(0, NA), y = c(0, NA))
 # diagonal persistence diagram, coding persistence to transparency
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim,
@@ -25,8 +19,14 @@ ggplot(toy.data,
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_tda() + coord_equal() +
-  stat_persistence(diagram = "diagonal") +
-  stat_frontier(diagram = "diagonal") +
+  stat_persistence() +
+  stat_frontier() +
+  lims(x = c(0, NA), y = c(0, NA))
+# flat persistence diagram
+ggplot(toy.data,
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_tda() +
+  stat_persistence(diagram = "flat") +
   lims(x = c(0, NA), y = c(0, NA))
 # landscape persistence frontier
 ggplot(toy.data,
