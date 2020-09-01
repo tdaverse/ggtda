@@ -4,10 +4,15 @@ Title: 'ggplot2' Extension to Visualize Topological Persistence
 Version: 0.1.0
 Authors@R: c(
     person("Jason Cory", "Brunson",
-           role = c("aut", "cre"), email = "cornelioid@gmail.com"),
+           role = c("aut", "cre"),
+           email = "cornelioid@gmail.com",
+           comment = c(ORCID = "0000-0003-3126-9494")),
     person("Raoul", "Wadhwa",
-           role = "aut", email = "raoulwadhwa@gmail.com"),
-    person("Jacob", "Scott", role = "aut"))
+           role = "aut",
+           email = "raoulwadhwa@gmail.com",
+           comment = c(ORCID = "0000-0003-0503-9580")),
+    person("Jacob", "Scott", role = "aut",
+           comment = c(ORCID = "0000-0003-2971-7673")))
 Description: Topological data analysis often produces summary data
     consisting of birth and death values for topological features;
     see Chazal and Michel (2017) <arXiv:1710.04019>
@@ -19,7 +24,8 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)
-Imports: ggplot2 (>= 3.2.1),
+Imports:
+    ggplot2 (>= 3.2.1),
     TDAstats (>= 0.4.1),
     rPref (>= 1.2)
 URL: https://github.com/rrrlw/ggtda
