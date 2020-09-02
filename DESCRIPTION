@@ -19,7 +19,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)
 Imports: ggplot2 (>= 3.2.1),
-    TDAstats (>= 0.4.1),
+    ripserr (>= 0.1.0),
     rPref (>= 1.2),
     vdiffr (>= 0.3.0)
 URL: https://github.com/rrrlw/ggtda
@@ -30,5 +30,5 @@ Suggests:
     rmarkdown (>= 1.10),
     covr (>= 3.1.0)
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)

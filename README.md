@@ -47,9 +47,9 @@ We aim to submit ggtda to [CRAN](https://CRAN.R-project.org) soon.
 **ggtda** visualizes persistence data but also includes stat layers for
 common TDA constructions. This example illustrates them together. For
 some artificial data, generate a “noisy circle” and calculate its
-persistent homology (PH) using [the **TDAstats**
-package](https://github.com/rrrlw/TDAstats), which ports [the `ripser`
-implementation](https://github.com/Ripser/ripser) into R:
+persistent homology (PH) using [the **ripserr**
+package](https://cran.r-project.org/package=ripserr), which ports [the
+`ripser` implementation](https://github.com/Ripser/ripser) into R:
 
 ``` r
 # generate a noisy circle
@@ -61,7 +61,7 @@ d <- data.frame(
   y = sin(t) + stats::rnorm(n = n, mean = 0, sd = sd)
 )
 # compute the persistent homology
-ph <- as.data.frame(TDAstats::calculate_homology(as.matrix(d), dim = 1))
+ph <- as.data.frame(ripserr::vietoris_rips(as.matrix(d), dim = 1))
 print(head(ph, n = 12))
 #>    dimension birth      death
 #> 1          0     0 0.02903148
@@ -98,8 +98,8 @@ pair of which are within `prox` of each other.
 
 ``` r
 # attach *ggtda*
+library(ggplot2)
 library(ggtda)
-#> Loading required package: ggplot2
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +

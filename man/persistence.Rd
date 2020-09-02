@@ -161,10 +161,10 @@ ggplot(toy.data,
 
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
-library("TDAstats")
+library("ripserr")
 data("annulus2d")  # noisy unit circle (Betti-1 number = 1)
 # calculate persistence homology and format
-annulus.phom <- as.data.frame(calculate_homology(annulus2d))
+annulus.phom <- as.data.frame(vietoris_rips(annulus2d))
 annulus.phom$dimension <- as.factor(annulus.phom$dimension)
 # pretty flat persistence diagram
 ggplot(annulus.phom, aes(start = birth, end = death,
