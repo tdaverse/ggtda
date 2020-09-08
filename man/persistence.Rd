@@ -123,7 +123,7 @@ structure.
 
 \examples{
 #####EXAMPLE 1#####
-library("ggplot2")
+
 # toy example
 toy.data <- data.frame(
   birth = c(0, 0, 1, 2, 1.5),

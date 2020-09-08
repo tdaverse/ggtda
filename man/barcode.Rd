@@ -95,7 +95,7 @@ features of different dimension, by vertical grouping or by faceting.
 
 \examples{
 #####EXAMPLE 1#####
-library("ggplot2")
+
 # toy example
 toy.data <- data.frame(
   appear = c(0, 0, 0, 1, 2),

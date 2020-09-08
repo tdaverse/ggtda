@@ -98,8 +98,8 @@ pair of which are within `prox` of each other.
 
 ``` r
 # attach *ggtda*
-library(ggplot2)
 library(ggtda)
+#> Loading required package: ggplot2
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +

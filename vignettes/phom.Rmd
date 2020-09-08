@@ -85,7 +85,6 @@ This vignette introduces how users can use ggtda to construct publication-qualit
 We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.
 
 ```{r setup, message = FALSE}
-library("ggplot2")
 library("ggtda")
 library("ripserr")
 

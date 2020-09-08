@@ -75,7 +75,6 @@ Geometrically, the Vietoris complex is constructed based on balls of fixed radiu
 
 ```{r, fig.height=3.5}
 # attach *ggtda*
-library(ggplot2)
 library(ggtda)
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
