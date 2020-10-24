@@ -23,9 +23,11 @@ Description: Topological data analysis often produces summary data
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 2.10)
+Depends:
+    ggplot2 (>= 3.2),
+    R (>= 2.10)
 Imports:
-    ggplot2 (>= 3.2.1),
+    ripserr (>= 0.1.1),
     rPref (>= 1.2)
 URL: https://github.com/rrrlw/ggtda
 BugReports: https://github.com/rrrlw/ggtda/issues
