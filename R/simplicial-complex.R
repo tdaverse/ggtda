@@ -483,8 +483,3 @@ GeomFace <- ggproto(
   default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
                     size = 0.5, linetype = 1)
 )
-
-acos_tol <- function(x, tol = sqrt(.Machine$double.eps)) {
-  x <- ifelse(abs(x) > 1 + tol, x, pmin(pmax(x, -1), 1))
-  acos(x)
-}

@@ -6,7 +6,7 @@ test_that("Proximate functions work as expected on equilateral triangle", {
   # equilateral triangle
   et <- data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
   # small perturbations from key values
-  eps <- .01
+  eps <- .00000001
   
   # proximate pairs at diameter ~ sqrt(3)
   expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0L)
