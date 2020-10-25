@@ -38,5 +38,5 @@ Suggests:
     rmarkdown (>= 1.10),
     covr (>= 3.1.0)
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
