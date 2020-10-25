@@ -212,7 +212,6 @@ aliases for \code{\link[ggplot2:stat_identity]{ggplot2::stat_identity()}} that d
 }
 
 \examples{
-library("ggplot2")
 
 # function to generate noisy 2D circles
 make_noisy_circle <- function(n, sd = .01) {

@@ -95,7 +95,7 @@ features of different dimension, by vertical grouping or by faceting.
 
 \examples{
 #####EXAMPLE 1#####
-library("ggplot2")
+
 # toy example
 toy.data <- data.frame(
   appear = c(0, 0, 0, 1, 2),
@@ -110,10 +110,11 @@ ggplot(toy.data,
 
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example
-library("TDAstats")
-data("circle2d") # unit circle (Betti-1 number = 1)
+library("ripserr")
+angles <- runif(100, 0, 2 * pi)
+circle2d <- cbind(cos(angles), sin(angles)) # unit circle (Betti-1 number = 1)
 # calculate persistence homology and format
-circ.phom <- as.data.frame(calculate_homology(circle2d))
+circ.phom <- as.data.frame(vietoris_rips(circle2d))
 circ.phom$dimension <- as.factor(circ.phom$dimension)
 # pretty topological barcode with geom layer
 ggplot(circ.phom, aes(start = birth, end = death,

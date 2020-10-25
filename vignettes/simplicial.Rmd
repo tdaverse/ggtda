@@ -28,19 +28,18 @@ We first setup our environment as follows, attaching the necessary R packages (i
 
 ```{r setup, message = FALSE}
 library("ggtda")
-library("ggplot2")
-library("TDAstats") # to calculate persistent homology
+library("ripserr")
 
 # load dataset
-data("unif2d")
 data("annulus2d")
 ```
 
-The `unif2d` dataset (visualized below; left) is included with TDAstats, and a subset of 25 points from it will be used to demonstrate how individual ggtda functions work.
-The `annulus2d` dataset (visualized below; right) is included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.
+The `unif_df` dataset (visualized below; left) is a subset of 25 points sampled uniformly from the unit interval; it will be used to demonstrate how individual ggtda functions work.
+The `annulus_df` dataset (visualized below; right) is data-framed from the `annulus2d` data included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.
 
 ```{r plots, fig.show = 'hold'}
-unif_df <- as.data.frame(unif2d[1:25, ])
+set.seed(1)
+unif_df <- as.data.frame(cbind(runif(25), runif(25)))
 colnames(unif_df) <- c("x", "y")
 annulus_df <- as.data.frame(annulus2d)
 
@@ -116,6 +115,7 @@ Note that either parameter can be passed to each stat, and correct values must b
 ```{r vietoris1-disk, fig.height = 5, fig.width = 5}
 # combine stat_vietoris1 with stat_disk
 ggplot(unif_df, aes(x = x, y = y)) +
+  coord_fixed() +
   stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   geom_point() +
   stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
@@ -193,11 +193,11 @@ ggplot(eq_tri, aes(x = x, y = y)) +
 ## Persistence, Punctuated {#eg}
 
 The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
-We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.
+We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with corresponding simplicial complices at various radii.
 
 ```{r phom, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
 # calculate persistent homology of annulus
-annulus_phom <- as.data.frame(calculate_homology(annulus2d))
+annulus_phom <- as.data.frame(vietoris_rips(annulus2d))
 annulus_phom$dimension <- as.factor(annulus_phom$dimension)
 
 # plot topological barcode (left panel)
