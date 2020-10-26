@@ -1,7 +1,7 @@
 ---
 title: "Visualizing persistent homology with ggtda"
 author: "J. Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa"
-date: "1 January 2020"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Visualizing persistent homology with ggtda}
@@ -86,8 +86,7 @@ We first setup our environment as follows, attaching the necessary R packages (i
 
 ```{r setup, message = FALSE}
 library("ggtda")
-library("ggplot2")
-library("TDAstats") # to calculate persistent homology
+library("ripserr")
 
 # load dataset
 data("annulus2d")
@@ -103,11 +102,11 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 ```
 
 The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
-We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with each of the three visualizations using ggtda.
+We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with each of the three visualizations using ggtda.
 
 ```{r phom}
 # calculate persistent homology of annulus and format
-annulus_phom <- as.data.frame(calculate_homology(annulus2d))
+annulus_phom <- as.data.frame(vietoris_rips(annulus2d))
 annulus_phom$dimension <- as.factor(annulus_phom$dimension)
 ```
 
@@ -124,7 +123,7 @@ tail(annulus_phom)
 Clearly, graphical visualizations would permit easier and more effective interpretation than printing raw data.
 We will start off by plotting this as a topological barcode.
 
-*N.B.* although TDAstats calculates persistent homology using the Vietoris-Rips complex, persistent homology from another simplicial complex (e.g. Čech complex) can also be visualized with ggtda.
+*N.B.* although `ripserr::vietoris_rips()` calculates persistent homology using the Vietoris-Rips complex, persistent homology from another simplicial complex (e.g. Čech complex) can also be visualized with ggtda.
 To account for this, the axes will be labeled in a generic manner that should be adapted by users depending on the specific context.
 
 ## Topological barcode (aka persistence barcode)
@@ -176,6 +175,7 @@ Aesthetically, it is also generally pleasing to have the vertical and horizontal
 ggplot(annulus_phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_persistence(diagram = "diagonal") +
+  coord_equal() +
   geom_abline(slope = 1, intercept = 0) +
   xlim(c(0, 1.5)) +
   ylim(c(0, 1.5)) +
