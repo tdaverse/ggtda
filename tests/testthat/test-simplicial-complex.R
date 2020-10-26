@@ -6,15 +6,15 @@ test_that("Proximate functions work as expected on equilateral triangle", {
   # equilateral triangle
   et <- data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
   # small perturbations from key values
-  eps <- .01
+  eps <- .00000001
   
   # proximate pairs at diameter ~ sqrt(3)
-  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) + eps)), 3)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) - eps)), 0L)
+  expect_equal(nrow(proximate_pairs(et, diameter = sqrt(3) + eps)), 3L)
   
-  # proximate triples at diameter ~ sqrt(3)
-  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) - eps)), 0)
-  expect_equal(nrow(proximate_triples(et, diameter = sqrt(3) + eps)), 1)
+  # proximate triples at diameter ~ 2
+  expect_equal(nrow(proximate_triples(et, diameter = 2 - eps)), 0L)
+  expect_equal(nrow(proximate_triples(et, diameter = 2 + eps)), 1L)
 })
 
 test_that("Vietoris-Rips distance calculations run as expected", {
@@ -78,7 +78,7 @@ test_that("Cech layers work as expected", {
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p1)), 1097)
+  expect_equal(nrow(layer_data(p1)), 1097L)
   
   # Čech 2-skeleton stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
@@ -86,7 +86,7 @@ test_that("Cech layers work as expected", {
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 12651)
+  expect_equal(nrow(layer_data(p2)), 16953L)
   
   # skip on continuous integration services
   skip_on_travis()

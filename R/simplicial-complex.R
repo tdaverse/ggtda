@@ -385,7 +385,7 @@ StatCech2 <- ggproto(
     }
     
     # indices of triples of data points that are within `diameter` of some point
-    faces <- as.data.frame(proximate_triples(data, diameter))
+    faces <- proximate_triples(data, diameter)
     faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
     
     # data frame of faces' perimeter coordinates
@@ -414,7 +414,8 @@ proximate_triples <- function(data, diameter) {
     b = unlist(lapply(2:nrow(data), function(k) k:nrow(data))),
     d = as.vector(stats::dist(data))
   )
-  dists <- dists[dists$d < diameter, ]
+  # shed too-distant pairs
+  dists <- dists[dists$d < diameter, , drop = FALSE]
   # distances among triples
   triples <- merge(
     dists,
@@ -426,43 +427,24 @@ proximate_triples <- function(data, diameter) {
     transform(dists, c = dists$b, b = NULL, d_ac = dists$d, d = NULL),
     by = c("a", "c")
   )
-  # triples within `diameter` of each other -> circumdiameter
-  triples$s <- (triples$d_ab + triples$d_bc + triples$d_ac) / 2
-  triples$cd <- 2 * triples$d_ab * triples$d_bc * triples$d_ac / sqrt(
+  # semiperimeters
+  triples$s <- .5 * (triples$d_ab + triples$d_bc + triples$d_ac)
+  # circumdiameters
+  triples$cd <- .5 * triples$d_ab * triples$d_bc * triples$d_ac / sqrt(
     triples$s * (triples$s - triples$d_ab) *
       (triples$s - triples$d_bc) * (triples$s - triples$d_ac)
   )
-  # vectors between pairs
-  triples <- transform(
-    triples,
-    x_ab = data$x[triples$b] - data$x[triples$a],
-    y_ab = data$y[triples$b] - data$y[triples$a],
-    x_bc = data$x[triples$c] - data$x[triples$b],
-    y_bc = data$y[triples$c] - data$y[triples$b],
-    x_ac = data$x[triples$c] - data$x[triples$a],
-    y_ac = data$y[triples$c] - data$y[triples$a]
-  )
-  # inner products of vectors within triples
-  triples <- transform(
-    triples,
-    d_a = triples$x_ab * triples$x_ac + triples$y_ab * triples$y_ac,
-    d_b = triples$x_ab * triples$x_bc + triples$y_ab * triples$y_bc,
-    d_c = triples$x_ac * triples$x_bc + triples$y_ac * triples$y_bc
-  )
-  # angles among triples
-  triples <- transform(
-    triples,
-    t_a = acos_tol(triples$d_a / (triples$d_ab * triples$d_ac), 1e-7),
-    t_b = acos_tol(triples$d_b / (triples$d_ab * triples$d_bc), 1e-7),
-    t_c = acos_tol(triples$d_c / (triples$d_ac * triples$d_bc), 1e-7)
-  )
-  # if any angle is obtuse, longest side length; otherwise, circumdiameter
+  # squares of longest sides
+  triples$m <- pmax(triples$d_ab, triples$d_bc, triples$d_ac)^2
+  # sum of squares of remaining sides
+  triples$n <- triples$d_ab^2 + triples$d_bc^2 + triples$d_ac^2 - triples$m
+  # when largest angles obtuse, longest side lengths; otherwise, circumdiameters
   triples$diam <- ifelse(
-    pmax(triples$t_a, triples$t_b, triples$t_c) > pi/2,
+    triples$m > triples$n,
     pmax(triples$d_ab, triples$d_bc, triples$d_ac),
     triples$cd
   )
-  triples <- triples[triples$diam < diameter, c("a", "b", "c")]
+  triples <- triples[triples$diam < diameter, c("a", "b", "c"), drop = FALSE]
   rownames(triples) <- NULL
   triples
 }
@@ -501,8 +483,3 @@ GeomFace <- ggproto(
   default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
                     size = 0.5, linetype = 1)
 )
-
-acos_tol <- function(x, tol = sqrt(.Machine$double.eps)) {
-  x <- ifelse(abs(x) > 1 + tol, x, pmin(pmax(x, -1), 1))
-  acos(x)
-}

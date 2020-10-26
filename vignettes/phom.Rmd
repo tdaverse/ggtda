@@ -1,7 +1,7 @@
 ---
 title: "Visualizing persistent homology with ggtda"
 author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
-date: "1 January 2020"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Visualizing persistent homology with ggtda}
