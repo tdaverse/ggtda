@@ -2,6 +2,8 @@
 
 export(GeomBarcode)
 export(GeomFace)
+export(StatCech0)
+export(StatCech1)
 export(StatCech2)
 export(StatDisk)
 export(StatFrontier)

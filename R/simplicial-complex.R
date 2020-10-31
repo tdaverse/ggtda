@@ -331,9 +331,19 @@ StatVietoris2 <- ggproto(
 #' @export
 stat_cech0 <- stat_vietoris0
 
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatCech0 <- ggproto("StatCech0", StatVietoris0)
+
 #' @rdname simplicial-complex
 #' @export
 stat_cech1 <- stat_vietoris1
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatCech1 <- ggproto("StatCech1", StatVietoris1)
 
 #' @rdname simplicial-complex
 #' @export

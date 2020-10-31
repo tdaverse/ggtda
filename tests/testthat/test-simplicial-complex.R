@@ -1,4 +1,4 @@
-context("Computation and visualization of simplicial complexes")
+context("Simplicial complexes")
 
 test_that("proximate functions threshold correctly on equilateral triangle", {
   
@@ -42,7 +42,7 @@ test_that("disk layer works as expected", {
 
 test_that("Cech layers work as expected", {
   
-  # Čech 0-skeleton stat
+  # Čech 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
     stat_cech0()
   expect_is(p0, "ggplot")
@@ -50,7 +50,7 @@ test_that("Cech layers work as expected", {
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p0)), nrow(d))
   
-  # Čech 1-skeleton stat
+  # Čech 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
     stat_cech1(diameter = 0.7)
   expect_is(p1, "ggplot")
@@ -58,7 +58,7 @@ test_that("Cech layers work as expected", {
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p1)), 1097L)
   
-  # Čech 2-skeleton stat
+  # Čech 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
     stat_cech2(diameter = 0.7)
   expect_is(p2, "ggplot")
@@ -78,7 +78,7 @@ test_that("Cech layers work as expected", {
 
 test_that("Vietoris layers work as expected", {
   
-  # Vietoris 0-skeleton stat
+  # Vietoris 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
     stat_vietoris0()
   expect_is(p0, "ggplot")
@@ -86,7 +86,7 @@ test_that("Vietoris layers work as expected", {
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p0)), nrow(d))
   
-  # Vietoris 1-skeleton stat
+  # Vietoris 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
     stat_vietoris1(diameter = 0.7)
   expect_is(p1, "ggplot")
@@ -94,7 +94,7 @@ test_that("Vietoris layers work as expected", {
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
   expect_equal(nrow(layer_data(p1)), 1097)
   
-  # Vietoris 2-skeleton stat
+  # Vietoris 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
     stat_vietoris2(diameter = 0.7)
   expect_is(p2, "ggplot")
@@ -110,4 +110,40 @@ test_that("Vietoris layers work as expected", {
   vdiffr::expect_doppelganger("stat_vietoris0, annulus", p0)
   vdiffr::expect_doppelganger("stat_vietoris1, annulus", p1)
   vdiffr::expect_doppelganger("stat_vietoris2, annulus", p2)
+})
+
+test_that("face layer works as expected", {
+  
+  # disks of specified radius and resolution (segments)
+  p1 <- ggplot(d, aes(x = x, y = y)) +
+    geom_face(stat = "disk", radius = 0.35) +
+    geom_point()
+  expect_is(p1, "ggplot")
+  expect_is(p1$layer[[1]], "ggproto")
+  expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
+  
+  # Vietoris-Rips face geom
+  p2 <- ggplot(d, aes(x = x, y = y)) +
+    geom_face(stat = "vietoris2", diameter = 0.7, alpha = .05)
+  expect_is(p2, "ggplot")
+  expect_is(p2$layer[[1]], "ggproto")
+  expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
+  expect_equal(nrow(layer_data(p2)), 16977L)
+  
+  # Čech face geom
+  p3 <- ggplot(d, aes(x = x, y = y)) +
+    geom_face(stat = "cech2", diameter = 0.7, alpha = .05)
+  expect_is(p3, "ggplot")
+  expect_is(p3$layer[[1]], "ggproto")
+  expect_equal(c(p3$labels$x, p3$labels$y), c("x", "y"))
+  expect_equal(nrow(layer_data(p3)), 16953L)
+  
+  # skip on continuous integration services
+  skip_on_travis()
+  skip_on_appveyor()
+  
+  # visual regression test
+  vdiffr::expect_doppelganger("geom_face, stat_disk, annulus", p1)
+  vdiffr::expect_doppelganger("geom_face, stat_vietoris, annulus", p2)
+  vdiffr::expect_doppelganger("geom_face, stat_cech, annulus", p3)
 })
