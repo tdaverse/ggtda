@@ -1,5 +1,7 @@
 context("Barcode plots")
 
+# ggplot object tests ----------------------------------------------------------
+
 # toy example
 d <- data.frame(
   birth = c(0, 0, 1, 2),

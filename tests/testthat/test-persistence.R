@@ -1,5 +1,36 @@
 context("Persistence diagrams")
 
+# Tests adapted from rPref psel tests ------------------------------------------
+
+# 'mtcars' data, subsetted and renamed for persistence interpretation
+d <- subset(mtcars, select = c(mpg, hp))
+names(d) <- c("start", "end")
+
+test_that("pareto calculations work on 'mtcars' data not using rPref", {
+  skip_if("rPref" %in% rownames(utils::installed.packages()))
+  
+  # uses to base R calculation with no message
+  expect_equal(rownames(pareto_persistence(d)),
+               rownames(d)[c(16L, 24L, 31L)])
+  
+  # throw warning if rPref is explicitly requested
+  expect_warning(rownames(pareto_persistence(d, .use_rPref = TRUE)), "rPref")
+})
+
+test_that("pareto calculations work on 'mtcars' data using rPref", {
+  skip_if_not_installed("rPref")
+  
+  # uses rPref
+  expect_equal(rownames(pareto_persistence(d)),
+               rownames(d)[c(16L, 24L, 31L)])
+  
+  # gives same result using base R calculation
+  expect_equal(rownames(pareto_persistence(d, .use_rPref = FALSE)),
+               rownames(d)[c(16L, 24L, 31L)])
+})
+
+# ggplot object tests ----------------------------------------------------------
+
 # sample data set
 d <- data.frame(
   birth = c(0, 0, 1, 2, 1.5),

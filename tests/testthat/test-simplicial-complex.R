@@ -19,6 +19,8 @@ test_that("proximate functions threshold correctly on equilateral triangle", {
 # sample data set
 d <- as.data.frame(ggtda::annulus2d)
 
+# ggplot object tests ----------------------------------------------------------
+
 test_that("disk layer works as expected", {
   
   # disks of specified radius and resolution (segments)
