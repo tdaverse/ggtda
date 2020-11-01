@@ -7,25 +7,18 @@ d <- subset(mtcars, select = c(mpg, hp))
 names(d) <- c("start", "end")
 
 test_that("pareto calculations work on 'mtcars' data not using rPref", {
-  skip_if("rPref" %in% rownames(utils::installed.packages()))
-  
-  # uses to base R calculation with no message
-  expect_equal(rownames(pareto_persistence(d)),
+  expect_equal(rownames(pareto_persistence_base(d)),
                rownames(d)[c(16L, 24L, 31L)])
-  
-  # throw warning if rPref is explicitly requested
-  expect_warning(rownames(pareto_persistence(d, .use_rPref = TRUE)), "rPref")
 })
 
 test_that("pareto calculations work on 'mtcars' data using rPref", {
   skip_if_not_installed("rPref")
-  
-  # uses rPref
-  expect_equal(rownames(pareto_persistence(d)),
+  expect_equal(rownames(pareto_persistence_rPref(d)),
                rownames(d)[c(16L, 24L, 31L)])
-  
-  # gives same result using base R calculation
-  expect_equal(rownames(pareto_persistence(d, .use_rPref = FALSE)),
+})
+
+test_that("pareto calculations are obtained via conditional function", {
+  expect_equal(rownames(pareto_persistence(d)),
                rownames(d)[c(16L, 24L, 31L)])
 })
 
