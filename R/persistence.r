@@ -52,6 +52,9 @@
 #'   a string to override the default.
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take
+#' @param .use_rPref Logical; make explicit whether to use the *rPref* package
+#'   to compute pareto frontiers. if `TRUE` but the package is unavailable, a
+#'   warning is printed.
 #' @example inst/examples/ex-persistence.R
 
 #' @rdname persistence
@@ -118,6 +121,7 @@ stat_frontier <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE,
+                          .use_rPref = NA,
                           ...) {
   layer(
     stat = StatFrontier,
@@ -129,6 +133,7 @@ stat_frontier <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       diagram = diagram,
+      .use_rPref = .use_rPref,
       na.rm = na.rm,
       ...
     )
@@ -144,14 +149,15 @@ StatFrontier <- ggproto(
   required_aes = c("start", "end"),
   
   compute_group = function(data, scales,
-                           diagram = "diagonal") {
+                           diagram = "diagonal",
+                           .use_rPref = NA) {
     
     # first row (for aesthetics)
     first_row <- data[1, setdiff(names(data), c("start", "end")), drop = FALSE]
     rownames(first_row) <- NULL
     
     # Pareto frontier
-    data <- pareto_persistence(data)
+    data <- pareto_persistence(data, .use_rPref = .use_rPref)
     data <- data[order(data$start), ]
     if (! all(data$end == cummax(data$end))) {
       warning("`start` and `end` are not anti-sorted.")
@@ -194,11 +200,18 @@ diagram_transform <- function(data, diagram) {
   )
 }
 
-pareto_persistence <- function(data) {
-  if ("rPref" %in% rownames(utils::installed.packages())) {
-    rPref::psel(data, rPref::low("start") * rPref::high("end"))
+pareto_persistence <- function(data, .use_rPref = NA) {
+  .use_rPref <- as.logical(.use_rPref)
+  if (! isFALSE(.use_rPref) &&
+      "rPref" %in% rownames(utils::installed.packages())) {
+    return(rPref::psel(data, rPref::low("start") * rPref::high("end")))
   } else {
+    if (isTRUE(.use_rPref)) {
+      warning("Package 'rPref' is unavailable; ",
+              "using base R to compute Pareto frontier.",
+              immediate. = TRUE)
+    }
     pd <- data[order(data$start, -data$end), ]
-    pd[! duplicated(cummax(pd$end)), ]
+    return(pd[! duplicated(cummax(pd$end)), ])
   }
 }

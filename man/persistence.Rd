@@ -27,6 +27,7 @@ stat_frontier(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
+  .use_rPref = NA,
   ...
 )
 }
@@ -77,6 +78,10 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+
+\item{.use_rPref}{Logical; make explicit whether to use the \emph{rPref} package
+to compute pareto frontiers. if \code{TRUE} but the package is unavailable, a
+warning is printed.}
 }
 \description{
 Visualize persistence data in a (flat, diagonal, or landscape)

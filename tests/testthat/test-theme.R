@@ -1,20 +1,45 @@
-context("Test visualization theme(s)")
-library("ggtda")
+context("Themes")
 
-test_that("Minimalist TDA theme works correctly", {
+# Tests adapted from ggplot2 theme tests ---------------------------------------
+
+test_that("provided themes explicitly define only (void) theme elements", {
+  t0 <- theme_void()
+  
+  t <- theme_tda()
+  expect_is(t, "theme")
+  expect_true(all(names(t) %in% names(t0)))
+  
+  t <- theme_persist()
+  expect_is(t, "theme")
+  expect_true(all(names(t) %in% names(t0)))
+  
+  t <- theme_barcode()
+  expect_is(t, "theme")
+  expect_true(all(names(t) %in% names(t0)))
+})
+
+test_that("themes don't change without acknowledgement", {
   # sample dataset
-  test.df <- data.frame(start = c(0, 1, 2, 3),
-                        end = c(1, 3, 6, 10))
-  
-  # build ggplot2 objects without plotting
-  test.gg <- ggplot(data = test.df, aes(start = start, end = end)) +
-    stat_persistence()
-  test.theme1 <- test.gg + theme_persist()
-  test.theme2 <- test.gg + theme_barcode()
-  
-  # run tests - not doing much, just making sure there's no errors
-  #   before this point
-  expect_true(is.ggplot(test.gg))
-  expect_true(is.ggplot(test.theme1))
-  expect_true(is.ggplot(test.theme2))
+  df <- data.frame(birth = c(0, 1, 2, 3),
+                   death = c(1, 3, 6, 10),
+                   dimension = factor(c(1L, 1L, 2L, 3L)),
+                   cloud = "A")
+  # element-rich persistence plot
+  p <- ggplot(df, aes(start = birth, end = death, color = dimension)) +
+    stat_persistence() +
+    facet_wrap(~ cloud)
+  # comparisons
+  skip_on_cran()
+  vdiffr::expect_doppelganger("theme_tda, persistence", p + theme_tda())
+  vdiffr::expect_doppelganger("theme_persist, persistence", p + theme_persist())
+  # element-rich barcode plot
+  p <- ggplot(df, aes(start = birth, end = death, color = dimension)) +
+    geom_barcode() +
+    facet_wrap(~ cloud)
+  # comparisons
+  skip_on_cran()
+  vdiffr::expect_doppelganger("theme_tda, barcode", p + theme_tda())
+  vdiffr::expect_doppelganger("theme_barcode, barcode", p + theme_barcode())
+  vdiffr::expect_doppelganger("theme_barcode, barcode, vertical",
+                              p + theme_barcode(vertical = TRUE))
 })
