@@ -121,7 +121,7 @@ stat_frontier <- function(mapping = NULL,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE,
-                          .use_rPref = NULL,
+                          .use_rPref = NA,
                           ...) {
   layer(
     stat = StatFrontier,
@@ -150,7 +150,7 @@ StatFrontier <- ggproto(
   
   compute_group = function(data, scales,
                            diagram = "diagonal",
-                           .use_rPref = NULL) {
+                           .use_rPref = NA) {
     
     # first row (for aesthetics)
     first_row <- data[1, setdiff(names(data), c("start", "end")), drop = FALSE]
@@ -200,8 +200,8 @@ diagram_transform <- function(data, diagram) {
   )
 }
 
-pareto_persistence <- function(data, .use_rPref = NULL) {
-  if (! is.null(.use_rPref)) .use_rPref <- as.logical(.use_rPref)
+pareto_persistence <- function(data, .use_rPref = NA) {
+  .use_rPref <- as.logical(.use_rPref)
   if (! isFALSE(.use_rPref) &&
       "rPref" %in% rownames(utils::installed.packages())) {
     return(rPref::psel(data, rPref::low("start") * rPref::high("end")))

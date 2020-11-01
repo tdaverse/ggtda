@@ -27,7 +27,7 @@ stat_frontier(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
-  .use_rPref = NULL,
+  .use_rPref = NA,
   ...
 )
 }
