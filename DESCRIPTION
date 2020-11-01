@@ -27,8 +27,8 @@ Depends:
     R (>= 2.10),
     ggplot2 (>= 3.2.1)
 Imports:
-    ripserr (>= 0.1.1)
 Suggests:
+    ripserr (>= 0.1.1),
     rPref (>= 1.2),
     covr (>= 3.1.0),
     testthat (>= 2.0.0),
