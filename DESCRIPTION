@@ -23,19 +23,19 @@ Description: Topological data analysis often produces summary data
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 2.10)
-Imports:
-    ggplot2 (>= 3.2.1),
-    rPref (>= 1.2)
-URL: https://github.com/rrrlw/ggtda
-BugReports: https://github.com/rrrlw/ggtda/issues
-Suggests: 
-    vdiffr (>= 0.3.0),
+Depends:
+    R (>= 2.10),
+    ggplot2 (>= 3.2.1)
+Suggests:
+    ripserr (>= 0.1.1),
+    rPref (>= 1.2),
+    covr (>= 3.1.0),
     testthat (>= 2.0.0),
+    vdiffr (>= 0.3.0),
     knitr (>= 1.20),
-    rmarkdown (>= 1.10),
-    TDAstats (>= 0.4.1),
-    covr (>= 3.1.0)
+    rmarkdown (>= 1.10)
+URL: https://rrrlw.github.io/ggtda/
+BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)

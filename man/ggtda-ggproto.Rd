@@ -11,6 +11,8 @@
 \alias{StatVietoris0}
 \alias{StatVietoris1}
 \alias{StatVietoris2}
+\alias{StatCech0}
+\alias{StatCech1}
 \alias{StatCech2}
 \alias{GeomFace}
 \title{Base \code{ggproto} classes for \emph{ggtda}}
@@ -26,6 +28,10 @@ An object of class \code{StatVietoris0} (inherits from \code{StatIdentity}, \cod
 An object of class \code{StatVietoris1} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{StatVietoris2} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{StatCech0} (inherits from \code{StatVietoris0}, \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
+
+An object of class \code{StatCech1} (inherits from \code{StatVietoris1}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
 
 An object of class \code{StatCech2} (inherits from \code{StatVietoris2}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
 

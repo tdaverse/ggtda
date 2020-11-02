@@ -196,9 +196,17 @@ diagram_transform <- function(data, diagram) {
 
 pareto_persistence <- function(data) {
   if ("rPref" %in% rownames(utils::installed.packages())) {
-    rPref::psel(data, rPref::low("start") * rPref::high("end"))
+    pareto_persistence_rPref(data)
   } else {
-    pd <- data[order(data$start, -data$end), ]
-    pd[! duplicated(cummax(pd$end)), ]
+    pareto_persistence_base(data)
   }
+}
+
+pareto_persistence_base <- function(data) {
+  pd <- data[order(data$start, -data$end), ]
+  pd[! duplicated(cummax(pd$end)), ]
+}
+
+pareto_persistence_rPref <- function(data) {
+  rPref::psel(data, rPref::low("start") * rPref::high("end"))
 }
