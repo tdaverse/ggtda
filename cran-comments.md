@@ -2,7 +2,8 @@ This is the first submission of ggtda to CRAN.
 
 ## Test environments
 
-* Mac OS X local install, R 4.0.2
+* Debian 10 local install, R 4.0.3
+* OS X local install, R 4.0.3
 * Ubuntu 16.04 (Travis CI), R 4.0.0
 * Windows Server 2012 R2 (AppVeyor CI), R 4.0.2
 * win-builder, r-devel
@@ -11,8 +12,7 @@ This is the first submission of ggtda to CRAN.
 
 There were no ERRORs or WARNINGs.
 
-There was 1 NOTE.
-- new package submission
+There was 1 NOTE: new package submission to CRAN.
 
 Some checks flagged words in the DESCRIPTION as possible misspellings, but these are correct:
 
