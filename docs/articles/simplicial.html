@@ -88,7 +88,7 @@
       <h1 data-toc-skip>Visualizing a simplicial complex with ggtda</h1>
                         <h4 class="author">J. Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
             
-            <h4 class="date">1 January 2020</h4>
+            <h4 class="date">2020-11-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/master/vignettes/simplicial.Rmd"><code>vignettes/simplicial.Rmd</code></a></small>
       <div class="hidden name"><code>simplicial.Rmd</code></div>
@@ -106,156 +106,177 @@
 <h2 class="hasAnchor">
 <a href="#setup-and-dataset-details" class="anchor"></a>Setup and dataset details</h2>
 <p>We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required datasets.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"ggtda"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"ggplot2"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"TDAstats"</span>) <span class="co"># to calculate persistent homology</span>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://rrrlw.github.io/ggtda">"ggtda"</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://rrrlw.github.io/ripserr">"ripserr"</a></span>)
 
 <span class="co"># load dataset</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"unif2d"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"annulus2d"</span>)</pre></body></html></div>
-<p>The <code>unif2d</code> dataset (visualized below; left) is included with TDAstats, and a subset of 25 points from it will be used to demonstrate how individual ggtda functions work. The <code>annulus2d</code> dataset (visualized below; right) is included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">unif_df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">unif2d</span>[<span class="fl">1</span>:<span class="fl">25</span>, ])
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">unif_df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"x"</span>, <span class="st">"y"</span>)
-<span class="no">annulus_df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">annulus2d</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"annulus2d"</span>)
+</pre></div>
+<p>The <code>unif_df</code> dataset (visualized below; left) is a subset of 25 points sampled uniformly from the unit interval; it will be used to demonstrate how individual ggtda functions work. The <code>annulus_df</code> dataset (visualized below; right) is data-framed from the <code>annulus2d</code> data included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
+<span class="kw">unif_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">25</span>), <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">25</span>)))
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">unif_df</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"x"</span>, <span class="st">"y"</span>)
+<span class="kw">annulus_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">annulus2d</span>)
 
 <span class="co"># left panel</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_bw</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"x"</span>) + <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span>(<span class="st">"y"</span>)
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu">theme_bw</span>() <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"x"</span>) <span class="op">+</span> <span class="fu">ylab</span>(<span class="st">"y"</span>)
 
 <span class="co"># right panel</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_bw</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu">theme_bw</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/plots-1.png" width="700"><img src="simplicial_files/figure-html/plots-2.png" width="700"></p>
 </div>
 <div id="visualizing-a-simplicial-complex" class="section level2">
 <h2 class="hasAnchor">
 <a href="#visualizing-a-simplicial-complex" class="anchor"></a>Visualizing a simplicial complex</h2>
 <p>For the sake of simplicity, we will first demonstrate use of the individual simplicial complex visualization functions with a 25-point subset of <code>unif2d</code>. The <a href="#eg">next section</a> will use the <code>annulus2d</code> dataset to show how the individual functions can work together to create effective visualizations. We will use a radius of <code>0.1</code> for the visualizations in this section. First, we explore <code>stat_disk</code> that, in combination with <code>geom_point</code> from ggplot2, will draw proximity circles surrounding each point; since <code>0.1</code> is the circle radius, any pair of points less than a distance of <code>0.2</code> units away from each other will have overlapping circles, indicating an edge should be drawn between them at this radius.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># set radius value</span>
-<span class="no">rad_val</span> <span class="kw">&lt;-</span> <span class="fl">0.1</span>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co"># set radius value</span>
+<span class="kw">rad_val</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
 
 <span class="co"># use stat_disk to visualize simplicial complex</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rad_val</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rad_val</span>, fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/disk-1.png" width="384"></p>
 <p>To directly visualize the edges and better visualize the features themselves, we can use the <code>stat_vietoris0</code>, <code>stat_vietoris1</code>, and <code>stat_vietoris2</code> functions. <code>stat_vietoris0</code> is essentially an alias for <code>geom_point</code> and represents the 0-dimensional components (points) of a Vietoris-Rips complex, as follows. Since the 0-skeleton of a Vietoris-Rips complex is not dependent on a specific radius (<code>rad_val</code> above), <code>stat_vietoris0</code> requires no parameters.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/vietoris0-1.png" width="700"></p>
 <p><code>stat_vietoris1</code> adds excitement by plotting the 1-dimensional components (edges between point pairs with overlapping circles). Since these edges are dependent on a specific radius, we provide a value (double <code>rad_val</code>) for the <code>diameter</code> parameter. The <code>alpha</code> parameter is provided solely for aesthetic purposes. It is important to note that while <code>stat_vietoris1</code> can be used alone (left panel below), it is often most effective when used in conjunction with <code>stat_vietoris0</code> (right panel below).</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># left panel: stat_vietoris1 alone</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># left panel: stat_vietoris1 alone</span>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># right panel: stat_vietoris1 used with stat_vietoris0</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/vietoris1-1.png" width="700"><img src="simplicial_files/figure-html/vietoris1-2.png" width="700"></p>
 <p>Since <code>stat_disk</code> sometimes requires close evaluation to determine if two points are connected, <code>stat_vietoris1</code> can be used to add clarity. The radius is more intuitive to understand <code>stat_disk</code>, but topological barcodes and persistence diagrams are generally plotted with the diameter on the relevant axes. Accordingly, we’ve parameterized disks using <code>radius</code> and complexes using <code>diameter</code>. Note that either parameter can be passed to each stat, and correct values must be provided with care.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># combine stat_vietoris1 with stat_disk</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rad_val</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="co"># combine stat_vietoris1 with stat_disk</span>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rad_val</span>, fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/vietoris1-disk-1.png" width="480"></p>
 <p>Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), <code>stat_vietoris2</code> adds the faces of the Vietoris-Rips complex to permit more intuitive interpretation. <code>stat_vietoris2</code> is parameterized similarly to <code>stat_vietoris1</code>. As was the case with <code>stat_vietoris1</code>, while <code>stat_vietoris2</code> can be used alone (left panel), it is most effectively used when the lower dimensional components of the Vietoris-Rips complex are also plotted (right panel). Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co"># left panel: stat_vietoris2 alone</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="co"># left panel: stat_vietoris2 alone</span>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># right panel: stat_vietoris2 in combination with stat_vietoris1 and stat_vietoris0</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.15</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.15</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/vietoris2-1.png" width="331.2"><img src="simplicial_files/figure-html/vietoris2-2.png" width="331.2"></p>
 <p>Generally, using <code>stat_vietoris2</code> in combination with <code>stat_disk</code> creates too much overlap (figure below) and we suggest avoiding use of both in a single panel.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">unif_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">rad_val</span> * <span class="fl">2</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rad_val</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="fu">ggplot</span>(<span class="kw">unif_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">rad_val</span> <span class="op">*</span> <span class="fl">2</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rad_val</span>, fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/clutter-1.png" width="480"></p>
 <p>In addition to the Vietoris-Rips complex, ggtda permits visualization of the Čech complex with the <code>stat_cech0</code> (identical to <code>stat_vietoris0</code>), <code>stat_cech1</code> (identical to <code>stat_vietoris1</code>), and <code>stat_cech2</code> (distinct from <code>stat_vietoris2</code>) functions. We plot an equilateral triangle using the <code>stat_vietoris*</code> functions and <code>stat_cech*</code> functions to showcase the difference. With a diameter of <code>1.1</code>, the three points are all pairwise connected, but the three corresponding circles do not all share a single point of overlap (bottom left panel). Thus, while the Vietoris-Rips complex and the Čech complex share the same 1-skeleton, only the Vietoris-Rips complex has a face between the three points.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># create equilateral triangle point cloud</span>
-<span class="no">eq_tri</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.5</span>),
-                     <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="fl">3</span>)/<span class="fl">2</span>))
-<span class="no">diam</span> <span class="kw">&lt;-</span> <span class="fl">1.1</span>
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="co"># create equilateral triangle point cloud</span>
+<span class="kw">eq_tri</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(x = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.5</span>),
+                     y = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="fl">3</span>)<span class="op">/</span><span class="fl">2</span>))
+<span class="kw">diam</span> <span class="op">&lt;-</span> <span class="fl">1.1</span>
 
 <span class="co"># top left panel: VR with stat_vietoris*</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">eq_tri</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Vietoris-Rips complex"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<span class="fu">ggplot</span>(<span class="kw">eq_tri</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">diam</span>, fill = <span class="st">"darkgoldenrod"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">diam</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu">ggtitle</span>(<span class="st">"Vietoris-Rips complex"</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># top right panel: Čech with stat_cech*</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">eq_tri</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Čech complex"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<span class="fu">ggplot</span>(<span class="kw">eq_tri</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech2</a></span>(diameter = <span class="kw">diam</span>, fill = <span class="st">"darkgoldenrod"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech1</a></span>(diameter = <span class="kw">diam</span>, alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_cech0</a></span>() <span class="op">+</span>
+  <span class="fu">ggtitle</span>(<span class="st">"Čech complex"</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># bottom left panel: equilateral triangle with stat_disk</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">eq_tri</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">diam</span> / <span class="fl">2</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">eq_tri</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">diam</span> <span class="op">/</span> <span class="fl">2</span>, fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/cech-1.png" width="331.2"><img src="simplicial_files/figure-html/cech-2.png" width="331.2"><img src="simplicial_files/figure-html/cech-3.png" width="331.2"></p>
 </div>
 <div id="eg" class="section level2">
 <h2 class="hasAnchor">
 <a href="#eg" class="anchor"></a>Persistence, Punctuated</h2>
-<p>The <code>annulus2d</code> dataset contains 100 points noisily distributed around the circumference of a unit circle. We will calculate its persistent homology using the TDAstats package (following code block) and then plot the result with corresponding simplicial complices at various radii.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># calculate persistent homology of annulus</span>
-<span class="no">annulus_phom</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/TDAstats/man/calculate_homology.html">calculate_homology</a></span>(<span class="no">annulus2d</span>))
-<span class="no">annulus_phom</span>$<span class="no">dimension</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">annulus_phom</span>$<span class="no">dimension</span>)
+<p>The <code>annulus2d</code> dataset contains 100 points noisily distributed around the circumference of a unit circle. We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with corresponding simplicial complices at various radii.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="co"># calculate persistent homology of annulus</span>
+<span class="kw">annulus_phom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/ripserr/man/vietoris_rips.html">vietoris_rips</a></span>(<span class="kw">annulus2d</span>))
+<span class="kw">annulus_phom</span><span class="op">$</span><span class="kw">dimension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="kw">annulus_phom</span><span class="op">$</span><span class="kw">dimension</span>)
 
 <span class="co"># plot topological barcode (left panel)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">group</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Simplicial complex diameter"</span>) +
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         group = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Simplicial complex diameter"</span>) <span class="op">+</span>
   <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>()
 
 <span class="co"># plot diagonal persistence diagram (right panel)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">shape</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(<span class="kw">diagram</span> <span class="kw">=</span> <span class="st">"diagonal"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_abline</a></span>(<span class="kw">slope</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">intercept</span> <span class="kw">=</span> <span class="fl">0</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.0</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Feature appearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span>(<span class="st">"Feature disappearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(diagram = <span class="st">"diagonal"</span>) <span class="op">+</span>
+  <span class="fu">geom_abline</span>(slope = <span class="fl">1</span>, intercept = <span class="fl">0</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.0</span>)) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
+  <span class="fu">ylab</span>(<span class="st">"Feature disappearance"</span>) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/phom-1.png" width="331.2"><img src="simplicial_files/figure-html/phom-2.png" width="331.2"></p>
 <p>The dominant feature in <code>annulus2d</code> is a 1-dimensional loop that we identify in the following code block.</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">annulus_phom</span>, <span class="no">dimension</span> <span class="kw">==</span> <span class="fl">1</span>)
+<div class="sourceCode" id="cb11"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="kw">annulus_phom</span>, <span class="kw">dimension</span> <span class="op">==</span> <span class="fl">1</span>)
 <span class="co">#&gt;     dimension     birth     death</span>
 <span class="co">#&gt; 100         1 0.3333741 0.3350650</span>
 <span class="co">#&gt; 101         1 0.3250107 0.3450117</span>
@@ -268,51 +289,56 @@
 <span class="co">#&gt; 108         1 0.1885419 0.2378600</span>
 <span class="co">#&gt; 109         1 0.1877741 0.1919384</span>
 <span class="co">#&gt; 110         1 0.1620650 0.1772953</span>
-<span class="co">#&gt; 111         1 0.1564191 0.1584211</span></pre></body></html></div>
+<span class="co">#&gt; 111         1 0.1564191 0.1584211</span>
+</pre></div>
 <p>The feature of interest persists the longest and is listed in row 104 of <code>annulus_phom</code> (starts at diameter of <code>0.29</code>; ends at diameter of <code>1.44</code>). Let’s explore simplicial complex visualization prior to the start of the dominant feature (diameter <code>0.25</code>), during the presence of the dominant feature (diameter <code>0.75</code>), and after the end of the dominant feature (diameter <code>1.5</code>).</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">diam</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>, <span class="fl">1.5</span>)
-<span class="no">rads</span> <span class="kw">&lt;-</span> <span class="no">diam</span> / <span class="fl">2</span></pre></body></html></div>
+<div class="sourceCode" id="cb12"><pre class="downlit">
+<span class="kw">diam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>, <span class="fl">1.5</span>)
+<span class="kw">rads</span> <span class="op">&lt;-</span> <span class="kw">diam</span> <span class="op">/</span> <span class="fl">2</span>
+</pre></div>
 <p>We use four panels to properly explore each diameter: (1) topological barcode with a vertical dotted line indicating diameter; (2) persistence diagram with horizontal and vertical lines, with points to the top-left of the intersection indicating current features; (3) simplicial complex visualization with <code>stat_disk</code>; and (4) simplicial complex visualization with <code>stat_vietoris0</code>, <code>stat_vietoris1</code>, and <code>stat_vietoris2</code>. First, we generate the visualization for a diameter of <code>0.25</code>.</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co"># topological barcode</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">group</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">1</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Simplicial complex diameter"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.5</span>))
+<div class="sourceCode" id="cb13"><pre class="downlit">
+<span class="co"># topological barcode</span>
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         group = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">1</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Simplicial complex diameter"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.5</span>))
 
 <span class="co"># persistence diagram</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">shape</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(<span class="kw">diagram</span> <span class="kw">=</span> <span class="st">"diagonal"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_abline</a></span>(<span class="kw">slope</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">intercept</span> <span class="kw">=</span> <span class="fl">0</span>) +
-
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) + <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Feature appearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span>(<span class="st">"Feature disappearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>, <span class="kw">shape</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">1</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">1</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.4</span>))
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(diagram = <span class="st">"diagonal"</span>) <span class="op">+</span>
+  <span class="fu">geom_abline</span>(slope = <span class="fl">1</span>, intercept = <span class="fl">0</span>) <span class="op">+</span>
+  
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
+  <span class="fu">ylab</span>(<span class="st">"Feature disappearance"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>, shape = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">1</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">geom_hline</span>(yintercept = <span class="kw">diam</span>[<span class="fl">1</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.4</span>))
 
 <span class="co"># stat_disk</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rads</span>[<span class="fl">1</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rads</span>[<span class="fl">1</span>], fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># stat_vietoris*</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">1</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">1</span>], <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">1</span>], fill = <span class="st">"darkgoldenrod"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">1</span>], alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/before-1.png" width="331.2"><img src="simplicial_files/figure-html/before-2.png" width="331.2"><img src="simplicial_files/figure-html/before-3.png" width="331.2"><img src="simplicial_files/figure-html/before-4.png" width="331.2"></p>
 <p>Interpretation at diameter <code>0.25</code>:</p>
 <ul>
@@ -346,46 +372,48 @@
 </li>
 </ul>
 <p>Each of the four panels complement one another by providing overlapping and consistent pieces of information with varying levels of clarity. Together, we get a good sense of what’s going on in <code>annulus2d</code> at a diameter of <code>0.25</code>. Next, we look at diameter <code>0.75</code>.</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co"># topological barcode</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">group</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">2</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Simplicial complex diameter"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.5</span>))
+<div class="sourceCode" id="cb14"><pre class="downlit">
+<span class="co"># topological barcode</span>
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         group = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">2</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Simplicial complex diameter"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.5</span>))
 
 <span class="co"># persistence diagram</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">shape</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(<span class="kw">diagram</span> <span class="kw">=</span> <span class="st">"diagonal"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_abline</a></span>(<span class="kw">slope</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">intercept</span> <span class="kw">=</span> <span class="fl">0</span>) +
-
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) + <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Feature appearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span>(<span class="st">"Feature disappearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>, <span class="kw">shape</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">2</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">2</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.3</span>))
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(diagram = <span class="st">"diagonal"</span>) <span class="op">+</span>
+  <span class="fu">geom_abline</span>(slope = <span class="fl">1</span>, intercept = <span class="fl">0</span>) <span class="op">+</span>
+  
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
+  <span class="fu">ylab</span>(<span class="st">"Feature disappearance"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>, shape = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">2</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">geom_hline</span>(yintercept = <span class="kw">diam</span>[<span class="fl">2</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.3</span>))
 
 <span class="co"># stat_disk</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rads</span>[<span class="fl">2</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.05</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rads</span>[<span class="fl">2</span>], fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.05</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># stat_vietoris*</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">2</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">2</span>], <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">2</span>], fill = <span class="st">"darkgoldenrod"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">2</span>], alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/during-1.png" width="331.2"><img src="simplicial_files/figure-html/during-2.png" width="331.2"><img src="simplicial_files/figure-html/during-3.png" width="331.2"><img src="simplicial_files/figure-html/during-4.png" width="331.2"></p>
 <p>Interpretation at diameter <code>0.75</code>:</p>
 <ul>
@@ -421,45 +449,47 @@
 </li>
 </ul>
 <p>Lastly, we plot the four panels for diameter <code>1.5</code>. We leave interpretation of these panels as an exercise to the reader.</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="co"># topological barcode</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">group</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">3</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Simplicial complex diameter"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.85</span>, <span class="fl">0.5</span>))
+<div class="sourceCode" id="cb15"><pre class="downlit">
+<span class="co"># topological barcode</span>
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         group = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">3</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">xlab</span>(<span class="st">"Simplicial complex diameter"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.85</span>, <span class="fl">0.5</span>))
 
 <span class="co"># persistence diagram</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_phom</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>,
-                         <span class="kw">shape</span> <span class="kw">=</span> <span class="no">dimension</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dimension</span>)) +
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(<span class="kw">diagram</span> <span class="kw">=</span> <span class="st">"diagonal"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_abline</a></span>(<span class="kw">slope</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">intercept</span> <span class="kw">=</span> <span class="fl">0</span>) +
-
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">xlab</a></span>(<span class="st">"Feature appearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ylab</a></span>(<span class="st">"Feature disappearance"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="kw">colour</span> <span class="kw">=</span> <span class="st">"dim"</span>, <span class="kw">shape</span> <span class="kw">=</span> <span class="st">"dim"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">3</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_hline</a></span>(<span class="kw">yintercept</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">3</span>], <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.85</span>, <span class="fl">0.4</span>))
+<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
+                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(diagram = <span class="st">"diagonal"</span>) <span class="op">+</span>
+  <span class="fu">geom_abline</span>(slope = <span class="fl">1</span>, intercept = <span class="fl">0</span>) <span class="op">+</span>
+  
+  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
+  <span class="fu">ylab</span>(<span class="st">"Feature disappearance"</span>) <span class="op">+</span>
+  <span class="fu">labs</span>(colour = <span class="st">"dim"</span>, shape = <span class="st">"dim"</span>) <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">diam</span>[<span class="fl">3</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">geom_hline</span>(yintercept = <span class="kw">diam</span>[<span class="fl">3</span>], linetype = <span class="st">"dashed"</span>) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>() <span class="op">+</span>
+  <span class="fu">theme</span>(legend.position = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.85</span>, <span class="fl">0.4</span>))
 
 <span class="co"># stat_disk</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">rads</span>[<span class="fl">3</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.05</span>) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">geom_point</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">rads</span>[<span class="fl">3</span>], fill = <span class="st">"blue"</span>, alpha = <span class="fl">0.05</span>) <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
 
 <span class="co"># stat_vietoris*</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="no">annulus_df</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">3</span>], <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.1</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">diam</span>[<span class="fl">3</span>], <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.25</span>) +
-  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() +
-  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggtheme.html">theme_minimal</a></span>()</pre></body></html></div>
+<span class="fu">ggplot</span>(<span class="kw">annulus_df</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">3</span>], fill = <span class="st">"darkgoldenrod"</span>, alpha = <span class="fl">0.1</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">diam</span>[<span class="fl">3</span>], alpha = <span class="fl">0.25</span>) <span class="op">+</span>
+  <span class="fu"><a href="../reference/simplicial-complex.html">stat_vietoris0</a></span>() <span class="op">+</span>
+  <span class="fu">theme_minimal</span>()
+</pre></div>
 <p><img src="simplicial_files/figure-html/after-1.png" width="331.2"><img src="simplicial_files/figure-html/after-2.png" width="331.2"><img src="simplicial_files/figure-html/after-3.png" width="331.2"><img src="simplicial_files/figure-html/after-4.png" width="331.2"></p>
 </div>
   </div>
@@ -479,7 +509,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

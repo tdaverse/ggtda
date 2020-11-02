@@ -16,7 +16,7 @@
     consisting of birth and death values for topological features;
     see Chazal and Michel (2017) &lt;arXiv:1710.04019&gt;
     and Wasserman (2018) &lt;10.1146/annurev-statistics-031017-100045&gt;.
-    This package extends the user-friendly layered grammar of graphics
+    This extends the user-friendly layered grammar of graphics
     of Wickham (2010) &lt;doi:10.1198/jcgs.2009.07098&gt;
     to conveniently visualize these persistence data in several standard ways.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -104,28 +104,33 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>The development version of <strong>ggtda</strong> can be installed used the <strong>remotes</strong> package:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="co"># install from GitHub</span>
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"rrrlw/ggtda"</span>, <span class="kw">vignettes</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="co"># install from GitHub</span>
+<span class="kw">remotes</span>::<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"rrrlw/ggtda"</span>, vignettes = <span class="fl">TRUE</span>)
+</pre></div>
 <p>For an introduction to <strong>ggtda</strong> functionality, read the vignettes:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># read vignettes</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/vignette.html">vignette</a></span>(<span class="kw">topic</span> <span class="kw">=</span> <span class="st">"intro-ggtda"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"ggtda"</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="co"># read vignettes</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/vignette.html">vignette</a></span>(topic = <span class="st">"intro-ggtda"</span>, package = <span class="st">"ggtda"</span>)
+</pre></div>
 <p>We aim to submit ggtda to <a href="https://CRAN.R-project.org">CRAN</a> soon.</p>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
-<p><strong>ggtda</strong> visualizes persistence data but also includes stat layers for common TDA constructions. This example illustrates them together. For some artificial data, generate a “noisy circle” and calculate its persistent homology (PH) using <a href="https://github.com/rrrlw/TDAstats">the <strong>TDAstats</strong> package</a>, which ports <a href="https://github.com/Ripser/ripser">the <code>ripser</code> implementation</a> into R:</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="co"># generate a noisy circle</span>
-<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">36</span>; <span class="no">sd</span> <span class="kw">&lt;-</span> <span class="fl">.2</span>
+<p><strong>ggtda</strong> visualizes persistence data but also includes stat layers for common TDA constructions. This example illustrates them together. For some artificial data, generate a “noisy circle” and calculate its persistent homology (PH) using <a href="https://cran.r-project.org/package=ripserr">the <strong>ripserr</strong> package</a>, which ports <a href="https://github.com/Ripser/ripser">the <code>ripser</code> implementation</a> into R:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co"># generate a noisy circle</span>
+<span class="kw">n</span> <span class="op">&lt;-</span> <span class="fl">36</span>; <span class="kw">sd</span> <span class="op">&lt;-</span> <span class="fl">.2</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">0</span>)
-<span class="no">t</span> <span class="kw">&lt;-</span> <span class="kw pkg">stats</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">min</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">max</span> <span class="kw">=</span> <span class="fl">2</span>*<span class="no">pi</span>)
-<span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-  <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span>(<span class="no">t</span>) + <span class="kw pkg">stats</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="no">sd</span>),
-  <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span>(<span class="no">t</span>) + <span class="kw pkg">stats</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="no">sd</span>)
+<span class="kw">t</span> <span class="op">&lt;-</span> <span class="kw">stats</span>::<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(n = <span class="kw">n</span>, min = <span class="fl">0</span>, max = <span class="fl">2</span><span class="op">*</span><span class="kw">pi</span>)
+<span class="kw">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
+  x = <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span>(<span class="kw">t</span>) <span class="op">+</span> <span class="kw">stats</span>::<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(n = <span class="kw">n</span>, mean = <span class="fl">0</span>, sd = <span class="kw">sd</span>),
+  y = <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span>(<span class="kw">t</span>) <span class="op">+</span> <span class="kw">stats</span>::<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(n = <span class="kw">n</span>, mean = <span class="fl">0</span>, sd = <span class="kw">sd</span>)
 )
 <span class="co"># compute the persistent homology</span>
-<span class="no">ph</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw pkg">TDAstats</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/TDAstats/man/calculate_homology.html">calculate_homology</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">d</span>), <span class="kw">dim</span> <span class="kw">=</span> <span class="fl">1</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">ph</span>, <span class="kw">n</span> <span class="kw">=</span> <span class="fl">12</span>))
+<span class="kw">ph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">ripserr</span>::<span class="fu"><a href="https://rdrr.io/pkg/ripserr/man/vietoris_rips.html">vietoris_rips</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="kw">d</span>), dim = <span class="fl">1</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw">ph</span>, n = <span class="fl">12</span>))
 <span class="co">#&gt;    dimension birth      death</span>
 <span class="co">#&gt; 1          0     0 0.02903148</span>
 <span class="co">#&gt; 2          0     0 0.05579919</span>
@@ -139,56 +144,62 @@
 <span class="co">#&gt; 10         0     0 0.15895889</span>
 <span class="co">#&gt; 11         0     0 0.16171041</span>
 <span class="co">#&gt; 12         0     0 0.16548606</span>
-<span class="no">ph</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html">transform</a></span>(<span class="no">ph</span>, <span class="kw">dim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">dimension</span>))</pre></div>
+<span class="kw">ph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html">transform</a></span>(<span class="kw">ph</span>, dim = <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="kw">dimension</span>))
+</pre></div>
 <p>Now pick an example proximity at which to recognize features in the persistence data. This choice corresponds to a specific Vietoris complex in the filtration underlying the PH calculation. (This is not a good way to identify features, since it ignores persistence entirely, but it intuitively links back to the geometric construction.)</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="co"># fix a proximity for a Vietoris complex</span>
-<span class="no">prox</span> <span class="kw">&lt;-</span> <span class="fl">2</span>/<span class="fl">3</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="co"># fix a proximity for a Vietoris complex</span>
+<span class="kw">prox</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span>
+</pre></div>
 <p>Geometrically, the Vietoris complex is constructed based on balls of fixed radius around the data points — in the 2-dimensional setting, disks (left). The simplicial complex itself consists of a simplex at each subset of points having diameter at most <code>prox</code> — that is, each pair of which are within <code>prox</code> of each other.</p>
-<div class="sourceCode" id="cb5"><pre class="r"><span class="co"># attach *ggtda*</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggtda</span>)
-<span class="co">#&gt; Loading required package: ggplot2</span>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># attach *ggtda*</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://rrrlw.github.io/ggtda">ggtda</a></span>)
 <span class="co"># visualize disks of fixed radii and the Vietoris complex for this proximity</span>
-<span class="no">p_d</span> <span class="kw">&lt;-</span> <span class="fu">ggplot</span>(<span class="no">d</span>, <span class="fu">aes</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu">theme_bw</span>() +
-  <span class="fu">coord_fixed</span>() +
-  <span class="fu"><a href="reference/simplicial-complex.html">stat_disk</a></span>(<span class="kw">radius</span> <span class="kw">=</span> <span class="no">prox</span>/<span class="fl">2</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"aquamarine3"</span>) +
+<span class="kw">p_d</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span>(<span class="kw">d</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">theme_bw</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="reference/simplicial-complex.html">stat_disk</a></span>(radius = <span class="kw">prox</span><span class="op">/</span><span class="fl">2</span>, fill = <span class="st">"aquamarine3"</span>) <span class="op">+</span>
   <span class="fu">geom_point</span>()
-<span class="no">p_sc</span> <span class="kw">&lt;-</span> <span class="fu">ggplot</span>(<span class="no">d</span>, <span class="fu">aes</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu">theme_bw</span>() +
-  <span class="fu">coord_fixed</span>() +
-  <span class="fu"><a href="reference/simplicial-complex.html">stat_vietoris2</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">prox</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>) +
-  <span class="fu"><a href="reference/simplicial-complex.html">stat_vietoris1</a></span>(<span class="kw">diameter</span> <span class="kw">=</span> <span class="no">prox</span>, <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">.25</span>) +
+<span class="kw">p_sc</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span>(<span class="kw">d</span>, <span class="fu">aes</span>(x = <span class="kw">x</span>, y = <span class="kw">y</span>)) <span class="op">+</span>
+  <span class="fu">theme_bw</span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="reference/simplicial-complex.html">stat_vietoris2</a></span>(diameter = <span class="kw">prox</span>, fill = <span class="st">"darkgoldenrod"</span>) <span class="op">+</span>
+  <span class="fu"><a href="reference/simplicial-complex.html">stat_vietoris1</a></span>(diameter = <span class="kw">prox</span>, alpha = <span class="fl">.25</span>) <span class="op">+</span>
   <span class="fu"><a href="reference/simplicial-complex.html">stat_vietoris0</a></span>()
 <span class="co"># combine the plots</span>
-<span class="kw pkg">gridExtra</span><span class="kw ns">::</span><span class="fu">grid.arrange</span>(
-  <span class="no">p_d</span>, <span class="no">p_sc</span>,
-  <span class="kw">layout_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)
-)</pre></div>
+<span class="kw">gridExtra</span>::<span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(
+  <span class="kw">p_d</span>, <span class="kw">p_sc</span>,
+  layout_matrix = <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), nrow = <span class="fl">1</span>)
+)
+</pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
 <p>We can visualize the persistence data using a barcode (left) and a flat persistence diagram (right). In each plot, the dashed line indicates the cutoff at the proximity <code>prox</code> (= 0.6666667).</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="co"># visualize the persistence data, indicating cutoffs at this proximity</span>
-<span class="no">p_bc</span> <span class="kw">&lt;-</span> <span class="fu">ggplot</span>(<span class="no">ph</span>,
-       <span class="fu">aes</span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dim</span>)) +
-  <span class="fu"><a href="reference/theme_tda.html">theme_tda</a></span>() +
-  <span class="fu"><a href="reference/barcode.html">geom_barcode</a></span>() +
-  <span class="fu">labs</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Diameter"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Homological features"</span>) +
-  <span class="fu">geom_vline</span>(<span class="kw">xintercept</span> <span class="kw">=</span> <span class="no">prox</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>)
-<span class="no">p_pd</span> <span class="kw">&lt;-</span> <span class="fu">ggplot</span>(<span class="no">ph</span>,
-       <span class="fu">aes</span>(<span class="kw">start</span> <span class="kw">=</span> <span class="no">birth</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">death</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">dim</span>, <span class="kw">shape</span> <span class="kw">=</span> <span class="no">dim</span>)) +
-  <span class="fu"><a href="reference/theme_tda.html">theme_tda</a></span>() +
-  <span class="fu">coord_fixed</span>() +
-  <span class="fu"><a href="reference/persistence.html">stat_persistence</a></span>() +
-  <span class="fu">labs</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">"Birth"</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Persistence"</span>) +
-  <span class="fu">lims</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">NA</span>), <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">NA</span>)) +
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="co"># visualize the persistence data, indicating cutoffs at this proximity</span>
+<span class="kw">p_bc</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span>(<span class="kw">ph</span>,
+       <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>, colour = <span class="kw">dim</span>)) <span class="op">+</span>
+  <span class="fu"><a href="reference/theme_tda.html">theme_tda</a></span>() <span class="op">+</span>
+  <span class="fu"><a href="reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
+  <span class="fu">labs</span>(x = <span class="st">"Diameter"</span>, y = <span class="st">"Homological features"</span>) <span class="op">+</span>
+  <span class="fu">geom_vline</span>(xintercept = <span class="kw">prox</span>, color = <span class="st">"darkgoldenrod"</span>, linetype = <span class="st">"dashed"</span>)
+<span class="kw">p_pd</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span>(<span class="kw">ph</span>,
+       <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>, colour = <span class="kw">dim</span>, shape = <span class="kw">dim</span>)) <span class="op">+</span>
+  <span class="fu"><a href="reference/theme_tda.html">theme_tda</a></span>() <span class="op">+</span>
+  <span class="fu">coord_fixed</span>() <span class="op">+</span>
+  <span class="fu"><a href="reference/persistence.html">stat_persistence</a></span>() <span class="op">+</span>
+  <span class="fu">labs</span>(x = <span class="st">"Birth"</span>, y = <span class="st">"Death"</span>) <span class="op">+</span>
+  <span class="fu">lims</span>(x = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">0.8</span>), y = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">NA</span>)) <span class="op">+</span>
   <span class="fu">geom_abline</span>(
-    <span class="kw">intercept</span> <span class="kw">=</span> <span class="no">prox</span>, <span class="kw">slope</span> <span class="kw">=</span> - <span class="fl">1</span>,
-    <span class="kw">color</span> <span class="kw">=</span> <span class="st">"darkgoldenrod"</span>, <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>
+    intercept = <span class="fl">0</span>, slope = <span class="fl">1</span>,
+    color = <span class="st">"darkgoldenrod"</span>, linetype = <span class="st">"dashed"</span>
   )
 <span class="co"># combine the plots</span>
-<span class="kw pkg">gridExtra</span><span class="kw ns">::</span><span class="fu">grid.arrange</span>(
-  <span class="no">p_bc</span>, <span class="no">p_pd</span>,
-  <span class="kw">layout_matrix</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)
-)</pre></div>
+<span class="kw">gridExtra</span>::<span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(
+  <span class="kw">p_bc</span>, <span class="kw">p_pd</span>,
+  layout_matrix = <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), nrow = <span class="fl">1</span>)
+)
+</pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 <p>The barcode shows red lines of varying persistence for the 0-dimensional features, i.e. the gaps between connected components, and one blue line for the 1-dimensional feature, i.e. the loop. These groups of lines do not overlap, which means that the loop exists only in the persistence domain where all the data points are part of the same connected component. Because our choice of <code>prox</code> is between the birth and death of the loop, the simplicial complex above recovers it.</p>
 <p>The persistence diagram clearly shows that the loop persists for longer than any of the gaps. This is consistent with the gaps being artifacts of the sampling procedure while the loop being an intrinsic property of the underlying distribution.</p>
@@ -251,7 +262,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>
