@@ -99,7 +99,6 @@ pair of which are within `prox` of each other.
 ``` r
 # attach *ggtda*
 library(ggtda)
-#> Loading required package: ggplot2
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
@@ -138,10 +137,10 @@ p_pd <- ggplot(ph,
   theme_tda() +
   coord_fixed() +
   stat_persistence() +
-  labs(x = "Birth", y = "Persistence") +
-  lims(x = c(0, NA), y = c(0, NA)) +
+  labs(x = "Birth", y = "Death") +
+  lims(x = c(0, 0.8), y = c(0, NA)) +
   geom_abline(
-    intercept = prox, slope = - 1,
+    intercept = 0, slope = 1,
     color = "darkgoldenrod", linetype = "dashed"
   )
 # combine the plots
