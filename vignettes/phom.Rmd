@@ -1,6 +1,6 @@
 ---
 title: "Visualizing persistent homology with ggtda"
-author: "J. Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
+author: "Jason Cory Brunson, Raoul R. Wadhwa, Jacob G. Scott"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -75,119 +75,163 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Purpose
+## Opening
 
-The ggtda package provides users with a ggplot2-compatible tool to visualize persistent homology as part of a topological data analysis pipeline.
-This vignette introduces how users can use ggtda to construct publication-quality topological barcodes [@barcode1;@barcode2], flat persistence diagrams [@flatpersist], and diagonal persistence diagrams [@diagpersist].
+The ggtda package provides users with ggplot2 layers to visualize persistent homology, especially as part of a topological data analysis pipeline.
+This vignette shows how to use ggtda to construct publication-quality barcode [@barcode1; @barcode2], and persistence diagrams [@diagpersist; @flatpersist].
 
-## Setup and dataset details
-
-We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.
+We set up our environment by attaching ggtda. Other packages (`Suggests` in the ggtda DESCRIPTION) will be called to generate a simulated data set and to compute persistent homology.
 
 ```{r setup, message = FALSE}
-library("ggtda")
-library("ripserr")
-
-# load dataset
-data("annulus2d")
+library(ggtda)
 ```
 
-The `annulus2d` dataset (visualized below) comes with ggtda, and will be used to demonstrate each form of visualization.
+## Sample data
 
-```{r annulus-scatter, echo = FALSE, fig.height = 4, fig.width = 4}
-annulus_df <- as.data.frame(annulus2d)
-ggplot(annulus_df, aes(x = x, y = y)) +
-  geom_point() +
-  theme_minimal()
+We use [the **tdaunif** package](https://github.com/corybrunson/tdaunif/) to generate a sample from an interesting topological space that requires 4 Euclidean dimensions to embed: the real projective plane $\mathbb{P}^2(\mathbb{R})$.[^simple]
+The sample of 240 points is generated uniformly from a commonly-used embedding $\mathbb{P}^2(\mathbb{R}) \to \mathbb{R}^4$ of the projective plane as a 2-dimensional manifold in 4-dimensional Euclidean space, with some gaussian noise then introduced.
+
+[^simple]: For the simpler example of a noisy circle, see the README.
+
+```{r manifold sample, echo = FALSE}
+set.seed(7480L)
+rpp <- tdaunif::sample_projective_plane(n = 240L, sd = 0.005)
 ```
 
-The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
-We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with each of the three visualizations using ggtda.
+We can build some limited intuition about the space by plotting 2-coordinate projections from the point cloud:
+
+```{r manifold sample pairs, echo = FALSE, fig.height = 4, fig.width = 4}
+pairs(rpp, pch = 16L, cex = .5)
+```
+
+The real projective plane has known homology groups, given here as reduced homology over integer coefficiets:[^torsion]
+
+$$
+\tilde{H}_k(\mathbb{P}^2(\mathbb{R}))=\begin{cases}
+0 & k=0 \\
+\mathbb{Z}/2\mathbb{Z} & k=1 \\
+0 & k>1
+\end{cases}
+$$
+
+[^torsion]: The torsion in the degree-1 homology is due to $\mathbb{P}^2(\mathbb{R})$ having the 2-sphere $\mathbb{S}^2$, whose degree-2 homology is $\mathbb{Z}$, as a double-cover.
+
+The ranks of these groups ($\tilde\beta_0=0,\tilde\beta_1=1,\tilde\beta_2=0$) are the features we should expect to emerge from our computation as the most _persistent_. More on that next.
+
+## Persistent homology
+
+We will calculate the persistent homology of our sample using [the **ripserr** package](https://github.com/rrrlw/ripserr) and then plot several visualizations of the resulting persistent pairs using **ggtda**. Because the space from which the sample was taken is 2-dimensional, we perform the calculation up to dimension 2:
 
 ```{r phom}
-# calculate persistent homology of annulus and format
-annulus_phom <- as.data.frame(vietoris_rips(annulus2d))
-annulus_phom$dimension <- as.factor(annulus_phom$dimension)
+# calculate and format persistent homology
+rpp_phom <- as.data.frame(ripserr::vietoris_rips(rpp, dim = 2L))
+rpp_phom$dimension <- as.factor(rpp_phom$dimension)
 ```
 
-We take a quick peek with `head()` and `tail()` to see what the raw form of `annulus2d`'s persistent homology looks like.
+We take a quick peek with `head()` and `tail()` to see how long the homological features of this point cloud tend to persist:
 
 ```{r peek}
 # first few features (0-dimensional)
-head(annulus_phom)
-
-# last few features (1-dimensional)
-tail(annulus_phom)
+head(rpp_phom)
+# last few features (highest-dimensional)
+tail(rpp_phom)
 ```
 
-Clearly, graphical visualizations would permit easier and more effective interpretation than printing raw data.
-We will start off by plotting this as a topological barcode.
+Since we are interested in persistent features, let us have a look at the most persistent of these pairs:
 
-*N.B.* although `ripserr::vietoris_rips()` calculates persistent homology using the Vietoris-Rips complex, persistent homology from another simplicial complex (e.g. Čech complex) can also be visualized with ggtda.
-To account for this, the axes will be labeled in a generic manner that should be adapted by users depending on the specific context.
+```{r most persistent}
+rpp_top <- transform(rpp_phom, persistence = death - birth)
+head(rpp_top[with(rpp_top, order(-persistence)), ])
+```
 
-## Topological barcode (aka persistence barcode)
+This table reveals that a single feature dominates the rest, with persistence nearly 0.6 versus just over 0.3 for the next-most persistent features.
+Nevertheless, graphical visualization would allow us to more easily and effectively interpret the complete collection of features than printing raw data.
+We will start off by plotting this as a topological barcode.[^filtrations]
+
+[^filtrations]: Although `ripserr::vietoris_rips()` calculates persistent homology using the Vietoris–Rips filtration, persistent homology from another filtration (e.g. of Čech complexes) can also be visualized with ggtda.
+We will therefore label the axes in a generic manner that can then be specialized by users depending on their specific context.
+
+## Topological barcode
 
 Topological barcodes plot features as vertically stacked horizontal bars.
-Here, each bar corresponds to a single feature (single row in `annulus_phom`) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in `annulus_phom`) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in `annulus_phom`).
-Creating a topological barcode with ggtda is straightforward using `geom_barcode`.
+Each bar corresponds to a single feature (a single row in `rpp_phom`) with the left boundary of the bar corresponding to the ball radius at which the feature appears in the simplicial complex (column `"birth"` in `rpp_phom`) and the right boundary of the bar corresponding to the radius at which the feature disappears (column `"death"`).
+Creating a topological barcode with ggtda is straightforward using `geom_barcode()`:
 
 ```{r barcode, fig.height = 3, fig.width = 5}
 # create topological barcode with appropriate theme
-ggplot(annulus_phom, aes(start = birth, end = death,
-                         group = dimension, colour = dimension)) +
+ggplot(rpp_phom, aes(start = birth, end = death,
+                     group = dimension, colour = dimension)) +
   geom_barcode() +
   xlab("Simplicial complex diameter") +
   theme_barcode()
 ```
 
-The `group` aesthetic orders features by dimension ensuring that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on.
-The `color` aesthetic allows for explicit discrimination between features of different dimensions.
+The `group` aesthetic orders features by dimension to ensure that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on.
+The `color` aesthetic visually discriminates between features of different dimensions.
 
-Given that an annulus (aka noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected.
-This finding should be replicated in the persistence diagrams below.
+Given that $\mathbb{P}^2(\mathbb{R})$ has first Betti number equal to 1, the dominant 1-dimensional feature (or 1-cycle) appears as expected.
+Other features of, say, secondary persistence also emerge, and we will discuss them later, after we have showcased some alternative representations of these data.
 
 ## Persistence diagrams
 
-Flat persistence diagrams plot features as points on a scatterplot.
-Each point corresponds to a single feature (one row in `annulus_phom`), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in `annulus_phom`) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in `annulus_phom`).
-Flat persistence diagrams are generated using `stat_persistence` as follows.
-
-```{r flatpersist, fig.height=3.5, fig.width = 4.5}
-# create flat persistence diagram with appropriate theme
-ggplot(annulus_phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence() +
-  xlab("Feature appearance") +
-  ylab("Feature persistence") +
-  theme_persist()
-```
-
-The `shape` and `colour` aesthetics redundantly discriminate between features of different dimensions.
-This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. due to color-blind readers).
-
-Diagonal persistence diagrams can also be generated with `stat_persistence` by setting the `diagram` parameter to `"diagonal"`.
+Persistence diagrams plot features as points on a scatterplot.
+Each point corresponds to a single feature (one row in `rpp_phom`), so that features with equal births and deaths yield overlapping points.
+They are generated using `stat_persistence()` as follows. By default, they use the conventional "diagonal" layout: A feature born at $b$ and dead at $d$ is located at coordinates $(b,d)$.
 A reference line often helps interpretation of diagonal persistence diagrams so we add one with `geom_abline`.
 Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range.
 
-```{r diagadjust, fig.height = 3.5, fig.width = 4.5}
-# create diagonal persistence diagrams with adjustments
-ggplot(annulus_phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence(diagram = "diagonal") +
-  coord_equal() +
+```{r flat diagram, fig.height=3.5, fig.width = 4.5}
+# create flat persistence diagram with appropriate theme
+ggplot(rpp_phom, aes(start = birth, end = death,
+                     shape = dimension, colour = dimension)) +
+  stat_persistence() +
   geom_abline(slope = 1, intercept = 0) +
-  xlim(c(0, 1.5)) +
-  ylim(c(0, 1.5)) +
+  coord_equal() +
   xlab("Feature appearance") +
   ylab("Feature disappearance") +
   theme_persist()
 ```
 
-`ggplot2::ggsave` can be used to save plots produced by ggtda.
-Thus, running the following line of code will save the most recently plotted diagram (diagonal persistence diagram) as a PNG image file in the local working directory.
+The `shape` and `colour` aesthetics redundantly discriminate between features of different dimensions.
+This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. for color-blind viewers).
 
-```{r save-eg, eval = FALSE}
+Flat persistence diagrams can also be generated with `stat_persistence()`, by setting the `diagram` parameter to `"flat"`.
+In this layout, the horizontal coordinate is equal to the radius at which each feature appears (column `"birth"`) and the vertical coordinate is equal to the _persistence_ of the feature (the difference between `"death"` and `"birth"`).
+While these dimensions can be understood to lie on the same scale, the usefulness of the plot lies in recognizing the most persistent features by height and their relative appearences by birth, so it is less essential to fix the aspect ratio to 1.
+
+```{r diagonal diagram, fig.height = 3.5, fig.width = 4.5}
+# create diagonal persistence diagrams with adjustments
+ggplot(rpp_phom, aes(start = birth, end = death,
+                     shape = dimension, colour = dimension)) +
+  stat_persistence(diagram = "flat") +
+  xlim(c(0, 1.5)) +
+  ylim(c(0, 1.5)) +
+  xlab("Feature appearance") +
+  ylab("Feature persistence") +
+  theme_persist()
+```
+
+## Interpretation
+
+As mentioned above, the dominant feature detected in the point cloud `rpp` is a 1-cycle that persists from radius 0.27 to radius 0.86, nearly twice the persistence of any other feature.
+Still, the flat persistence diagram reveals that some other degree-1 and -2 features stand out from the rest.
+
+One way to convince ourselves that these are artifacts of noise in the sample is to compare their persistence to that of the degree-0 features.
+The latter are merely disconnected components, which finally disappear when the radius becomes large enough for the filtration to link every sampled point to every other.
+That the most persistent 1- and 2-cycles (other than the dominant 1-cycle) persist for no more than this "cut radius" of the point cloud suggests that they can plausibly be attributed to noise.
+
+In particular, the most persistent 2-cycle, which stands out clearly from is fellow 2-cycles, may be understood as a _geometric_ rather than a _topological_ feature.
+Each Vietoris–Rips complex of the filtration is built of simplices on points within the associated distance of each other---and these distances are in $\mathbb{R}^4$, not in $\mathbb{P}^2(\mathbb{R})$.
+Half of the two-coordinate projections of the embedded manifold are disks, which indicates that the embedding occupies space that is not far from spherical in shape; the filtration may form a spherical shell around the embedding that persists until 2-simplices fill its interior.[^bottle]
+
+[^bottle]: As a foil, imagine sampling points from a bottle with a narrow spout. Connecting nearby points will effectively stop the spout well before it fills the bottle.
+
+## **ggplot2** functionality
+
+Plots produced using **ggtda** can be handled like any other `"ggplot"` objects---for example, they can be saved using `ggplot2::ggsave()`.
+Running the following line of code will save the most recently plotted diagram (diagonal persistence diagram) as a PNG image file named `my-plot.png` in the local working directory.
+
+```{r save, eval = FALSE}
 ggsave("my-plot.png")
 ```
 
