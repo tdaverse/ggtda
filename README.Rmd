@@ -11,6 +11,10 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+library("ggplot2")
+library("ggtda")
+library("gridExtra")
 ```
 
 # ggtda
@@ -110,10 +114,10 @@ p_pd <- ggplot(ph,
   theme_tda() +
   coord_fixed() +
   stat_persistence() +
-  labs(x = "Birth", y = "Persistence") +
-  lims(x = c(0, NA), y = c(0, NA)) +
+  labs(x = "Birth", y = "Death") +
+  lims(x = c(0, 0.8), y = c(0, NA)) +
   geom_abline(
-    intercept = prox, slope = - 1,
+    intercept = 0, slope = 1,
     color = "darkgoldenrod", linetype = "dashed"
   )
 # combine the plots
