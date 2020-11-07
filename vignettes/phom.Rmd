@@ -66,6 +66,14 @@ references:
   page: 511-533
   type: article-journal
   issued: 2002
+- id: ripser
+  title: "Ripser: efficient computation of Vietoris-Rips persistence barcodes"
+  author: 
+  - family: Bauer
+    given: Ulrich
+  archive-place: arXiv:1908.02518
+  type: report
+  issued: 2019
 ---
 
 ```{r setup-orig, include = FALSE}
@@ -89,42 +97,42 @@ library(ggtda)
 ## Sample data
 
 We use [the **tdaunif** package](https://github.com/corybrunson/tdaunif/) to generate a sample from an interesting topological space that requires 4 Euclidean dimensions to embed: the real projective plane $\mathbb{P}^2(\mathbb{R})$.[^simple]
-The sample of 240 points is generated uniformly from a commonly-used embedding $\mathbb{P}^2(\mathbb{R}) \to \mathbb{R}^4$ of the projective plane as a 2-dimensional manifold in 4-dimensional Euclidean space, with some gaussian noise then introduced.
+The sample of 240 points is generated uniformly from a commonly-used embedding $\mathbb{P}^2(\mathbb{R}) \to \mathbb{R}^4$ of the 2-dimensional manifold into 4-dimensional Euclidean space, with some gaussian noise then introduced.
 
 [^simple]: For the simpler example of a noisy circle, see the README.
 
-```{r manifold sample, echo = FALSE}
+```{r manifold sample}
 set.seed(7480L)
 rpp <- tdaunif::sample_projective_plane(n = 240L, sd = 0.005)
 ```
 
 We can build some limited intuition about the space by plotting 2-coordinate projections from the point cloud:
 
-```{r manifold sample pairs, echo = FALSE, fig.height = 4, fig.width = 4}
+```{r manifold sample pairs, fig.height = 4, fig.width = 4}
 pairs(rpp, pch = 16L, cex = .5)
 ```
 
-The real projective plane has known homology groups, given here as reduced homology over integer coefficiets:[^torsion]
+The real projective plane has known homology groups, given here as reduced homology (to exclude the infinite degree-0 feature) over coefficients in the prime field of characteristic two $\mathbb{F}_2$:[^prime]
 
 $$
 \tilde{H}_k(\mathbb{P}^2(\mathbb{R}))=\begin{cases}
 0 & k=0 \\
-\mathbb{Z}/2\mathbb{Z} & k=1 \\
+\mathbb{F}_2 & k=1 \\
 0 & k>1
 \end{cases}
 $$
 
-[^torsion]: The torsion in the degree-1 homology is due to $\mathbb{P}^2(\mathbb{R})$ having the 2-sphere $\mathbb{S}^2$, whose degree-2 homology is $\mathbb{Z}$, as a double-cover.
+The ranks of these three groups---$0$, $1$, and $0$---count the features we should expect to emerge from our computation as the most _persistent_. More on that next.
 
-The ranks of these groups ($\tilde\beta_0=0,\tilde\beta_1=1,\tilde\beta_2=0$) are the features we should expect to emerge from our computation as the most _persistent_. More on that next.
+[^prime]: Ripser [@ripser] computes persistent homology using prime field coefficients for any prime $p<2^{16}$. Over integer coefficients, $\tilde{H}_1(\mathbb{P}^2(\mathbb{R}))=\mathbb{Z}/2\mathbb{Z}$ is cyclic; in our discussion we dodge this issue of torsion.
 
 ## Persistent homology
 
-We will calculate the persistent homology of our sample using [the **ripserr** package](https://github.com/rrrlw/ripserr) and then plot several visualizations of the resulting persistent pairs using **ggtda**. Because the space from which the sample was taken is 2-dimensional, we perform the calculation up to dimension 2:
+We will calculate the persistent homology of our sample using [the **ripserr** package](https://github.com/rrrlw/ripserr) and then plot several visualizations of the resulting persistent pairs using **ggtda**. Because the space from which the sample was taken is 2-dimensional, we perform the calculation in $\mathbb{F}_2$ up to dimension 2:
 
 ```{r phom}
 # calculate and format persistent homology
-rpp_phom <- as.data.frame(ripserr::vietoris_rips(rpp, dim = 2L))
+rpp_phom <- as.data.frame(ripserr::vietoris_rips(rpp, dim = 2L, p = 2L))
 rpp_phom$dimension <- as.factor(rpp_phom$dimension)
 ```
 
@@ -169,7 +177,7 @@ ggplot(rpp_phom, aes(start = birth, end = death,
 The `group` aesthetic orders features by dimension to ensure that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on.
 The `color` aesthetic visually discriminates between features of different dimensions.
 
-Given that $\mathbb{P}^2(\mathbb{R})$ has first Betti number equal to 1, the dominant 1-dimensional feature (or 1-cycle) appears as expected.
+Given that $\mathbb{P}^2(\mathbb{R})$ has first homology group of rank 1, the dominant 1-dimensional feature (or 1-cycle) appears as expected.
 Other features of, say, secondary persistence also emerge, and we will discuss them later, after we have showcased some alternative representations of these data.
 
 ## Persistence diagrams
