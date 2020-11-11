@@ -114,10 +114,11 @@ p_pd <- ggplot(ph,
   theme_tda() +
   coord_fixed() +
   stat_persistence() +
+  geom_abline(intercept = 0, slope = 1, color = "darkgray") +
   labs(x = "Birth", y = "Death") +
   lims(x = c(0, 0.8), y = c(0, NA)) +
   geom_abline(
-    intercept = 0, slope = 1,
+    intercept = 2*prox, slope = -1,
     color = "darkgoldenrod", linetype = "dashed"
   )
 # combine the plots
