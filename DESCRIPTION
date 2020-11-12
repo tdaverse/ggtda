@@ -27,6 +27,7 @@ Depends:
     R (>= 2.10),
     ggplot2 (>= 3.2.1)
 Suggests:
+    tdaunif (>= 0.1.0),
     ripserr (>= 0.1.1),
     rPref (>= 1.2),
     covr (>= 3.1.0),
