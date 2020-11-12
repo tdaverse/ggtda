@@ -121,8 +121,9 @@ gridExtra::grid.arrange(
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 We can visualize the persistence data using a barcode (left) and a flat
-persistence diagram (right). In each plot, the dashed line indicates the
-cutoff at the proximity `prox` (= 0.6666667).
+persistence diagram (right). In the barcode plot, the dashed line
+indicates the cutoff at the proximity `prox` (= 0.6666667); in the
+persistence diagram plot, the diamond point marks this cutoff.
 
 ``` r
 # visualize the persistence data, indicating cutoffs at this proximity
@@ -132,18 +133,15 @@ p_bc <- ggplot(ph,
   geom_barcode() +
   labs(x = "Diameter", y = "Homological features") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
-p_pd <- ggplot(ph,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
+p_pd <- ggplot(ph) +
   theme_tda() +
   coord_fixed() +
-  stat_persistence() +
+  stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_abline(intercept = 0, slope = 1, color = "darkgray") +
   labs(x = "Birth", y = "Death") +
   lims(x = c(0, 0.8), y = c(0, NA)) +
-  geom_abline(
-    intercept = 2*prox, slope = -1,
-    color = "darkgoldenrod", linetype = "dashed"
-  )
+  geom_point(data = data.frame(x = prox), aes(x, x),
+             colour = "darkgoldenrod", shape = "diamond", size = 4)
 # combine the plots
 gridExtra::grid.arrange(
   p_bc, p_pd,
