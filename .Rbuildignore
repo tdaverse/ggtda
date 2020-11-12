@@ -2,10 +2,13 @@
 ^README\.md$
 ^README\.Rmd$
 ^LICENSE$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTING.md$
 data-raw
 man-roxygen
 ^NEWS\.md$
 ^cran-comments\.md$
+^docs$
 
 # R project metadata
 ^.*\.Rproj$
