@@ -17,7 +17,13 @@ test_that("proximate functions threshold correctly on equilateral triangle", {
 })
 
 # sample data set
-d <- as.data.frame(ggtda::annulus2d)
+n <- 100L; sd <- 0.1
+set.seed(7)
+t <- stats::runif(n = n, min = 0, max = 2*pi)
+d <- data.frame(
+  x = cos(t) + stats::rnorm(n = n, mean = 0, sd = sd),
+  y = sin(t) + stats::rnorm(n = n, mean = 0, sd = sd)
+)
 
 # ggplot object tests ----------------------------------------------------------
 
@@ -58,7 +64,7 @@ test_that("Cech layers work as expected", {
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p1)), 1097L)
+  expect_equal(nrow(layer_data(p1)), 1090L)
   
   # Čech 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
@@ -66,7 +72,7 @@ test_that("Cech layers work as expected", {
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 16953L)
+  expect_equal(nrow(layer_data(p2)), 17205L)
   
   # skip on continuous integration services
   skip_on_travis()
@@ -94,7 +100,7 @@ test_that("Vietoris layers work as expected", {
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p1)), 1097)
+  expect_equal(nrow(layer_data(p1)), 1090L)
   
   # Vietoris 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
@@ -102,7 +108,7 @@ test_that("Vietoris layers work as expected", {
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 16977)
+  expect_equal(nrow(layer_data(p2)), 17214L)
   
   # skip on continuous integration services
   skip_on_travis()
@@ -130,7 +136,7 @@ test_that("face layer works as expected", {
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 16977L)
+  expect_equal(nrow(layer_data(p2)), 17214L)
   
   # Čech face geom
   p3 <- ggplot(d, aes(x = x, y = y)) +
@@ -138,7 +144,7 @@ test_that("face layer works as expected", {
   expect_is(p3, "ggplot")
   expect_is(p3$layer[[1]], "ggproto")
   expect_equal(c(p3$labels$x, p3$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p3)), 16953L)
+  expect_equal(nrow(layer_data(p3)), 17205L)
   
   # skip on continuous integration services
   skip_on_travis()

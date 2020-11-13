@@ -24,24 +24,25 @@ This vignette explains how ggtda can be used to quickly and easily plot a simpli
 
 ## Setup and dataset details
 
-We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required datasets.
+We first setup our environment by attaching **ggtda**.
 
 ```{r setup, message = FALSE}
 library("ggtda")
-library("ripserr")
-
-# load dataset
-data("annulus2d")
 ```
 
 The `unif_df` dataset (visualized below; left) is a subset of 25 points sampled uniformly from the unit interval; it will be used to demonstrate how individual ggtda functions work.
-The `annulus_df` dataset (visualized below; right) is data-framed from the `annulus2d` data included with ggtda, and will be used to demonstrate effective combination use of ggtda functions.
+The `annulus_df` dataset (visualized below; right) consists of 100 points sampled with noise from a circle, and will be used to demonstrate effective combination use of ggtda functions.
 
 ```{r plots, fig.show = 'hold'}
 set.seed(1)
-unif_df <- as.data.frame(cbind(runif(25), runif(25)))
-colnames(unif_df) <- c("x", "y")
-annulus_df <- as.data.frame(annulus2d)
+unif_df <- as.data.frame(cbind(x = runif(25), y = runif(25)))
+n <- 100L; sd <- 0.1
+set.seed(2)
+t <- stats::runif(n = n, min = 0, max = 2*pi)
+annulus_df <- data.frame(
+  x = cos(t) + stats::rnorm(n = n, mean = 0, sd = sd),
+  y = sin(t) + stats::rnorm(n = n, mean = 0, sd = sd)
+)
 
 # left panel
 ggplot(unif_df, aes(x = x, y = y)) +
@@ -59,8 +60,8 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 
 ## Visualizing a simplicial complex
 
-For the sake of simplicity, we will first demonstrate use of the individual simplicial complex visualization functions with a 25-point subset of `unif2d`.
-The [next section](#eg) will use the `annulus2d` dataset to show how the individual functions can work together to create effective visualizations.
+For the sake of simplicity, we will first demonstrate use of the individual simplicial complex visualization functions with a 25-point subset of `unif_df`.
+The [next section](#eg) will use the `annulus_df` dataset to show how the individual functions can work together to create effective visualizations.
 We will use a radius of `0.1` for the visualizations in this section.
 First, we explore `stat_disk` that, in combination with `geom_point` from ggplot2, will draw proximity circles surrounding each point; since `0.1` is the circle radius, any pair of points less than a distance of `0.2` units away from each other will have overlapping circles, indicating an edge should be drawn between them at this radius.
 
@@ -192,12 +193,12 @@ ggplot(eq_tri, aes(x = x, y = y)) +
 
 ## Persistence, Punctuated {#eg}
 
-The `annulus2d` dataset contains 100 points noisily distributed around the circumference of a unit circle.
+The `annulus_df` dataset contains 100 points noisily distributed around the circumference of a unit circle.
 We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with corresponding simplicial complices at various radii.
 
 ```{r phom, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
 # calculate persistent homology of annulus
-annulus_phom <- as.data.frame(vietoris_rips(annulus2d))
+annulus_phom <- as.data.frame(ripserr::vietoris_rips(annulus_df))
 annulus_phom$dimension <- as.factor(annulus_phom$dimension)
 
 # plot topological barcode (left panel)
@@ -219,7 +220,7 @@ ggplot(annulus_phom, aes(start = birth, end = death,
   theme_persist()
 ```
 
-The dominant feature in `annulus2d` is a 1-dimensional loop that we identify in the following code block.
+The dominant feature in `annulus_df` is a 1-dimensional loop that we identify in the following code block.
 
 ```{r annulus-main}
 subset(annulus_phom, dimension == 1)
@@ -297,7 +298,7 @@ Interpretation at diameter ```r diam[1]```:
   * there are at least a couple 1-loops at this diameter (adjacent to `(0.0, -1.0)`)
 
 Each of the four panels complement one another by providing overlapping and consistent pieces of information with varying levels of clarity.
-Together, we get a good sense of what's going on in `annulus2d` at a diameter of ```r diam[1]```.
+Together, we get a good sense of what's going on in `annulus_df` at a diameter of ```r diam[1]```.
 Next, we look at diameter ```r diam[2]```.
 
 ```{r during, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
