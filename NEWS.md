@@ -16,4 +16,4 @@ The `stat_disk()`, `stat_vietoris*()`, and `stat_cech*()` layers can be used to 
 
 ## vignettes
 
-The two vignettes illustrate these two collections of tools. The vignettes call the **tdaunif** and **risperr** packages, for this reason included under `Suggests` in the DESCSRIPTION, to generate data and compute persistent homology.
+The two vignettes illustrate these two collections of tools. The vignettes call the **tdaunif** and **ripserr** packages, for this reason included under `Suggests` in the DESCSRIPTION, to generate data and compute persistent homology.
