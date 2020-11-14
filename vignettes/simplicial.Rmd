@@ -1,6 +1,6 @@
 ---
 title: "Visualizing a simplicial complex with ggtda"
-author: "J. Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa"
+author: "Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
