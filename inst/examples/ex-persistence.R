@@ -22,11 +22,11 @@ ggplot(toy.data,
   stat_persistence() +
   stat_frontier() +
   lims(x = c(0, NA), y = c(0, NA))
-# flat persistence diagram
+# flat persistence diagram, coding dimension to numeral
 ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
+       aes(start = birth, end = death, label = dim)) +
   theme_tda() +
-  stat_persistence(diagram = "flat") +
+  stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
 # landscape persistence frontier
 ggplot(toy.data,
