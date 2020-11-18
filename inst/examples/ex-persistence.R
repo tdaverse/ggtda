@@ -10,7 +10,8 @@ toy.data <- data.frame(
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim,
            alpha = after_stat(persistence))) +
-  theme_tda() + coord_equal() +
+  theme_persist() +
+  coord_equal() +
   stat_persistence(diagram = "diagonal", size = 3) +
   geom_abline(intercept = 0, slope = 1, color = "grey") +
   lims(x = c(0, 6), y = c(0, 6)) +
@@ -18,20 +19,22 @@ ggplot(toy.data,
 # diagonal persistence diagram with frontier
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_tda() + coord_equal() +
+  theme_persist() +
+  coord_equal() +
   stat_persistence() +
   stat_frontier() +
   lims(x = c(0, NA), y = c(0, NA))
 # flat persistence diagram, coding dimension to numeral
 ggplot(toy.data,
        aes(start = birth, end = death, label = dim)) +
-  theme_tda() +
+  theme_persist() +
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
 # landscape persistence frontier
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_tda() + coord_equal() +
+  theme_persist() +
+  coord_equal() +
   stat_frontier(diagram = "landscape") +
   lims(x = c(0, NA), y = c(0, NA))
 
