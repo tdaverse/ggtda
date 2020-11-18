@@ -17,7 +17,6 @@ the form of persistence barcodes (aka topological barcodes).
 }
 \seealso{
 Other TDA themes: 
-\code{\link{theme_persist}()},
-\code{\link{theme_tda}()}
+\code{\link{theme_persist}()}
 }
 \concept{TDA themes}

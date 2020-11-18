@@ -12,7 +12,6 @@ the form of flat persistence diagrams or diagonal persistence diagrams.
 }
 \seealso{
 Other TDA themes: 
-\code{\link{theme_barcode}()},
-\code{\link{theme_tda}()}
+\code{\link{theme_barcode}()}
 }
 \concept{TDA themes}
