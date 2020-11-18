@@ -129,16 +129,16 @@
       <small>Source: <a href='https://github.com/rrrlw/ggtda/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="ggtda-v0-1-0" class="section level1">
+    <div id="ggtda-v010" class="section level1">
 <h1 class="page-header" data-toc-text="0.1.0">
-<a href="#ggtda-v0-1-0" class="anchor"></a>ggtda v0.1.0</h1>
+<a href="#ggtda-v010" class="anchor"></a>ggtda v0.1.0</h1>
 <p>This is the inaugural release. It contains several basic plotting layers and associated themes, with a small data set and two vignettes for illustration.</p>
 <div id="barcode-and-persistence-diagrams" class="section level2">
 <h2 class="hasAnchor">
 <a href="#barcode-and-persistence-diagrams" class="anchor"></a>barcode and persistence diagrams</h2>
 <p>The <code><a href="../reference/barcode.html">geom_barcode()</a></code> layer takes persistence data with the two required aesthetics <code>start</code> (or <code>xmin</code>) and <code>end</code> (or <code>xmax</code>) and produces a barcode diagram, which can optionally be grouped and color-coded by an additional variable (usually dimension).</p>
 <p>The <code><a href="../reference/persistence.html">stat_persistence()</a></code> and <code><a href="../reference/persistence.html">stat_frontier()</a></code> layers also take persistence data, though they only accept the required aesthetics <code>start</code> and <code>end</code>. They transform these data into the coordinates of a persistence diagram and into the endpoints of line segments that outline the persistence frontier, respectively. They can be oriented according to “flat”, diagonal, or landscape formats.</p>
-<p>The themes <code><a href="../reference/theme_persist.html">theme_persist()</a></code> (equivalent to <code><a href="../reference/theme_tda.html">theme_tda()</a></code>) and <code><a href="../reference/theme_barcode.html">theme_barcode()</a></code> format plots to resemble the persistence and barcode diagrams found in the literature.</p>
+<p>The themes <code><a href="../reference/theme_persist.html">theme_persist()</a></code> and <code><a href="../reference/theme_barcode.html">theme_barcode()</a></code> format plots to resemble the persistence and barcode diagrams found in the literature.</p>
 </div>
 <div id="illustration-tools" class="section level2">
 <h2 class="hasAnchor">
@@ -148,7 +148,7 @@
 <div id="vignettes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vignettes" class="anchor"></a>vignettes</h2>
-<p>The two vignettes illustrate these two collections of tools. They use the installed <code>annulus2d</code> data set, a uniform sample from an annulus in the coordinate plane.</p>
+<p>The two vignettes illustrate these two collections of tools. The vignettes call the <strong>tdaunif</strong> and <strong>ripserr</strong> packages, for this reason included under <code>Suggests</code> in the DESCSRIPTION, to generate data and compute persistent homology.</p>
 </div>
 </div>
   </div>
@@ -168,7 +168,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

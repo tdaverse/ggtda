@@ -82,13 +82,14 @@
 
       
 
-      </header><div class="row">
+      </header><script src="phom_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="phom_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="phom_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Visualizing persistent homology with ggtda</h1>
-                        <h4 class="author">J. Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
+                        <h4 class="author">Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
             
-            <h4 class="date">2020-11-02</h4>
+            <h4 class="date">2020-11-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/master/vignettes/phom.Rmd"><code>vignettes/phom.Rmd</code></a></small>
       <div class="hidden name"><code>phom.Rmd</code></div>
@@ -97,123 +98,171 @@
 
     
     
-<div id="purpose" class="section level2">
+<div id="opening" class="section level2">
 <h2 class="hasAnchor">
-<a href="#purpose" class="anchor"></a>Purpose</h2>
-<p>The ggtda package provides users with a ggplot2-compatible tool to visualize persistent homology as part of a topological data analysis pipeline. This vignette introduces how users can use ggtda to construct publication-quality topological barcodes <span class="citation">(Carlsson et al.; Ghrist)</span>, flat persistence diagrams <span class="citation">(Wadhwa et al.)</span>, and diagonal persistence diagrams <span class="citation">(Edelsbrunner, Letscher, and Zomorodian)</span>.</p>
-</div>
-<div id="setup-and-dataset-details" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setup-and-dataset-details" class="anchor"></a>Setup and dataset details</h2>
-<p>We first setup our environment as follows, attaching the necessary R packages (including ggtda itself!) and loading the required dataset.</p>
+<a href="#opening" class="anchor"></a>Opening</h2>
+<p>The ggtda package provides users with ggplot2 layers to visualize persistent homology, especially as part of a topological data analysis pipeline. It <code>Depends</code> on ggplot2, which is loaded and attached when ggtda is. This vignette shows how to use ggtda to construct publication-quality barcode <span class="citation">(Carlsson et al. 2005; Ghrist 2008)</span>, and persistence diagrams <span class="citation">(Edelsbrunner, Letscher, and Zomorodian 2002; Wadhwa et al. 2018)</span>.</p>
+<p>We set up our environment by attaching ggtda. Other packages (<code>Suggests</code> in the ggtda DESCRIPTION) will be called to generate a simulated data set and to compute persistent homology.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://rrrlw.github.io/ggtda">"ggtda"</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st"><a href="https://rrrlw.github.io/ripserr">"ripserr"</a></span>)
-
-<span class="co"># load dataset</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"annulus2d"</span>)
-</pre></div>
-<p>The <code>annulus2d</code> dataset (visualized below) comes with ggtda, and will be used to demonstrate each form of visualization.</p>
-<p><img src="phom_files/figure-html/annulus-scatter-1.png" width="384"></p>
-<p>The <code>annulus2d</code> dataset contains 100 points noisily distributed around the circumference of a unit circle. We will calculate its persistent homology using the ripserr package (following code block) and then plot the result with each of the three visualizations using ggtda.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="co"># calculate persistent homology of annulus and format</span>
-<span class="kw">annulus_phom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/ripserr/man/vietoris_rips.html">vietoris_rips</a></span>(<span class="kw">annulus2d</span>))
-<span class="kw">annulus_phom</span><span class="op">$</span><span class="kw">dimension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="kw">annulus_phom</span><span class="op">$</span><span class="kw">dimension</span>)
-</pre></div>
-<p>We take a quick peek with <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> and <code><a href="https://rdrr.io/r/utils/head.html">tail()</a></code> to see what the raw form of <code>annulus2d</code>’s persistent homology looks like.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="co"># first few features (0-dimensional)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw">annulus_phom</span>)
-<span class="co">#&gt;   dimension birth      death</span>
-<span class="co">#&gt; 1         0     0 0.01285774</span>
-<span class="co">#&gt; 2         0     0 0.01815133</span>
-<span class="co">#&gt; 3         0     0 0.01910493</span>
-<span class="co">#&gt; 4         0     0 0.02926331</span>
-<span class="co">#&gt; 5         0     0 0.03059380</span>
-<span class="co">#&gt; 6         0     0 0.03230180</span>
-
-<span class="co"># last few features (1-dimensional)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="kw">annulus_phom</span>)
-<span class="co">#&gt;     dimension     birth     death</span>
-<span class="co">#&gt; 106         1 0.2443465 0.2523066</span>
-<span class="co">#&gt; 107         1 0.2306282 0.2794531</span>
-<span class="co">#&gt; 108         1 0.1885419 0.2378600</span>
-<span class="co">#&gt; 109         1 0.1877741 0.1919384</span>
-<span class="co">#&gt; 110         1 0.1620650 0.1772953</span>
-<span class="co">#&gt; 111         1 0.1564191 0.1584211</span>
-</pre></div>
-<p>Clearly, graphical visualizations would permit easier and more effective interpretation than printing raw data. We will start off by plotting this as a topological barcode.</p>
-<p><em>N.B.</em> although <code><a href="https://rdrr.io/pkg/ripserr/man/vietoris_rips.html">ripserr::vietoris_rips()</a></code> calculates persistent homology using the Vietoris-Rips complex, persistent homology from another simplicial complex (e.g. Čech complex) can also be visualized with ggtda. To account for this, the axes will be labeled in a generic manner that should be adapted by users depending on the specific context.</p>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rrrlw.github.io/ggtda/">ggtda</a></span><span class="op">)</span></pre></div>
 </div>
-<div id="topological-barcode-aka-persistence-barcode" class="section level2">
+<div id="sample-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#topological-barcode-aka-persistence-barcode" class="anchor"></a>Topological barcode (aka persistence barcode)</h2>
-<p>Topological barcodes plot features as vertically stacked horizontal bars. Here, each bar corresponds to a single feature (single row in <code>annulus_phom</code>) with the left boundary of the bar corresponding to the simplicial complex radius at which the feature appears (birth column in <code>annulus_phom</code>) and the right boundary of the bar corresponding to the simplicial complex radius at which the feature disappears (death column in <code>annulus_phom</code>). Creating a topological barcode with ggtda is straightforward using <code>geom_barcode</code>.</p>
+<a href="#sample-data" class="anchor"></a>Sample data</h2>
+<p>We use <a href="https://github.com/corybrunson/tdaunif/">the <strong>tdaunif</strong> package</a> to generate a sample from an interesting topological space that requires 4 Euclidean dimensions to embed: the real projective plane, denoted <span class="math inline">\(\mathbb{P}^2(\mathbb{R})\)</span>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The sample of 240 points is generated uniformly from a commonly-used embedding <span class="math inline">\(\mathbb{P}^2(\mathbb{R}) \to \mathbb{R}^4\)</span> of the 2-dimensional manifold into 4-dimensional Euclidean space, with some 4-dimensional gaussian noise introduced.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">7480L</span><span class="op">)</span>
+<span class="va">rpp</span> <span class="op">&lt;-</span> <span class="fu">tdaunif</span><span class="fu">::</span><span class="fu"><a href="https://corybrunson.github.io/tdaunif/reference/real-projective-planes.html">sample_projective_plane</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">240L</span>, sd <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></pre></div>
+<p>We can build some limited intuition about the space by plotting 2-coordinate projections from the point cloud:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html">pairs</a></span><span class="op">(</span><span class="va">rpp</span>, pch <span class="op">=</span> <span class="fl">16L</span>, cex <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span></pre></div>
+<p><img src="phom_files/figure-html/manifold%20sample%20pairs-1.png" width="384"></p>
+<p>The real projective plane has known homology groups, given here over coefficients in <span class="math inline">\(\mathbb{F}_2\)</span>, the field of two elements:</p>
+<p><span class="math display">\[
+\tilde{H}_k(\mathbb{P}^2(\mathbb{R});\mathbb{F}_2)=\begin{cases}
+0 &amp; k=0 \\
+\mathbb{F}_2 &amp; k=1 \\
+0 &amp; k&gt;1
+\end{cases}
+\]</span></p>
+<p>Each group <span class="math inline">\(\tilde{H}_k\)</span> indicates the complexity of the space in a different dimension <span class="math inline">\(k\)</span>. For example, the real projective plane has no gaps between connected components and no interior separated from its exterior, so its degree-0 and degree-2 homology groups are null.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> It does, however, have a sort of “hole”, or degree-1 feature, which is detected by a single copy of the field of coefficients.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> The ranks of these three groups—<span class="math inline">\(0\)</span>, <span class="math inline">\(1\)</span>, and <span class="math inline">\(0\)</span>—count the features of each degree we should expect to emerge as the most <em>persistent</em>.</p>
+</div>
+<div id="persistent-homology" class="section level2">
+<h2 class="hasAnchor">
+<a href="#persistent-homology" class="anchor"></a>Persistent homology</h2>
+<p>We will calculate the persistent homology of our sample using <a href="https://github.com/rrrlw/ripserr">the <strong>ripserr</strong> package</a>, specifying the prime field <code>p = 2L</code>. We will then plot several visualizations of the resulting persistent pairs using <strong>ggtda</strong>. Because the space from which the sample was taken is 2-dimensional, we run the calculation up to dimension <code>dim = 2L</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="co"># calculate persistent homology</span>
+<span class="va">rpp_phom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="fu">ripserr</span><span class="fu">::</span><span class="fu"><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html">vietoris_rips</a></span><span class="op">(</span><span class="va">rpp</span>, dim <span class="op">=</span> <span class="fl">2L</span>, p <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span><span class="op">)</span>
+<span class="co"># format persistence data for ggplot2</span>
+<span class="va">rpp_phom</span><span class="op">$</span><span class="va">dimension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">rpp_phom</span><span class="op">$</span><span class="va">dimension</span><span class="op">)</span></pre></div>
+<p>In keeping with tidy principles, <strong>ripserr</strong> returns a data frame whose observational units (one per row) are homological features. We take a quick peek with <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> and <code><a href="https://rdrr.io/r/utils/head.html">tail()</a></code> to see how long the features of this point cloud tend to persist:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># first few features (lowest-dimensional)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">rpp_phom</span><span class="op">)</span>
+<span class="co">#&gt;   dimension birth       death</span>
+<span class="co">#&gt; 1         0     0 0.007583014</span>
+<span class="co">#&gt; 2         0     0 0.012796774</span>
+<span class="co">#&gt; 3         0     0 0.014028751</span>
+<span class="co">#&gt; 4         0     0 0.016235590</span>
+<span class="co">#&gt; 5         0     0 0.016579049</span>
+<span class="co">#&gt; 6         0     0 0.016774255</span>
+<span class="co"># last few features (highest-dimensional)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">rpp_phom</span><span class="op">)</span>
+<span class="co">#&gt;     dimension      birth      death</span>
+<span class="co">#&gt; 292         1 0.11510766 0.11754975</span>
+<span class="co">#&gt; 293         1 0.09443284 0.12657100</span>
+<span class="co">#&gt; 294         1 0.08753047 0.09689070</span>
+<span class="co">#&gt; 295         1 0.08421899 0.08618699</span>
+<span class="co">#&gt; 296         1 0.05610310 0.05891388</span>
+<span class="co">#&gt; 297         1 0.05048809 0.05320885</span></pre></div>
+<p>Since we are interested in persistent features, let us have a look at the most persistent of these pairs:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">rpp_pers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html">transform</a></span><span class="op">(</span><span class="va">rpp_phom</span>, persistence <span class="op">=</span> <span class="va">death</span> <span class="op">-</span> <span class="va">birth</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">rpp_pers</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">rpp_pers</span>, <span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">persistence</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>, n <span class="op">=</span> <span class="fl">12L</span><span class="op">)</span>
+<span class="co">#&gt;     dimension     birth     death persistence</span>
+<span class="co">#&gt; 272         1 0.2678936 0.8587924   0.5908988</span>
+<span class="co">#&gt; 259         1 0.3266813 0.6612964   0.3346152</span>
+<span class="co">#&gt; 239         0 0.0000000 0.3272253   0.3272253</span>
+<span class="co">#&gt; 238         0 0.0000000 0.3228169   0.3228169</span>
+<span class="co">#&gt; 237         0 0.0000000 0.3162588   0.3162588</span>
+<span class="co">#&gt; 236         0 0.0000000 0.3111643   0.3111643</span>
+<span class="co">#&gt; 235         0 0.0000000 0.3082050   0.3082050</span>
+<span class="co">#&gt; 234         0 0.0000000 0.3080866   0.3080866</span>
+<span class="co">#&gt; 233         0 0.0000000 0.2971045   0.2971045</span>
+<span class="co">#&gt; 232         0 0.0000000 0.2964972   0.2964972</span>
+<span class="co">#&gt; 231         0 0.0000000 0.2957626   0.2957626</span>
+<span class="co">#&gt; 230         0 0.0000000 0.2955564   0.2955564</span></pre></div>
+<p>This table reveals that a single feature dominates the rest, with persistence nearly 0.6 versus just over 0.3 for the next-most persistent features. Nevertheless, graphical visualization would allow us to more easily and effectively interpret the complete collection of features than printing raw data. We will start off by plotting this as a topological barcode.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+</div>
+<div id="topological-barcode" class="section level2">
+<h2 class="hasAnchor">
+<a href="#topological-barcode" class="anchor"></a>Topological barcode</h2>
+<p>Topological barcodes plot features as vertically stacked horizontal bars. Each bar corresponds to a single feature with the left boundary of the bar corresponding to the ball radius at which the feature appears in the simplicial complex (column <code>"birth"</code> in <code>rpp_phom</code>) and the right boundary of the bar corresponding to the radius at which the feature disappears (column <code>"death"</code>). Creating a topological barcode with ggtda is straightforward using <code><a href="../reference/barcode.html">geom_barcode()</a></code>, with the persistence aesthetics <code>start</code> and <code>end</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="co"># create topological barcode with appropriate theme</span>
-<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
-                         group = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
-  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span>() <span class="op">+</span>
-  <span class="fu">xlab</span>(<span class="st">"Simplicial complex diameter"</span>) <span class="op">+</span>
-  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span>()
-</pre></div>
+<span class="fu">ggplot</span><span class="op">(</span><span class="va">rpp_phom</span>, <span class="fu">aes</span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>,
+                     group <span class="op">=</span> <span class="va">dimension</span>, colour <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Simplicial complex diameter"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_barcode.html">theme_barcode</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <p><img src="phom_files/figure-html/barcode-1.png" width="480"></p>
-<p>The <code>group</code> aesthetic orders features by dimension ensuring that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on. The <code>color</code> aesthetic allows for explicit discrimination between features of different dimensions.</p>
-<p>Given that an annulus (aka noisy circle) has a Betti-1 number equal to 1, the dominant 1-dimensional feature (or 1-cycle) is plotted just as expected. This finding should be replicated in the persistence diagrams below.</p>
+<p>This layer is coded as a graphical element (“geom”) rather than as a statistical transformation (“stat”) because the data undergo no computations—only aesthetic mappings—before the barcode is rendered. The <code>group</code> aesthetic orders features by dimension to ensure that all 0-dimensional features a plotted in one group, all 1-dimensional features above them, and so on. The <code>color</code> aesthetic visually discriminates between features of different dimensions.</p>
+<p>Given that <span class="math inline">\(\mathbb{P}^2(\mathbb{R})\)</span> has first homology group of rank 1, the dominant 1-dimensional feature (or 1-cycle) appears as expected. Other features of, say, secondary persistence also emerge, and we will discuss them later, after we have showcased some alternative representations of these data.</p>
 </div>
 <div id="persistence-diagrams" class="section level2">
 <h2 class="hasAnchor">
 <a href="#persistence-diagrams" class="anchor"></a>Persistence diagrams</h2>
-<p>Flat persistence diagrams plot features as points on a scatterplot. Each point corresponds to a single feature (one row in <code>annulus_phom</code>), with the horizontal coordinate equal to the simplicial complex radius at which the feature appears (birth column in <code>annulus_phom</code>) and the vertical coordinate equal to the persistence of the feature (difference between death and birth columns in <code>annulus_phom</code>). Flat persistence diagrams are generated using <code>stat_persistence</code> as follows.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
+<p>Persistence diagrams plot features as points on a scatterplot. Each point corresponds to a single feature, so that features with equal births and deaths yield overlapping points. They are generated using <code><a href="../reference/persistence.html">stat_persistence()</a></code> as below, using the same persistence aesthetics. This is indeed a stat layer, in that the coordinates are calculated differently from the data depending on the layout. By default, persistence diagrams take the conventional “diagonal” layout: A feature born at <span class="math inline">\(b\)</span> and dead at <span class="math inline">\(d\)</span> is located at coordinates <span class="math inline">\((b,d)\)</span>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit">
 <span class="co"># create flat persistence diagram with appropriate theme</span>
-<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
-                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>() <span class="op">+</span>
-  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
-  <span class="fu">ylab</span>(<span class="st">"Feature persistence"</span>) <span class="op">+</span>
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>()
-</pre></div>
-<p><img src="phom_files/figure-html/flatpersist-1.png" width="432"></p>
-<p>The <code>shape</code> and <code>colour</code> aesthetics redundantly discriminate between features of different dimensions. This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. due to color-blind readers).</p>
-<p>Diagonal persistence diagrams can also be generated with <code>stat_persistence</code> by setting the <code>diagram</code> parameter to <code>"diagonal"</code>. A reference line often helps interpretation of diagonal persistence diagrams so we add one with <code>geom_abline</code>. Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="fu">ggplot</span><span class="op">(</span><span class="va">rpp_phom</span>, <span class="fu">aes</span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>,
+                     shape <span class="op">=</span> <span class="va">dimension</span>, colour <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">geom_abline</span><span class="op">(</span>slope <span class="op">=</span> <span class="fl">1</span>, intercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Feature appearance"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ylab</span><span class="op">(</span><span class="st">"Feature disappearance"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+<p><img src="phom_files/figure-html/flat%20diagram-1.png" width="432"></p>
+<p>The reference line <span class="math inline">\(y=x\)</span> often aids the interpretation of diagonal persistence diagrams, so we add one with <code>geom_abline()</code>. Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range. The <code>shape</code> and <code>colour</code> aesthetics redundantly discriminate between features of different dimensions. This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. for color-blind viewers).</p>
+<p>Flat persistence diagrams can also be generated with <code><a href="../reference/persistence.html">stat_persistence()</a></code>, by setting the <code>diagram</code> parameter to <code>"flat"</code>. In this layout, the horizontal coordinate is equal to the radius at which each feature appears (column <code>"birth"</code>) and the vertical coordinate is equal to the <em>persistence</em> of the feature (the difference between <code>"death"</code> and <code>"birth"</code>). While these dimensions can be understood to lie on the same scale, the usefulness of the plot lies in recognizing the most persistent features by height and their relative appearences by birth, so it is less essential to fix the aspect ratio to 1.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="co"># create diagonal persistence diagrams with adjustments</span>
-<span class="fu">ggplot</span>(<span class="kw">annulus_phom</span>, <span class="fu">aes</span>(start = <span class="kw">birth</span>, end = <span class="kw">death</span>,
-                         shape = <span class="kw">dimension</span>, colour = <span class="kw">dimension</span>)) <span class="op">+</span>
-  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span>(diagram = <span class="st">"diagonal"</span>) <span class="op">+</span>
-  <span class="fu">coord_equal</span>() <span class="op">+</span>
-  <span class="fu">geom_abline</span>(slope = <span class="fl">1</span>, intercept = <span class="fl">0</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1.5</span>)) <span class="op">+</span>
-  <span class="fu">xlab</span>(<span class="st">"Feature appearance"</span>) <span class="op">+</span>
-  <span class="fu">ylab</span>(<span class="st">"Feature disappearance"</span>) <span class="op">+</span>
-  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span>()
-</pre></div>
-<p><img src="phom_files/figure-html/diagadjust-1.png" width="432"></p>
-<p><code><a href="https://rdrr.io/pkg/ggplot2/man/ggsave.html">ggplot2::ggsave</a></code> can be used to save plots produced by ggtda. Thus, running the following line of code will save the most recently plotted diagram (diagonal persistence diagram) as a PNG image file in the local working directory.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu">ggsave</span>(<span class="st">"my-plot.png"</span>)
-</pre></div>
+<span class="fu">ggplot</span><span class="op">(</span><span class="va">rpp_phom</span>, <span class="fu">aes</span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>,
+                     shape <span class="op">=</span> <span class="va">dimension</span>, colour <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span><span class="op">(</span>diagram <span class="op">=</span> <span class="st">"flat"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Feature appearance"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ylab</span><span class="op">(</span><span class="st">"Feature persistence"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="../reference/theme_persist.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+<p><img src="phom_files/figure-html/diagonal%20diagram-1.png" width="432"></p>
+</div>
+<div id="interpretation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#interpretation" class="anchor"></a>Interpretation</h2>
+<p>As mentioned above, the dominant feature detected in the point cloud <code>rpp</code> is a 1-cycle that persists from radius 0.27 to radius 0.86, nearly twice the persistence of any other feature. Still, the flat persistence diagram reveals that some other degree-1 and -2 features stand out from the rest.</p>
+<p>One way to convince ourselves that these are artifacts of noise in the sample is to compare their persistence to that of the degree-0 features. The latter are merely disconnected components, which finally disappear when the radius becomes large enough for the filtration to link every sampled point to every other. That the most persistent 1- and 2-cycles (other than the dominant 1-cycle) persist for no more than this “cut radius” of the point cloud suggests that they can plausibly be attributed to noise.</p>
+<p>In particular, the most persistent 2-cycle, which stands out clearly from is fellow 2-cycles, may be understood as a <em>geometric</em> rather than a <em>topological</em> feature. Each Vietoris–Rips complex of the filtration is built of simplices on points within the associated distance (the radius) of each other—and these distances are in <span class="math inline">\(\mathbb{R}^4\)</span>, not in <span class="math inline">\(\mathbb{P}^2(\mathbb{R})\)</span>. When the radius can reach between regions of the manifold embedded nearby in 4-space but not completely across, some purely topological features may collapse into features that are artifacts of the embedding. For a more intuitive example, imagine sampling points from a bottle with a narrow spout: A cover that connects nearby points will effectively plug the spout well before it fills the interior of the bottle, producing a persistent degree-2 feature though the manifold has null degree-2 homology.</p>
+<p>In real-world settings, we may rarely have topological insight beyond a point cloud itself. So, while we can be wary of homological features of “middling” persistence, we should also not dismiss them.</p>
+</div>
+<div id="ggplot2-functionality" class="section level2">
+<h2 class="hasAnchor">
+<a href="#ggplot2-functionality" class="anchor"></a><strong>ggplot2</strong> functionality</h2>
+<p>Plots produced using <strong>ggtda</strong> can be handled like any other <code>"ggplot"</code> objects—for example, they can be saved using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggplot2::ggsave()</a></code>. Running the following line of code will save the most recent plot (the flat persistence diagram) as a PNG image file named <code>my-plot.png</code> in the local working directory.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="fu">ggsave</span><span class="op">(</span><span class="st">"my-plot.png"</span><span class="op">)</span></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
 <div id="refs" class="references">
+<div id="ref-ripser">
+<p>Bauer, Ulrich. 2019. “Ripser: Efficient Computation of Vietoris–Rips Persistence Barcodes.”</p>
+</div>
 <div id="ref-barcode1">
-<p>Carlsson, Gunnar, Afra Zomorodian, Anne Collins, and Leonidas Guibas. “Persistence Barcodes for Shapes.” <em>International Journal of Shape Modeling</em> 11 (2): 149–87.</p>
+<p>Carlsson, Gunnar, Afra Zomorodian, Anne Collins, and Leonidas Guibas. 2005. “Persistence Barcodes for Shapes.” <em>International Journal of Shape Modeling</em> 11 (2): 149–87.</p>
 </div>
 <div id="ref-diagpersist">
-<p>Edelsbrunner, Herbert, David Letscher, and Afra Zomorodian. “Topological Persistence and Simplification.” <em>Discrete and Computational Geometry</em> 28 (4): 511–33.</p>
+<p>Edelsbrunner, Herbert, David Letscher, and Afra Zomorodian. 2002. “Topological Persistence and Simplification.” <em>Discrete and Computational Geometry</em> 28 (4): 511–33.</p>
 </div>
 <div id="ref-barcode2">
-<p>Ghrist, Robert. “Barcodes: The Persistent Topology of Data.” <em>Bulletin of the American Mathematical Society</em> 45 (1): 61–75.</p>
+<p>Ghrist, Robert. 2008. “Barcodes: The Persistent Topology of Data.” <em>Bulletin of the American Mathematical Society</em> 45 (1): 61–75.</p>
 </div>
 <div id="ref-flatpersist">
-<p>Wadhwa, Raoul, Andrew Dhawan, Drew Williamson, and Jacob Scott. “A Flat Persistence Diagram for Improved Visualization of Persistent Homology.” <em>arXiv</em>, 1812.04567.</p>
+<p>Wadhwa, Raoul R., Andrew Dhawan, Drew F. K. Williamson, and Jacob G. Scott. 2018. “A Flat Persistence Diagram for Improved Visualization of Persistent Homology.”</p>
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>For a simpler example using a noisy circle, see the README.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Like most TDAs of point clouds, Ripser computes <em>reduced homology</em> <span class="math inline">\(\tilde{H}_k\)</span>, so that all homological features eventually die as the radius of the cover exceeds the diameter of the point cloud. The (non-reduced) degree-0 homology <span class="math inline">\(H_0\)</span> of any connected topological space has rank 1, which would result in an infinite degree-0 feature in persistent homology.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Ripser <span class="citation">(Bauer 2019)</span> computes persistent homology using prime field coefficients for any prime characteristic <span class="math inline">\(p&lt;2^{16}\)</span>. Over integer coefficients, <span class="math inline">\(\tilde{H}_1(\mathbb{P}^2(\mathbb{R}))=\mathbb{Z}/2\mathbb{Z}\)</span> is cyclic; in our discussion we dodge this issue of torsion.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Although <code><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html">ripserr::vietoris_rips()</a></code> calculates persistent homology using the Vietoris–Rips filtration, persistent homology from another filtration (e.g. of Čech complexes) can also be visualized with ggtda. We will therefore label the axes in a generic manner that can then be specialized by users depending on their specific context.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
   </div>
 
@@ -232,7 +281,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

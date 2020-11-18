@@ -137,37 +137,37 @@ persistence diagram." />
 persistence diagram.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>stat_persistence</span>(
-  mapping = <span class='kw'>NULL</span>,
-  data = <span class='kw'>NULL</span>,
-  geom = <span class='st'>"point"</span>,
-  position = <span class='st'>"identity"</span>,
-  diagram = <span class='st'>"diagonal"</span>,
-  na.rm = <span class='fl'>FALSE</span>,
-  show.legend = <span class='fl'>NA</span>,
-  inherit.aes = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)
+    <pre class="usage"><span class='fu'>stat_persistence</span><span class='op'>(</span>
+  mapping <span class='op'>=</span> <span class='cn'>NULL</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  geom <span class='op'>=</span> <span class='st'>"point"</span>,
+  position <span class='op'>=</span> <span class='st'>"identity"</span>,
+  diagram <span class='op'>=</span> <span class='st'>"diagonal"</span>,
+  na.rm <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  show.legend <span class='op'>=</span> <span class='cn'>NA</span>,
+  inherit.aes <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
-<span class='fu'>stat_frontier</span>(
-  mapping = <span class='kw'>NULL</span>,
-  data = <span class='kw'>NULL</span>,
-  geom = <span class='st'>"line"</span>,
-  position = <span class='st'>"identity"</span>,
-  diagram = <span class='st'>"diagonal"</span>,
-  na.rm = <span class='fl'>FALSE</span>,
-  show.legend = <span class='fl'>NA</span>,
-  inherit.aes = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'>stat_frontier</span><span class='op'>(</span>
+  mapping <span class='op'>=</span> <span class='cn'>NULL</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  geom <span class='op'>=</span> <span class='st'>"line"</span>,
+  position <span class='op'>=</span> <span class='st'>"identity"</span>,
+  diagram <span class='op'>=</span> <span class='st'>"diagonal"</span>,
+  na.rm <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  show.legend <span class='op'>=</span> <span class='cn'>NA</span>,
+  inherit.aes <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>mapping</th>
-      <td><p>Set of aesthetic mappings created by <code><a href='https://rdrr.io/pkg/ggplot2/man/aes.html'>aes()</a></code> or
-<code><a href='https://rdrr.io/pkg/ggplot2/man/aes_.html'>aes_()</a></code>. If specified and <code>inherit.aes = TRUE</code> (the
+      <td><p>Set of aesthetic mappings created by <code><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes()</a></code> or
+<code><a href='https://ggplot2.tidyverse.org/reference/aes_.html'>aes_()</a></code>. If specified and <code>inherit.aes = TRUE</code> (the
 default), it is combined with the default mapping at the top level of the
 plot. You must supply <code>mapping</code> if there is no plot mapping.</p></td>
     </tr>
@@ -176,10 +176,10 @@ plot. You must supply <code>mapping</code> if there is no plot mapping.</p></td>
       <td><p>The data to be displayed in this layer. There are three
 options:</p>
 <p>If <code>NULL</code>, the default, the data is inherited from the plot
-data as specified in the call to <code><a href='https://rdrr.io/pkg/ggplot2/man/ggplot.html'>ggplot()</a></code>.</p>
+data as specified in the call to <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot()</a></code>.</p>
 <p>A <code>data.frame</code>, or other object, will override the plot
 data. All objects will be fortified to produce a data frame. See
-<code><a href='https://rdrr.io/pkg/ggplot2/man/fortify.html'>fortify()</a></code> for which variables will be created.</p>
+<code><a href='https://ggplot2.tidyverse.org/reference/fortify.html'>fortify()</a></code> for which variables will be created.</p>
 <p>A <code>function</code> will be called with a single argument,
 the plot data. The return value must be a <code>data.frame</code>, and
 will be used as the layer data. A <code>function</code> can be created
@@ -220,11 +220,11 @@ display.</p></td>
       <td><p>If <code>FALSE</code>, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. <code><a href='https://rdrr.io/pkg/ggplot2/man/borders.html'>borders()</a></code>.</p></td>
+the default plot specification, e.g. <code><a href='https://ggplot2.tidyverse.org/reference/borders.html'>borders()</a></code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments passed to <code><a href='https://rdrr.io/pkg/ggplot2/man/layer.html'>ggplot2::layer()</a></code>.</p></td>
+      <td><p>Additional arguments passed to <code><a href='https://ggplot2.tidyverse.org/reference/layer.html'>ggplot2::layer()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -281,7 +281,7 @@ fundamental and practical aspects for data scientists.
 <a href='https://arxiv.org/abs/1710.04019'>https://arxiv.org/abs/1710.04019</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/ggplot2/man/layer.html'>ggplot2::layer()</a></code> for additional arguments.</p>
+    <div class='dont-index'><p><code><a href='https://ggplot2.tidyverse.org/reference/layer.html'>ggplot2::layer()</a></code> for additional arguments.</p>
 <p>Other plot layers for persistence data: 
 <code><a href='barcode.html'>barcode</a></code></p></div>
 
@@ -289,62 +289,72 @@ fundamental and practical aspects for data scientists.
     <pre class="examples"><div class='input'><span class='co'>#####EXAMPLE 1#####</span>
 
 <span class='co'># toy example</span>
-<span class='kw'>toy.data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-  birth = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1.5</span>),
-  death = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>3</span>, <span class='fl'>5</span>, <span class='fl'>3</span>, <span class='fl'>6</span>),
-  dim = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"0"</span>, <span class='st'>"0"</span>, <span class='st'>"2"</span>, <span class='st'>"1"</span>, <span class='st'>"1"</span>)
-)
+<span class='va'>toy.data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+  birth <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1.5</span><span class='op'>)</span>,
+  death <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>3</span>, <span class='fl'>5</span>, <span class='fl'>3</span>, <span class='fl'>6</span><span class='op'>)</span>,
+  dim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"0"</span>, <span class='st'>"0"</span>, <span class='st'>"2"</span>, <span class='st'>"1"</span>, <span class='st'>"1"</span><span class='op'>)</span>
+<span class='op'>)</span>
 <span class='co'># diagonal persistence diagram, coding persistence to transparency</span>
-<span class='fu'>ggplot</span>(<span class='kw'>toy.data</span>,
-       <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>, colour = <span class='kw'>dim</span>, shape = <span class='kw'>dim</span>,
-           alpha = <span class='fu'>after_stat</span>(<span class='kw'>persistence</span>))) <span class='op'>+</span>
-  <span class='fu'><a href='theme_tda.html'>theme_tda</a></span>() <span class='op'>+</span> <span class='fu'>coord_equal</span>() <span class='op'>+</span>
-  <span class='fu'>stat_persistence</span>(diagram = <span class='st'>"diagonal"</span>, size = <span class='fl'>3</span>) <span class='op'>+</span>
-  <span class='fu'>geom_abline</span>(intercept = <span class='fl'>0</span>, slope = <span class='fl'>1</span>, color = <span class='st'>"grey"</span>) <span class='op'>+</span>
-  <span class='fu'>lims</span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>6</span>), y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>6</span>)) <span class='op'>+</span>
-  <span class='fu'>guides</span>(alpha = <span class='fl'>FALSE</span>)
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>toy.data</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>, colour <span class='op'>=</span> <span class='va'>dim</span>, shape <span class='op'>=</span> <span class='va'>dim</span>,
+           alpha <span class='op'>=</span> <span class='fu'>after_stat</span><span class='op'>(</span><span class='va'>persistence</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>coord_equal</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_persistence</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"diagonal"</span>, size <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_abline</span><span class='op'>(</span>intercept <span class='op'>=</span> <span class='fl'>0</span>, slope <span class='op'>=</span> <span class='fl'>1</span>, color <span class='op'>=</span> <span class='st'>"grey"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>lims</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>6</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>6</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>guides</span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># diagonal persistence diagram with frontier</span>
-<span class='fu'>ggplot</span>(<span class='kw'>toy.data</span>,
-       <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>, colour = <span class='kw'>dim</span>, shape = <span class='kw'>dim</span>)) <span class='op'>+</span>
-  <span class='fu'><a href='theme_tda.html'>theme_tda</a></span>() <span class='op'>+</span> <span class='fu'>coord_equal</span>() <span class='op'>+</span>
-  <span class='fu'>stat_persistence</span>() <span class='op'>+</span>
-  <span class='fu'>stat_frontier</span>() <span class='op'>+</span>
-  <span class='fu'>lims</span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>), y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>))
-</div><div class='img'><img src='persistence-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># flat persistence diagram</span>
-<span class='fu'>ggplot</span>(<span class='kw'>toy.data</span>,
-       <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>, colour = <span class='kw'>dim</span>, shape = <span class='kw'>dim</span>)) <span class='op'>+</span>
-  <span class='fu'><a href='theme_tda.html'>theme_tda</a></span>() <span class='op'>+</span>
-  <span class='fu'>stat_persistence</span>(diagram = <span class='st'>"flat"</span>) <span class='op'>+</span>
-  <span class='fu'>lims</span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>), y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>))
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>toy.data</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>, colour <span class='op'>=</span> <span class='va'>dim</span>, shape <span class='op'>=</span> <span class='va'>dim</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>coord_equal</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_persistence</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_frontier</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>lims</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='persistence-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># flat persistence diagram, coding dimension to numeral</span>
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>toy.data</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>, label <span class='op'>=</span> <span class='va'>dim</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_persistence</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"flat"</span>, geom <span class='op'>=</span> <span class='st'>"text"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>lims</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># landscape persistence frontier</span>
-<span class='fu'>ggplot</span>(<span class='kw'>toy.data</span>,
-       <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>, colour = <span class='kw'>dim</span>, shape = <span class='kw'>dim</span>)) <span class='op'>+</span>
-  <span class='fu'><a href='theme_tda.html'>theme_tda</a></span>() <span class='op'>+</span> <span class='fu'>coord_equal</span>() <span class='op'>+</span>
-  <span class='fu'>stat_frontier</span>(diagram = <span class='st'>"landscape"</span>) <span class='op'>+</span>
-  <span class='fu'>lims</span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>), y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>NA</span>))
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>toy.data</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>, colour <span class='op'>=</span> <span class='va'>dim</span>, shape <span class='op'>=</span> <span class='va'>dim</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>coord_equal</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_frontier</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>lims</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>#####EXAMPLE 2#####</span>
-<span class='co'># load library and dataset for comprehensive example</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'><a href='https://rrrlw.github.io/ripserr'>"ripserr"</a></span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"annulus2d"</span>)  <span class='co'># noisy unit circle (Betti-1 number = 1)</span>
+<span class='co'># load library and generate dataset for comprehensive example</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='st'><a href='https://rrrlw.github.io/ripserr/'>"ripserr"</a></span><span class='op'>)</span>
+<span class='co'># noisy unit circle (Betti-1 number = 1)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>100L</span>; <span class='va'>sd</span> <span class='op'>&lt;-</span> <span class='fl'>0.1</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>7</span><span class='op'>)</span>
+<span class='va'>t</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, min <span class='op'>=</span> <span class='fl'>0</span>, max <span class='op'>=</span> <span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>)</span>
+<span class='va'>annulus.df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='va'>t</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='va'>sd</span><span class='op'>)</span>,
+  y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>t</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>n</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='va'>sd</span><span class='op'>)</span>
+<span class='op'>)</span>
 <span class='co'># calculate persistence homology and format</span>
-<span class='kw'>annulus.phom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/ripserr/man/vietoris_rips.html'>vietoris_rips</a></span>(<span class='kw'>annulus2d</span>))
-<span class='kw'>annulus.phom</span><span class='op'>$</span><span class='kw'>dimension</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span>(<span class='kw'>annulus.phom</span><span class='op'>$</span><span class='kw'>dimension</span>)
+<span class='va'>annulus.phom</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='fu'><a href='https://rrrlw.github.io/ripserr/reference/vietoris_rips.html'>vietoris_rips</a></span><span class='op'>(</span><span class='va'>annulus.df</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>annulus.phom</span><span class='op'>$</span><span class='va'>dimension</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>annulus.phom</span><span class='op'>$</span><span class='va'>dimension</span><span class='op'>)</span>
 <span class='co'># pretty flat persistence diagram</span>
-<span class='fu'>ggplot</span>(<span class='kw'>annulus.phom</span>, <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>,
-                         shape = <span class='kw'>dimension</span>, colour = <span class='kw'>dimension</span>)) <span class='op'>+</span>
-  <span class='fu'>stat_persistence</span>(diagram = <span class='st'>"flat"</span>) <span class='op'>+</span>
-  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span>()
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>annulus.phom</span>, <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>,
+                         shape <span class='op'>=</span> <span class='va'>dimension</span>, colour <span class='op'>=</span> <span class='va'>dimension</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_persistence</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"flat"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-5.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># pretty diagonal persistence diagram</span>
-<span class='fu'>ggplot</span>(<span class='kw'>annulus.phom</span>, <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>,
-                         shape = <span class='kw'>dimension</span>, colour = <span class='kw'>dimension</span>)) <span class='op'>+</span>
-  <span class='fu'>stat_persistence</span>(diagram = <span class='st'>"diagonal"</span>) <span class='op'>+</span>
-  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span>()
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>annulus.phom</span>, <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>,
+                         shape <span class='op'>=</span> <span class='va'>dimension</span>, colour <span class='op'>=</span> <span class='va'>dimension</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_persistence</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"diagonal"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-6.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># pretty landscape persistence diagram</span>
-<span class='fu'>ggplot</span>(<span class='kw'>annulus.phom</span>, <span class='fu'>aes</span>(start = <span class='kw'>birth</span>, end = <span class='kw'>death</span>,
-                         shape = <span class='kw'>dimension</span>, colour = <span class='kw'>dimension</span>)) <span class='op'>+</span>
-  <span class='fu'>stat_frontier</span>(diagram = <span class='st'>"landscape"</span>) <span class='op'>+</span>
-  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span>()
+<span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>annulus.phom</span>, <span class='fu'>aes</span><span class='op'>(</span>start <span class='op'>=</span> <span class='va'>birth</span>, end <span class='op'>=</span> <span class='va'>death</span>,
+                         shape <span class='op'>=</span> <span class='va'>dimension</span>, colour <span class='op'>=</span> <span class='va'>dimension</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>stat_frontier</span><span class='op'>(</span>diagram <span class='op'>=</span> <span class='st'>"landscape"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='theme_persist.html'>theme_persist</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='img'><img src='persistence-7.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -361,7 +371,7 @@ fundamental and practical aspects for data scientists.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

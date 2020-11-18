@@ -30,7 +30,7 @@ theme_barcode <- function(vertical = FALSE) {
   # allows users to count how many features are there in barcode
   if (vertical) {
     theme_persist()
-  # default: same as theme_tda() without the vertical axis
+  # default: same as theme_persist() without the vertical axis
   } else {
     theme(axis.line.x = element_line(colour = "black"),
           axis.line.y = element_blank(),
