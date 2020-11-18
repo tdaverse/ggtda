@@ -106,7 +106,7 @@ toy.data <- data.frame(
 ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
-  theme_tda()
+  theme_barcode()
 
 #####EXAMPLE 2#####
 # load library and dataset for comprehensive example

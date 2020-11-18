@@ -8,7 +8,7 @@ The `geom_barcode()` layer takes persistence data with the two required aestheti
 
 The `stat_persistence()` and `stat_frontier()` layers also take persistence data, though they only accept the required aesthetics `start` and `end`. They transform these data into the coordinates of a persistence diagram and into the endpoints of line segments that outline the persistence frontier, respectively. They can be oriented according to "flat", diagonal, or landscape formats.
 
-The themes `theme_persist()` (equivalent to `theme_tda()`) and `theme_barcode()` format plots to resemble the persistence and barcode diagrams found in the literature.
+The themes `theme_persist()` and `theme_barcode()` format plots to resemble the persistence and barcode diagrams found in the literature.
 
 ## illustration tools
 

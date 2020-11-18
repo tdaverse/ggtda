@@ -129,12 +129,12 @@ persistence diagram plot, the diamond point marks this cutoff.
 # visualize the persistence data, indicating cutoffs at this proximity
 p_bc <- ggplot(ph,
        aes(start = birth, end = death, colour = dim)) +
-  theme_tda() +
+  theme_barcode() +
   geom_barcode() +
   labs(x = "Diameter", y = "Homological features") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
 p_pd <- ggplot(ph) +
-  theme_tda() +
+  theme_persist() +
   coord_fixed() +
   stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_abline(intercept = 0, slope = 1, color = "darkgray") +
