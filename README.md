@@ -131,16 +131,17 @@ persistence diagram plot, the diamond point marks this cutoff.
 p_bc <- ggplot(ph,
        aes(start = birth, end = death, colour = dim)) +
   theme_barcode() +
-  geom_barcode() +
+  geom_barcode(size = 1) +
   labs(x = "Diameter", y = "Homological features") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
+max_prox <- max(ph$death)
 p_pd <- ggplot(ph) +
   theme_persist() +
   coord_fixed() +
   stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
   geom_abline(intercept = 0, slope = 1, color = "darkgray") +
   labs(x = "Birth", y = "Death") +
-  lims(x = c(0, 0.8), y = c(0, NA)) +
+  lims(x = c(0, max_prox), y = c(0, max_prox)) +
   geom_point(data = data.frame(x = prox), aes(x, x),
              colour = "darkgoldenrod", shape = "diamond", size = 4)
 # combine the plots
