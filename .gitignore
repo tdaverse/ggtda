@@ -2,7 +2,6 @@
 .DS_Store
 
 # R project files
-*Rproj
 .Rproj.user
 .Rhistory
 
