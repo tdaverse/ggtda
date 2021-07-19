@@ -4,6 +4,7 @@
 \alias{persistence}
 \alias{stat_persistence}
 \alias{stat_frontier}
+\alias{geom_diagonal}
 \title{Persistence diagrams}
 \usage{
 stat_persistence(
@@ -24,6 +25,17 @@ stat_frontier(
   geom = "line",
   position = "identity",
   diagram = "diagonal",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+geom_diagonal(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -77,6 +89,9 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+
+\item{stat}{The statistical transformation to use on the data for this
+layer, as a string.}
 }
 \description{
 Visualize persistence data in a (flat, diagonal, or landscape)
@@ -108,6 +123,9 @@ death, and dimension.
 The original persistence diagrams plotted persistence against birth in what
 we call "flat" diagrams, but most plot death against birth in "diagonal"
 diagrams, often with a diagonal line indicating zero persistence.
+
+The convenience layer \code{geom_diagonal()} is appropriate only for the
+"diagonal" layout and accepts no aesthetics.
 }
 
 \section{Persistence landscapes}{
@@ -132,12 +150,12 @@ toy.data <- data.frame(
 )
 # diagonal persistence diagram, coding persistence to transparency
 ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim,
-           alpha = after_stat(persistence))) +
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_persistence(diagram = "diagonal", size = 3) +
-  geom_abline(intercept = 0, slope = 1, color = "grey") +
+  stat_persistence(aes(alpha = after_stat(persistence)),
+                   diagram = "diagonal", size = 3) +
+  geom_diagonal() +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = FALSE)
 # diagonal persistence diagram with frontier
