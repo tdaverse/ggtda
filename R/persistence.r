@@ -20,7 +20,9 @@
 #'   The original persistence diagrams plotted persistence against birth in what
 #'   we call "flat" diagrams, but most plot death against birth in "diagonal"
 #'   diagrams, often with a diagonal line indicating zero persistence.
-#'   
+#'
+#'   Persistence diagrams recognize extended persistence data, with negative
+#'   birth/death values arising from the relative part of the filtration.
 
 #' @section Persistence landscapes:
 #'
@@ -30,6 +32,8 @@
 #'   averaged over the diagrams obtained from multiple data sets designed or
 #'   hypothesized to have been generated from the same underlying topological
 #'   structure.
+#'   
+#'   Persistence landscapes do not currently recognize extended persistence data.
 #'   
 
 #' @template ref-edelsbrunner2000
@@ -93,12 +97,21 @@ StatPersistence <- ggproto(
   compute_panel = function(data, scales,
                            diagram = "diagonal") {
     
-    # points in cartesian coordinates
-    data$x <- data$start
-    data$y <- data$end
+    # points in cartesian coordinates (un-negated from opposite filtration)
+    data$x <- abs(data$start)
+    data$y <- abs(data$end)
     
-    # computed variables
+    # computed variable: `part`
+    data$part <- with(data, {
+      part <- NA_character_
+      part[start >= 0 & end >= 0] <- "ordinary"
+      part[start <  0 & end <  0] <- "relative"
+      part[start >= 0 & end <  0] <- "extended"
+      factor(part, levels = c("ordinary", "relative", "extended"))
+    })
+    # computed variable: `persistence` (infinite for extended points)
     data$persistence <- data$end - data$start
+    data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
     # diagram transformation
     data <- diagram_transform(data, diagram)
