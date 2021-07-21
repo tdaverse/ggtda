@@ -149,8 +149,6 @@ gridExtra::grid.arrange(
   p_bc, p_pd,
   layout_matrix = matrix(c(1, 2), nrow = 1)
 )
-#> Warning in max(data$x, data$y, data$start, data$end, na.rm = TRUE): no non-
-#> missing arguments to max; returning -Inf
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />

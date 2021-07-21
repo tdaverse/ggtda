@@ -251,10 +251,6 @@ GeomDiagonal <- ggproto(
   
   setup_data = function(data, params) {
     
-    # extract the largest birth or death value
-    diag_max <- max(data$x, data$y, data$start, data$end, na.rm = TRUE)
-    if (length(diag_max) != 1L || is.na(diag_max)) diag_max <- 1
-    
     # keep only columns that are constant throughout the data
     data <- dplyr::select_if(
       data,
