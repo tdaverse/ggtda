@@ -139,7 +139,7 @@ p_pd <- ggplot(ph) +
   theme_persist() +
   coord_fixed() +
   stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_abline(intercept = 0, slope = 1, color = "darkgray") +
+  geom_diagonal() +
   labs(x = "Birth", y = "Death") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
   geom_point(data = data.frame(x = prox), aes(x, x),
@@ -149,6 +149,8 @@ gridExtra::grid.arrange(
   p_bc, p_pd,
   layout_matrix = matrix(c(1, 2), nrow = 1)
 )
+#> Warning in max(data$x, data$y, data$start, data$end, na.rm = TRUE): no non-
+#> missing arguments to max; returning -Inf
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
