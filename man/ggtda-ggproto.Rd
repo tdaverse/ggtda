@@ -7,6 +7,7 @@
 \alias{ggtda-ggproto}
 \alias{StatPersistence}
 \alias{StatFrontier}
+\alias{GeomDiagonal}
 \alias{StatDisk}
 \alias{StatVietoris0}
 \alias{StatVietoris1}
