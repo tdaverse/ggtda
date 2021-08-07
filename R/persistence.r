@@ -251,13 +251,17 @@ GeomFundamentalBox <- ggproto(
     }
     
     # define segments and interior in default (diagonal) layout
+    # use `group` to separate boxes for different times
     data$x <- NULL; data$xend <- NULL
     data$y <- NULL; data$yend <- NULL
+    data$group <- NULL
     ray_data <- data.frame(
       x = as.vector(rbind(0, t)), xend = rep(t, each = 2L),
-      y = rep(t, each = 2L), yend = as.vector(rbind(t, ranges$y[[2L]]))
+      y = rep(t, each = 2L), yend = as.vector(rbind(t, ranges$y[[2L]])),
+      group = rep(seq_along(t), each = 2L)
     )
     ray_data <- merge(ray_data, data)
+    ray_data$group <- -1L
     int_data <- data.frame(
       x = as.vector(rbind(t, t, 0, 0)),
       y = as.vector(rbind(t, ranges$y[[2L]], ranges$y[[2L]], t)),
