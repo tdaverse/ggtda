@@ -124,12 +124,13 @@ gridExtra::grid.arrange(
 We can visualize the persistence data using a barcode (left) and a flat
 persistence diagram (right). In the barcode plot, the dashed line
 indicates the cutoff at the proximity `prox` (= 0.6666667); in the
-persistence diagram plot, the diamond point marks this cutoff.
+persistence diagram plot, the fundamental box contains the features that
+are detectable at this cutoff.
 
 ``` r
 # visualize the persistence data, indicating cutoffs at this proximity
 p_bc <- ggplot(ph,
-       aes(start = birth, end = death, colour = dim)) +
+               aes(start = birth, end = death, colour = dim)) +
   theme_barcode() +
   geom_barcode(size = 1) +
   labs(x = "Diameter", y = "Homological features") +
@@ -142,8 +143,9 @@ p_pd <- ggplot(ph) +
   geom_diagonal() +
   labs(x = "Birth", y = "Death") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
-  geom_point(data = data.frame(x = prox), aes(x, x),
-             colour = "darkgoldenrod", shape = "diamond", size = 4)
+  geom_fundamental_box(t = prox,
+                       color = "darkgoldenrod", fill = "darkgoldenrod",
+                       linetype = "dashed")
 # combine the plots
 gridExtra::grid.arrange(
   p_bc, p_pd,

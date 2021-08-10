@@ -16,6 +16,16 @@ ggplot(toy.data,
   geom_diagonal() +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = FALSE)
+# diagonal persistence diagram with fundamental boxes
+ggplot(toy.data,
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence() +
+  geom_diagonal() +
+  geom_fundamental_box(t = c(1.5, 5.5),
+                       color = "goldenrod", fill = "goldenrod") +
+  lims(x = c(0, 6), y = c(0, 6))
 # diagonal persistence diagram with frontier
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +

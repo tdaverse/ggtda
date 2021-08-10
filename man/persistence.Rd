@@ -4,6 +4,7 @@
 \alias{persistence}
 \alias{stat_persistence}
 \alias{stat_frontier}
+\alias{geom_fundamental_box}
 \alias{geom_diagonal}
 \title{Persistence diagrams}
 \usage{
@@ -25,6 +26,19 @@ stat_frontier(
   geom = "line",
   position = "identity",
   diagram = "diagonal",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+geom_fundamental_box(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  position = "identity",
+  diagram = "diagonal",
+  t = NULL,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -71,7 +85,7 @@ a string to override the default.}
 a call to a position adjustment function.}
 
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
-orientation for the diagram should take}
+orientation for the diagram should take.}
 
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
@@ -92,6 +106,8 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{stat}{The statistical transformation to use on the data for this
 layer, as a string.}
+
+\item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
 \description{
 Visualize persistence data in a (flat, diagonal, or landscape)
@@ -125,7 +141,9 @@ we call "flat" diagrams, but most plot death against birth in "diagonal"
 diagrams, often with a diagonal line indicating zero persistence.
 
 The convenience layer \code{geom_diagonal()} is appropriate only for the
-"diagonal" layout and accepts no aesthetics.
+"diagonal" layout and accepts no aesthetics. It pairs well with the
+\code{geom_fundamental_box()} layer that renders fundamental boxes at specified
+time points (Chung & Lawson, 2020).
 }
 
 \section{Persistence landscapes}{
@@ -158,6 +176,16 @@ ggplot(toy.data,
   geom_diagonal() +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = FALSE)
+# diagonal persistence diagram with fundamental boxes
+ggplot(toy.data,
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence() +
+  geom_diagonal() +
+  geom_fundamental_box(t = c(1.5, 5.5),
+                       color = "goldenrod", fill = "goldenrod") +
+  lims(x = c(0, 6), y = c(0, 6))
 # diagonal persistence diagram with frontier
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -225,6 +253,9 @@ Landscapes. \emph{Journal of Machine Learning Research}, \strong{16} 77--102.
 F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
 fundamental and practical aspects for data scientists.
 \url{https://arxiv.org/abs/1710.04019}
+
+Y-M Chung and A Lawson (2020) Persistence Curves: A Canonical Framework for
+Summarizing Persistence Diagrams. \url{https://arxiv.org/abs/1904.07768}
 }
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
