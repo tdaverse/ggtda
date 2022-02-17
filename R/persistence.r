@@ -356,10 +356,12 @@ GeomDiagonal <- ggproto(
   setup_data = function(data, params) {
     
     # keep only columns that are constant throughout the data
-    data <- dplyr::select_if(
-      data,
-      function(x) length(unique(x)) == 1L
-    )[1L, , drop = FALSE]
+    data <- aggregate(
+      data[, setdiff(names(data), "PANEL"), drop = FALSE],
+      by = data[, "PANEL", drop = FALSE],
+      function(x) if (length(unique(x)) == 1L) unique(x) else NA
+    )
+    data[] <- lapply(data, function(x) if (all(is.na(x))) NULL else x)
     rownames(data) <- NULL
     
     data
