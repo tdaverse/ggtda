@@ -11,6 +11,8 @@ Authors@R: c(
            role = "aut",
            email = "raoulwadhwa@gmail.com",
            comment = c(ORCID = "0000-0003-0503-9580")),
+    person("Nikola", "Milicevic",
+           role = "ctb"),
     person("Jacob", "Scott", role = "aut",
            comment = c(ORCID = "0000-0003-2971-7673")))
 Description: Topological data analysis often produces summary data
