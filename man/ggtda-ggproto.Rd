@@ -16,6 +16,9 @@
 \alias{StatCech0}
 \alias{StatCech1}
 \alias{StatCech2}
+\alias{StatAlpha0}
+\alias{StatAlpha1}
+\alias{StatAlpha2}
 \alias{GeomFace}
 \title{Base \code{ggproto} classes for \emph{ggtda}}
 \format{
@@ -36,6 +39,12 @@ An object of class \code{StatCech0} (inherits from \code{StatVietoris0}, \code{S
 An object of class \code{StatCech1} (inherits from \code{StatVietoris1}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
 
 An object of class \code{StatCech2} (inherits from \code{StatVietoris2}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
+
+An object of class \code{StatAlpha0} (inherits from \code{StatVietoris0}, \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
+
+An object of class \code{StatAlpha1} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{StatAlpha2} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{GeomFace} (inherits from \code{GeomPolygon}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.
 }

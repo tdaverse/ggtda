@@ -9,8 +9,11 @@
 \alias{stat_cech0}
 \alias{stat_cech1}
 \alias{stat_cech2}
+\alias{stat_alpha0}
+\alias{stat_alpha1}
+\alias{stat_alpha2}
 \alias{geom_face}
-\title{Disks about data points and skeletons of Vietoris and Čech complexes}
+\title{Disks and skeletons of Vietoris, Čech, and alpha complexes}
 \usage{
 stat_disk(
   mapping = NULL,
@@ -88,6 +91,43 @@ stat_cech1(
 )
 
 stat_cech2(
+  mapping = NULL,
+  data = NULL,
+  geom = "face",
+  position = "identity",
+  na.rm = FALSE,
+  radius = NULL,
+  diameter = NULL,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+stat_alpha0(
+  mapping = NULL,
+  data = NULL,
+  geom = "point",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+stat_alpha1(
+  mapping = NULL,
+  data = NULL,
+  geom = "segment",
+  position = "identity",
+  na.rm = FALSE,
+  radius = NULL,
+  diameter = NULL,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+stat_alpha2(
   mapping = NULL,
   data = NULL,
   geom = "face",
@@ -178,12 +218,18 @@ constructions used by TDA methods but cannot be pipelined into those methods.
 A \emph{ball} of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
 of all points whose distances from \eqn{x} are less than \eqn{r}.
 
-The \emph{Vietoris complex} of a point cloud is a simplicial complex consisting of
-a simplex for each subset of points within a fixed diameter of each other.
-The \emph{Čech complex} consists of a simplex for each subset that lies within a
-circle of fixed diameter. (This means that the Čech complex depends on the
-geometry of the ambient space containing the point cloud, while the Vietoris
-complex depends only on the inter-point distances.)
+A \emph{Vietoris complex} of a point cloud is the simplicial complex consisting of
+a simplex for each subset of points within a fixed diameter of each other. A
+\emph{Čech complex} contains the simplex for each subset that lies within a circle
+of fixed diameter. (This means that the Čech complex depends on the geometry
+of the ambient space containing the point cloud, while the Vietoris complex
+depends only on the inter-point distances. Moreover, a Vietoris complex
+contains the Čech complex of the same diameter.)
+
+An \emph{alpha complex} comprises those simplices of the Delaunay triangulation
+within a fixed diameter. \emph{ggtda} uses \code{\link[RTriangle:triangulate]{RTriangle::triangulate()}} to compute
+the Delaunay triangulation, without inserting Steiner points (so that the
+vertices of the triangulation are among those of the data).
 
 The \emph{0-skeleton} of a complex consists of its vertices (0-simplices), the
 \emph{1-skeleton} additionally the edges between pairs of vertices (1-simplices),
@@ -201,14 +247,19 @@ elements produced by the stat layers.
 Given \code{x} and \code{y} coordinates, \code{stat_vietoris1()} encodes the edges of the
 Vietoris complex using \code{x}, \code{y}, \code{xend}, and \code{yend} for \code{geom_segment()}, and
 \code{stat_vietoris2()} encodes the faces using \code{x}, \code{y}, and \code{group} for
-\code{geom_polygon()}. The edges of a Čech complex are exactly those of the
-Vietoris complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}, while
+\code{geom_face()}. The edges of a Čech complex are exactly those of the Vietoris
+complex, so \code{stat_cech1()} is an alias for \code{stat_vietoris1()}, while
 \code{stat_cech2()} encodes the faces of the Čech complex in the same way as
 \code{stat_vietoris2()} those of the Vietoris complex. Note that these stat layers
 encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
 they can be combined with \code{geom_vietoris0()} or \code{geom_cech0()}, which are
 aliases for \code{\link[ggplot2:stat_identity]{ggplot2::stat_identity()}} that default to
 \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}.
+
+\code{stat_alpha0()} behaves exactly like the other \code{stat_*0()}. \code{stat_alpha1()}
+and \code{stat_alpha2()} encode the edges and faces of the Delaunay triangulation
+(below the diameter threshold) in the same way as the other \code{stat_*1()} and
+\code{stat_*2()}.
 }
 
 \examples{
@@ -263,23 +314,13 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = 2*r, size = .2) +
   stat_vietoris0(size = .3)
 
-# plot Vietoris 2-skeleton atop balls
-ggplot(d, aes(x = x, y = y)) +
+# plot alpha 1-skeleton
+ggplot(d, aes(x, y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
-  stat_vietoris2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_vietoris1(diameter = 2*r, size = .2) +
-  stat_vietoris0(size = .3)
-
-# plot Čech 2-skeleton atop balls
-ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
-  stat_cech2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_cech1(diameter = 2*r, size = .2) +
-  stat_cech0(size = .3)
+  stat_alpha2(radius = r, fill = "darkgoldenrod") +
+  stat_alpha1(radius = r, size = .2) +
+  stat_alpha0()
 }
 \references{
 F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
