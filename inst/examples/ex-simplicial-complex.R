@@ -49,20 +49,10 @@ ggplot(d, aes(x = x, y = y)) +
   stat_vietoris1(diameter = 2*r, size = .2) +
   stat_vietoris0(size = .3)
 
-# plot Vietoris 2-skeleton atop balls
-ggplot(d, aes(x = x, y = y)) +
+# plot alpha 1-skeleton
+ggplot(d, aes(x, y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
-  stat_vietoris2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_vietoris1(diameter = 2*r, size = .2) +
-  stat_vietoris0(size = .3)
-
-# plot Čech 2-skeleton atop balls
-ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
-  stat_cech2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_cech1(diameter = 2*r, size = .2) +
-  stat_cech0(size = .3)
+  stat_alpha2(radius = r, fill = "darkgoldenrod") +
+  stat_alpha1(radius = r, size = .2) +
+  stat_alpha0()
