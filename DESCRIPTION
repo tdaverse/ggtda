@@ -11,6 +11,8 @@ Authors@R: c(
            role = "aut",
            email = "raoulwadhwa@gmail.com",
            comment = c(ORCID = "0000-0003-0503-9580")),
+    person("Nikola", "Milicevic",
+           role = "ctb"),
     person("Jacob", "Scott", role = "aut",
            comment = c(ORCID = "0000-0003-2971-7673")))
 Description: Topological data analysis often produces summary data
@@ -25,6 +27,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 2.10),
+    RTriangle,
     ggplot2 (>= 3.2.1)
 Suggests:
     tdaunif (>= 0.1.0),
@@ -38,5 +41,5 @@ Suggests:
 URL: https://rrrlw.github.io/ggtda/
 BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)

@@ -1,4 +1,4 @@
-#' @title Disks about data points and skeletons of Vietoris and Čech complexes
+#' @title Disks and skeletons of Vietoris, Čech, and alpha complexes
 #'
 #' @description Annotate 2-dimensional point clouds with TDA constructions.
 #'
@@ -6,7 +6,7 @@
 #'
 #' These plot layers are useful for exposition and education; they illustrate
 #' constructions used by TDA methods but cannot be pipelined into those methods.
-#'
+#' 
 
 #' @section Definitions:
 #'   
@@ -14,12 +14,18 @@
 #' A *ball* of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
 #' of all points whose distances from \eqn{x} are less than \eqn{r}.
 #'
-#' The *Vietoris complex* of a point cloud is a simplicial complex consisting of
-#' a simplex for each subset of points within a fixed diameter of each other.
-#' The *Čech complex* consists of a simplex for each subset that lies within a
-#' circle of fixed diameter. (This means that the Čech complex depends on the
-#' geometry of the ambient space containing the point cloud, while the Vietoris
-#' complex depends only on the inter-point distances.)
+#' A *Vietoris complex* of a point cloud is the simplicial complex consisting of
+#' a simplex for each subset of points within a fixed diameter of each other. A
+#' *Čech complex* contains the simplex for each subset that lies within a circle
+#' of fixed diameter. (This means that the Čech complex depends on the geometry
+#' of the ambient space containing the point cloud, while the Vietoris complex
+#' depends only on the inter-point distances. Moreover, a Vietoris complex
+#' contains the Čech complex of the same diameter.)
+#'
+#' An *alpha complex* comprises those simplices of the Delaunay triangulation
+#' within a fixed diameter. *ggtda* uses [RTriangle::triangulate()] to compute
+#' the Delaunay triangulation, without inserting Steiner points (so that the
+#' vertices of the triangulation are among those of the data).
 #'
 #' The *0-skeleton* of a complex consists of its vertices (0-simplices), the
 #' *1-skeleton* additionally the edges between pairs of vertices (1-simplices),
@@ -37,14 +43,19 @@
 #' Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
 #' Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
 #' `stat_vietoris2()` encodes the faces using `x`, `y`, and `group` for
-#' `geom_polygon()`. The edges of a Čech complex are exactly those of the
-#' Vietoris complex, so `stat_cech1()` is an alias for `stat_vietoris1()`, while
+#' `geom_face()`. The edges of a Čech complex are exactly those of the Vietoris
+#' complex, so `stat_cech1()` is an alias for `stat_vietoris1()`, while
 #' `stat_cech2()` encodes the faces of the Čech complex in the same way as
 #' `stat_vietoris2()` those of the Vietoris complex. Note that these stat layers
 #' encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
 #' they can be combined with `geom_vietoris0()` or `geom_cech0()`, which are
 #' aliases for [ggplot2::stat_identity()] that default to
 #' [ggplot2::geom_point()].
+#'
+#' `stat_alpha0()` behaves exactly like the other `stat_*0()`. `stat_alpha1()`
+#' and `stat_alpha2()` encode the edges and faces of the Delaunay triangulation
+#' (below the diameter threshold) in the same way as the other `stat_*1()` and
+#' `stat_*2()`.
 #' 
 
 #' @template ref-chazal2017
@@ -52,6 +63,7 @@
 
 #' @name simplicial-complex
 #' @import ggplot2
+#' @importFrom RTriangle triangulate pslg
 #' @family plot layers for point clouds
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
@@ -105,7 +117,8 @@ StatDisk <- ggproto(
   required_aes = c("x", "y"),
   
   compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL, segments = 60) {
+                           radius = NULL, diameter = NULL,
+                           segments = 60) {
     # handle disk dimension
     if ((is.null(radius) && is.null(diameter)) || segments == 0) {
       return(data[NULL, , drop = FALSE])
@@ -319,7 +332,7 @@ StatVietoris2 <- ggproto(
     res <- data.frame(
       x = data$x[as.vector(faces)],
       y = data$y[as.vector(faces)],
-      group = rep(seq_len(ncol(faces)), each = 3)
+      group = rep(seq_len(ncol(faces)), each = 3L)
     )
     
     # return the faces data
@@ -402,7 +415,210 @@ StatCech2 <- ggproto(
     data <- data.frame(
       x = data$x[as.vector(faces)],
       y = data$y[as.vector(faces)],
-      group = rep(seq_len(ncol(faces)), each = 3)
+      group = rep(seq_len(ncol(faces)), each = 3L)
+    )
+    
+    # return the faces data
+    data
+  }
+)
+
+#' @rdname simplicial-complex
+#' @export
+stat_alpha0 <- stat_vietoris0
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatAlpha0 <- ggproto("StatAlpha0", StatVietoris0)
+
+#' @rdname simplicial-complex
+#' @export
+stat_alpha1 <- function(mapping = NULL,
+                        data = NULL,
+                        geom = "segment",
+                        position = "identity",
+                        na.rm = FALSE,
+                        radius = NULL, diameter = NULL,
+                        show.legend = NA,
+                        inherit.aes = TRUE,
+                        ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = StatAlpha1,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius, diameter = diameter,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatAlpha1 <- ggproto(
+  "StatAlpha1", Stat,
+  
+  required_aes = c("x", "y"),
+  
+  default_aes = aes(alpha = .25),
+  
+  # statistical transformation into plot-ready data
+  compute_panel = function(data, scales,
+                           radius = NULL, diameter = NULL) {
+    if (is.null(radius) && is.null(diameter)) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(radius)) {
+      if (! is.null(diameter)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`diameter` value will be used.")
+      } else {
+        diameter <- radius * 2
+      }
+    }
+    
+    # Delaunay triangulation, keeping only indices of edges and of triangles
+    dt <- triangulate(pslg(as.matrix(data[, c("x", "y")])), Y = TRUE)[["E"]]
+    
+    # indices of Delaunay edges within `diameter` of each other
+    edge_dists <- apply(
+      data[dt[, 2L], c("x", "y"), drop = FALSE] -
+        data[dt[, 1L], c("x", "y"), drop = FALSE],
+      1L, norm, "2"
+    )
+    edges <- dt[edge_dists < diameter, , drop = FALSE]
+    edges <- matrix(t(apply(edges, 1L, sort)), ncol = 2L)
+    edges <- as.data.frame(edges)
+    names(edges) <- c("a", "b")
+    edges <- t(edges)[c("a", "b"), ]
+    
+    # data frame of edges' starting and ending coordinates
+    data <- data.frame(
+      x = data$x[edges["a", , drop = TRUE]],
+      y = data$y[edges["a", , drop = TRUE]],
+      xend = data$x[edges["b", , drop = TRUE]],
+      yend = data$y[edges["b", , drop = TRUE]]
+    )
+    
+    # return the edges data
+    data
+  }
+)
+
+#' @rdname simplicial-complex
+#' @export
+stat_alpha2 <- function(mapping = NULL,
+                        data = NULL,
+                        geom = "face",
+                        position = "identity",
+                        na.rm = FALSE,
+                        radius = NULL, diameter = NULL,
+                        show.legend = NA,
+                        inherit.aes = TRUE,
+                        ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = StatAlpha2,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius, diameter = diameter,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+StatAlpha2 <- ggproto(
+  "StatAlpha2", Stat,
+  
+  required_aes = c("x", "y"),
+  
+  default_aes = aes(alpha = .25),
+  
+  # statistical transformation into plot-ready data
+  compute_panel = function(data, scales,
+                           radius = NULL, diameter = NULL) {
+    if (is.null(radius) && is.null(diameter)) {
+      return(data[NULL, , drop = FALSE])
+    }
+    if (! is.null(radius)) {
+      if (! is.null(diameter)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`diameter` value will be used.")
+      } else {
+        diameter <- radius * 2
+      }
+    }
+    
+    # Delaunay triangulation, keeping only indices of edges and of triangles
+    dt <- triangulate(pslg(as.matrix(data[, c("x", "y")])), Y = TRUE)[["T"]]
+    
+    # indices of Delaunay faces within `diameter` of each other
+    face_vertices <- unique(as.vector(dt))
+    if (nrow(dt) * 3L > choose(length(face_vertices), 2L)) {
+      # calculate all distances among face vertices
+      face_vertices <- sort(face_vertices)
+      faces <- proximate_triples(data[face_vertices, , drop = FALSE], diameter)
+      faces[] <- face_vertices[as.matrix(faces)]
+      dt_faces <- matrix(t(apply(dt, 1L, sort)), ncol = 3L)
+      faces <- merge(faces, as.data.frame(dt_faces), by = seq(3L))
+    } else {
+      # calculate pairwise distances between face edges
+      face_pairs <-
+        rbind(dt[, c(1L, 2L)], dt[, c(1L, 3L)], dt[, c(2L, 3L)])
+      face_dists <- apply(
+        data[face_pairs[, 2L], c("x", "y"), drop = FALSE] -
+          data[face_pairs[, 1L], c("x", "y"), drop = FALSE],
+        1L, norm, "2"
+      )
+      face_dists <- matrix(face_dists, ncol = 3L, byrow = FALSE)
+      # shed too-distant pairs
+      face_wh <- apply(face_dists < diameter, 1L, all)
+      faces <- dt[face_wh, , drop = FALSE]
+      face_dists <- face_dists[face_wh, , drop = FALSE]
+      # semiperimeters
+      face_sp <- .5 * apply(face_dists, 1L, sum)
+      # circumdiameters
+      face_cd <- .5 * apply(face_dists, 1L, prod) / sqrt(
+        face_sp * (face_sp - face_dists[, 1L]) *
+          (face_sp - face_dists[, 2L]) * (face_sp - face_dists[, 3L])
+      )
+      # squares of longest sides
+      face_m <- apply(face_dists, 1L, max)^2
+      # sum of squares of remaining sides
+      face_n <- apply(face_dists^2, 1L, sum) - face_m
+      # when largest angles obtuse, longest side lengths;
+      # otherwise, circumdiameters
+      face_diam <- ifelse(
+        face_m > face_n,
+        apply(face_dists, 1L, max),
+        face_cd
+      )
+      faces <- faces[face_diam < diameter, , drop = FALSE]
+      faces <- as.data.frame(faces)
+      names(faces) <- c("a", "b", "c")
+    }
+    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
+    
+    # data frame of faces' perimeter coordinates
+    data <- data.frame(
+      x = data$x[as.vector(faces)],
+      y = data$y[as.vector(faces)],
+      group = rep(seq_len(ncol(faces)), each = 3L)
     )
     
     # return the faces data
