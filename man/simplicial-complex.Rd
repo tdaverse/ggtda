@@ -329,5 +329,8 @@ fundamental and practical aspects for data scientists.
 }
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
+
+Other plot layers for point clouds: 
+\code{\link{disk}}
 }
 \concept{plot layers for point clouds}

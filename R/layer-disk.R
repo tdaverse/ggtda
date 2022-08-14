@@ -1,0 +1,139 @@
+#' @title Disks around points
+#'
+#' @description Center disks at points in a scatterplot
+#'
+#' @details
+#'
+#' A _ball_ of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
+#' of all points whose distances from \eqn{x} are less than \eqn{r}. A ball in 2
+#' dimensions is called a _disk_.
+#'
+#' The geometric objects of `GeomDisk` can be used to illustrate disk covers of
+#' point clouds, in particular in the construction of simplicial filtrations. It
+#' could be paired with a statistical transformation of `Stat*` that samples
+#' points from a cloud.
+#'
+#' The convenience function `geom_disk()` produces a layer with the identity
+#' statistical transformation.
+#' 
+
+#' @name disk
+#' @import ggplot2
+#' @inheritParams ggplot2::layer
+#' @param na.rm Logical; ignored.
+#' @param ... Additional arguments passed to [ggplot2::layer()].
+#' @param radius A positive number; the radius of the disk to render around each
+#'   point.
+#' @param diameter A positive number; the diameter of the disk to render around
+#'   each point.
+#' @param segments The number of segments to be used in drawing each disk.
+#' @example inst/examples/ex-layer-disk.r
+#' @family plot layers for point clouds
+#' @seealso [ggplot2::layer()] for additional arguments.
+NULL
+
+#' @rdname disk
+#' @export
+geom_disk <- function(mapping = NULL,
+                      data = NULL,
+                      stat = "identity",
+                      position = "identity",
+                      na.rm = FALSE,
+                      radius = NULL, diameter = NULL,
+                      segments = 60L,
+                      show.legend = NA,
+                      inherit.aes = TRUE,
+                      ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomDisk,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius, diameter = diameter,
+      segments = segments,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+GeomDisk <- ggproto(
+  "GeomDisk", Geom,
+  
+  required_aes = c("x", "y"),
+  
+  default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
+                    size = 0.5, linetype = 1),
+  
+  setup_params = function(data, params) {
+    
+    # harmonize parameters
+    if (! is.null(params$diameter)) {
+      if (! is.null(params$radius)) {
+        warning("Pass a value to only one of `radius` or `diameter`; ",
+                "`radius` value will be used.")
+        params$diameter <- params$radius * 2
+      } else {
+        params$radius <- params$diameter / 2
+      }
+    }
+    
+    params
+  },
+  
+  setup_data = function(data, params) {
+    
+    # nothing to draw
+    if ((is.null(params$radius) && is.null(params$diameter)) ||
+        params$segments == 0L) {
+      data <- data[NULL, , drop = FALSE]
+    }
+    
+    data
+  },
+  
+  draw_panel = function(data, panel_params, coord,
+                        radius = NULL, diameter = NULL,
+                        segments = 60L) {
+    
+    # calculate a polygon that approximates a circle
+    angles <- (0:segments) * 2 * pi / segments
+    disk <- radius * cbind(cos(angles), sin(angles))
+    disk <- as.data.frame(disk)
+    names(disk) <- c("x.offset", "y.offset")
+    
+    # copy the circle at each point
+    disks <- tidyr::expand_grid(data[, c("x", "y")], disk)
+    data$.id <- 1:nrow(data)
+    data <- merge(data, disks, by = c("x", "y"))
+    data <- transform(data,
+                      x = x + x.offset, y = y + y.offset,
+                      group = interaction(group, .id))
+    data$group <- match(data$group, unique(data$group))
+    data <- data[, setdiff(names(data), c("x.offset", "y.offset", ".id"))]
+    
+    # transform coordinates (after all geometric calculations are done)
+    data <- coord$transform(data, panel_params)
+    
+    # create graphical objects
+    grob <- grid::polygonGrob(
+      data$x, data$y,
+      default.units = "native",
+      id = data$group,
+      gp = grid::gpar(
+        col = data$colour, 
+        fill = alpha(data$fill, data$alpha), 
+        lwd = data$size * .pt, lty = data$linetype
+      )
+    )
+    grob$name <- grid::grobName(grob, "disk")
+    grob
+  }
+)
