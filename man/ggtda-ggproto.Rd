@@ -9,44 +9,17 @@
 \alias{StatFrontier}
 \alias{GeomFundamentalBox}
 \alias{GeomDiagonal}
-\alias{StatDisk}
-\alias{StatVietoris0}
-\alias{StatVietoris1}
-\alias{StatVietoris2}
-\alias{StatCech0}
-\alias{StatCech1}
-\alias{StatCech2}
-\alias{StatAlpha0}
-\alias{StatAlpha1}
-\alias{StatAlpha2}
-\alias{GeomFace}
+\alias{StatSimplicialComplex}
+\alias{GeomSimplicialComplex}
 \title{Base \code{ggproto} classes for \emph{ggtda}}
 \format{
 An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{StatFrontier} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{StatDisk} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatSimplicialComplex} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{StatVietoris0} (inherits from \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
-
-An object of class \code{StatVietoris1} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{StatVietoris2} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{StatCech0} (inherits from \code{StatVietoris0}, \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
-
-An object of class \code{StatCech1} (inherits from \code{StatVietoris1}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
-
-An object of class \code{StatCech2} (inherits from \code{StatVietoris2}, \code{Stat}, \code{ggproto}, \code{gg}) of length 2.
-
-An object of class \code{StatAlpha0} (inherits from \code{StatVietoris0}, \code{StatIdentity}, \code{Stat}, \code{ggproto}, \code{gg}) of length 1.
-
-An object of class \code{StatAlpha1} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{StatAlpha2} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{GeomFace} (inherits from \code{GeomPolygon}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.
+An object of class \code{GeomSimplicialComplex} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \description{
 Base \code{ggproto} classes for \emph{ggtda}
