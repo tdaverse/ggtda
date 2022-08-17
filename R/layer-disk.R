@@ -109,15 +109,18 @@ GeomDisk <- ggproto(
     disk <- as.data.frame(disk)
     names(disk) <- c("x.offset", "y.offset")
     
-    # copy the circle at each point
-    disks <- tidyr::expand_grid(data[, c("x", "y")], disk)
-    data$.id <- 1:nrow(data)
-    data <- merge(data, disks, by = c("x", "y"))
+    # copy the circle to each point
+    data <- transform(data, .id = seq(nrow(data)))
+    data <- cbind(
+      data[rep(seq(nrow(data)), each = nrow(disk)), ],
+      disk[rep(seq(nrow(disk)), times = nrow(data)), ]
+    )
     data <- transform(data,
                       x = x + x.offset, y = y + y.offset,
                       group = interaction(group, .id))
     data$group <- match(data$group, unique(data$group))
-    data <- data[, setdiff(names(data), c("x.offset", "y.offset", ".id"))]
+    data <- data[, setdiff(names(data), c("x.offset", "y.offset", ".id")),
+                 drop = FALSE]
     
     # transform coordinates (after all geometric calculations are done)
     data <- coord$transform(data, panel_params)
