@@ -135,6 +135,8 @@ death, and dimension.
 
 \section{Persistence diagrams}{
 
+Persistence diagrams recognize extended persistence data, with negative
+birth/death values arising from the relative part of the filtration.
 
 The original persistence diagrams plotted persistence against birth in what
 we call "flat" diagrams, but most plot death against birth in "diagonal"
@@ -155,6 +157,8 @@ demarcate the Pareto frontiers of persistence diagrams. They can be
 averaged over the diagrams obtained from multiple data sets designed or
 hypothesized to have been generated from the same underlying topological
 structure.
+
+Persistence landscapes do not currently recognize extended persistence data.
 }
 
 \examples{
