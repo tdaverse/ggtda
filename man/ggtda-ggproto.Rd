@@ -9,7 +9,6 @@
 \alias{StatPersistence}
 \alias{StatFrontier}
 \alias{GeomFundamentalBox}
-\alias{GeomDiagonal}
 \alias{StatDisk}
 \alias{StatVietoris0}
 \alias{StatVietoris1}
