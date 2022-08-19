@@ -93,6 +93,7 @@ GeomBarcode <- ggproto(
     
     # introduce categorical -> integer y-values
     # in order of `group`, `x`, and `xend`
+    # (assumes that `group` is a refinement of dimension)
     grp <- if (is.null(data$group)) NA_character_ else data$group
     data$y <- interaction(
       grp, data$start, data$end,

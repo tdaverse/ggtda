@@ -8,6 +8,7 @@
 \alias{GeomDisk}
 \alias{StatPersistence}
 \alias{StatFrontier}
+\alias{GeomFrontier}
 \alias{GeomFundamentalBox}
 \alias{GeomDiagonal}
 \alias{StatDisk}
@@ -28,6 +29,8 @@ An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{G
 An object of class \code{GeomDisk} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 
 An object of class \code{StatFrontier} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+
+An object of class \code{GeomFrontier} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 3.
 
 An object of class \code{StatDisk} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 

@@ -4,6 +4,7 @@
 \alias{persistence}
 \alias{stat_persistence}
 \alias{stat_frontier}
+\alias{geom_frontier}
 \alias{geom_fundamental_box}
 \alias{geom_diagonal}
 \title{Persistence diagrams}
@@ -26,6 +27,17 @@ stat_frontier(
   geom = "line",
   position = "identity",
   diagram = "diagonal",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+geom_frontier(
+  mapping = NULL,
+  data = NULL,
+  stat = "persistence",
+  position = "identity",
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -179,7 +191,7 @@ ggplot(toy.data,
                    diagram = "diagonal", size = 3) +
   geom_diagonal() +
   lims(x = c(0, 6), y = c(0, 6)) +
-  guides(alpha = FALSE)
+  guides(alpha = "none")
 # diagonal persistence diagram with fundamental boxes
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -241,6 +253,30 @@ ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_frontier(diagram = "landscape") +
   theme_persist()
+
+
+
+ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence(
+    geom = "text",
+    aes(label = after_stat(feature_id), alpha = after_stat(persistence)),
+    diagram = "flat", size = 3
+  ) +
+  guides(alpha = "none")
+
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  theme_persist() + coord_equal() +
+  stat_persistence(geom = "frontier")
+
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  theme_persist() + coord_equal() +
+  stat_persistence(geom = "frontier", diagram = "flat")
+
+ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
+  theme_persist() + coord_equal() +
+  stat_persistence(geom = "frontier", diagram = "landscape")
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence

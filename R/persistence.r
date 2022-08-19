@@ -103,12 +103,22 @@ StatPersistence <- ggproto(
   
   required_aes = c("start", "end"),
   
-  compute_panel = function(data, scales,
+  compute_group = function(data, scales,
                            diagram = "diagonal") {
+    save(data, scales, diagram,
+         file = here::here("stat-persistence-compute.rda"))
+    load(here::here("stat-persistence-compute.rda"))
+    
+    # <<<<<< compute persistence from list column of data objects >>>>>>
     
     # points in cartesian coordinates (un-negated from opposite filtration)
     data$x <- abs(data$start)
     data$y <- abs(data$end)
+    # endpoints of frontier segments
+    data$x0 <- data$y0 <- data$x
+    data$xend <- data$yend <- data$y
+    # TODO: Is this overkill? Could just use `x0` and `xend`, though at some
+    # risk of confusion.
     
     # computed variable: `part`
     data$part <- with(data, {
@@ -121,6 +131,14 @@ StatPersistence <- ggproto(
     # computed variable: `persistence` (infinite for extended points)
     data$persistence <- data$end - data$start
     data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
+    # computed variable: `feature_id` (sort by dimension, birth, death)
+    data$feature_id <- interaction(
+      if (is.null(data$group)) NA_character_ else data$group,
+      data$start, data$end,
+      drop = TRUE, lex.order = TRUE
+    )
+    # re-distinguish duplicates
+    data$feature_id <- order(order(data$feature_id))
     
     # diagram transformation
     data <- diagram_transform(data, diagram)
@@ -197,6 +215,86 @@ StatFrontier <- ggproto(
     
     # return frontier data
     cbind(data, first_row)
+  }
+)
+
+#' @rdname persistence
+#' @export
+geom_frontier <- function(mapping = NULL,
+                          data = NULL,
+                          stat = "persistence",
+                          position = "identity",
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE,
+                          ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomFrontier,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+GeomFrontier <- ggproto(
+  "GeomFrontier", GeomSegment,
+  
+  required_aes = c("x", "y", "x0", "y0", "xend", "yend"),
+  
+  draw_panel = function(data, panel_params, coord,
+                        lineend = "butt", linejoin = "round",
+                        na.rm = FALSE) {
+    
+    data <- remove_missing(
+      data, na.rm = na.rm,
+      vars = c("x", "y", "x0", "y0", "xend", "yend",
+               "linetype", "size", "shape"),
+      name = "geom_frontier"
+    )
+    
+    # expand two-segment rows to one-segment rows
+    data <- data[rep(seq(nrow(data)), each = 2L), , drop = FALSE]
+    repl_rows <- seq(nrow(data)) %% 2L == 0L
+    data$xend[repl_rows] <- data$x0[repl_rows]
+    data$yend[repl_rows] <- data$y0[repl_rows]
+    data$x0 <- data$y0 <- NULL
+    
+    if (is.null(data) || nrow(data) == 0 || ncol(data) == 0 ||
+        inherits(data, "waiver")) 
+      return(zeroGrob())
+    if (coord$is_linear()) {
+      coord <- coord$transform(data, panel_params)
+      return(grid::segmentsGrob(
+        coord$x, coord$y, coord$xend, coord$yend,
+        default.units = "native",
+        gp = grid::gpar(
+          col = alpha(coord$colour, coord$alpha),
+          fill = alpha(coord$colour, coord$alpha),
+          lwd = coord$size * .pt,
+          lty = coord$linetype,
+          lineend = lineend, linejoin = linejoin
+        ),
+        arrow = NULL
+      ))
+    }
+    
+    data$group <- seq(nrow(data))
+    starts <- subset(data, select = c(-xend, -yend))
+    ends <- rename(subset(data, select = c(-x, -y)), c(xend = "x", yend = "y"))
+    pieces <- rbind(starts, ends)
+    pieces <- pieces[order(pieces$group), ]
+    GeomPath$draw_panel(pieces, panel_params, coord,
+                        arrow = NULL, lineend = lineend)
   }
 )
 
@@ -303,13 +401,19 @@ diagram_transform <- function(data, diagram) {
     match.arg(diagram, c("flat", "diagonal", "landscape")),
     flat = transform(
       data,
-      y = data$y - data$x
+      y = data$y - data$x,
+      y0 = data$y0 - data$x0,
+      yend = data$yend - data$xend
     ),
     diagonal = data,
     landscape = transform(
       data,
       x = (data$x + data$y) / 2,
-      y = (data$y - data$x) / 2
+      y = (data$y - data$x) / 2,
+      x0 = (data$x0 + data$y0) / 2,
+      y0 = (data$y0 - data$x0) / 2,
+      xend = (data$xend + data$yend) / 2,
+      yend = (data$yend - data$xend) / 2
     )
   )
 }

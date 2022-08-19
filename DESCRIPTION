@@ -41,5 +41,5 @@ Suggests:
 URL: https://rrrlw.github.io/ggtda/
 BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
