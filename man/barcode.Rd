@@ -138,6 +138,6 @@ fundamental and practical aspects for data scientists.
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other plot layers for persistence data: 
-\code{\link{persistence}}
+\code{\link{geom_diagonal}()}
 }
 \concept{plot layers for persistence data}
