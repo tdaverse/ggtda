@@ -33,6 +33,7 @@ Suggests:
     tdaunif (>= 0.1.0),
     ripserr (>= 0.1.1),
     rPref (>= 1.2),
+    tidyr,
     covr (>= 3.1.0),
     testthat (>= 2.0.0),
     vdiffr (>= 0.3.0),

@@ -14,6 +14,11 @@ stat_persistence(
   data = NULL,
   geom = "point",
   position = "identity",
+  diameter_max = Inf,
+  radius_max = NULL,
+  p = 2L,
+  dimension_max = 1L,
+  complex = "rips",
   diagram = "diagonal",
   na.rm = FALSE,
   show.legend = NA,
@@ -96,6 +101,14 @@ a string to override the default.}
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
+\item{diameter_max, radius_max}{(Document.)}
+
+\item{p}{(Document.)}
+
+\item{dimension_max}{(Document.)}
+
+\item{complex}{(Document.)}
+
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
 
@@ -126,10 +139,8 @@ Visualize persistence data in a (flat, diagonal, or landscape)
 persistence diagram.
 }
 \details{
-\emph{Persistence diagrams} are
-\href{https://ggplot2.tidyverse.org/reference/geom_point.html}{scatterplots} of
-persistence data. \emph{Persistence landscapes} can be understood as rotated
-diagonal persistence diagrams.
+\emph{Persistence diagrams} are scatterplots of persistence data. \emph{Persistence
+landscapes} can be understood as rotated diagonal persistence diagrams.
 }
 \section{Persistence data}{
 
@@ -254,7 +265,7 @@ ggplot(annulus.phom, aes(start = birth, end = death,
   stat_frontier(diagram = "landscape") +
   theme_persist()
 
-
+## Experimental examples to test new functionality
 
 ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
@@ -277,6 +288,12 @@ ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
 ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
   theme_persist() + coord_equal() +
   stat_persistence(geom = "frontier", diagram = "landscape")
+
+# this is silly but a good test
+raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
+raw_data$class <- vapply(raw_data$obj, class, "")
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_persistence(aes(shape = factor(after_stat(dimension)), color = class))
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence

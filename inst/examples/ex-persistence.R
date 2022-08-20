@@ -78,7 +78,7 @@ ggplot(annulus.phom, aes(start = birth, end = death,
   stat_frontier(diagram = "landscape") +
   theme_persist()
 
-
+## Experimental examples to test new functionality
 
 ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
@@ -101,3 +101,9 @@ ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
 ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
   theme_persist() + coord_equal() +
   stat_persistence(geom = "frontier", diagram = "landscape")
+
+# this is silly but a good test
+raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
+raw_data$class <- vapply(raw_data$obj, class, "")
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_persistence(aes(shape = factor(after_stat(dimension)), color = class))

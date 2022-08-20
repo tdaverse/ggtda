@@ -6,10 +6,8 @@
 
 #' @details
 #'
-#' *Persistence diagrams* are
-#' [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
-#' persistence data. *Persistence landscapes* can be understood as rotated
-#' diagonal persistence diagrams.
+#' *Persistence diagrams* are scatterplots of persistence data. *Persistence
+#' landscapes* can be understood as rotated diagonal persistence diagrams.
 #' 
 
 #' @template persistence-data
@@ -62,6 +60,10 @@
 #' @param geom The geometric object to use display the data; defaults to
 #'   `segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
 #'   a string to override the default.
+#' @param diameter_max,radius_max (Document.)
+#' @param p (Document.)
+#' @param dimension_max (Document.)
+#' @param complex (Document.)
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
@@ -73,6 +75,10 @@ stat_persistence <- function(mapping = NULL,
                              data = NULL,
                              geom = "point",
                              position = "identity",
+                             diameter_max = Inf, radius_max = NULL,
+                             p = 2L,
+                             dimension_max = 1L,
+                             complex = "rips",
                              diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
@@ -87,6 +93,10 @@ stat_persistence <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      diameter_max = diameter_max, radius_max = radius_max,
+      p = p,
+      dimension_max = dimension_max,
+      complex = complex,
       diagram = diagram,
       na.rm = na.rm,
       ...
@@ -101,15 +111,81 @@ stat_persistence <- function(mapping = NULL,
 StatPersistence <- ggproto(
   "StatPersistence", Stat,
   
-  required_aes = c("start", "end"),
+  required_aes = c("start|dataset", "end|dataset"),
   
-  compute_group = function(data, scales,
-                           diagram = "diagonal") {
-    save(data, scales, diagram,
-         file = here::here("stat-persistence-compute.rda"))
-    load(here::here("stat-persistence-compute.rda"))
+  optional_aes = c("dataset"),
+  
+  setup_data = function(data, params) {
     
-    # <<<<<< compute persistence from list column of data objects >>>>>>
+    if (! is.null(data$dataset)) {
+      
+      if (! is.null(data$start) || ! is.null(data$end)) {
+        warning("Map to either `start` and `end` or to `dataset` aesthetic, ",
+                "not both. `dataset` will be used.")
+        data$end <- data$start <- NULL
+      }
+      
+      # ensure that engine can handle data
+      ph_classes <- gsub(
+        "vietoris_rips\\.", "",
+        as.character(methods(ripserr::vietoris_rips))
+      )
+      ph_classes <- setdiff(ph_classes, "default")
+      if (! all(vapply(data$dataset, inherits, FALSE, what = ph_classes))) {
+        stop("`dataset` accepts data of the following classes: ",
+             paste(paste("'", ph_classes, "'", sep = ""), collapse = ", "))
+      }
+      
+    }
+    
+    data
+  },
+  
+  setup_params = function(data, params) {
+    
+    # need to implement other complexes (Cech, Alpha, ...)
+    if (params$complex != "vietoris" && params$complex != "rips")
+      stop("Only `'vietoris'` / `'rips'` complexes are currently implemented.")
+    
+    # handle disk size
+    if (is.null(params$radius_max) && is.null(params$diameter_max)) {
+      params$diameter_max <- Inf
+    }
+    if (! is.null(params$radius_max)) {
+      if (! is.null(params$diameter_max)) {
+        warning("Pass a value to only one of `radius_max` or `diameter_max`; ",
+                "`diameter_max` value will be used.")
+      } else {
+        params$diameter_max <- params$radius_max
+      }
+    }
+    
+    params
+  },
+  
+  compute_group = function(
+    data, scales,
+    radius_max = NULL, diameter_max = Inf,
+    p = 2L, dimension_max = 1L, complex = "rips",
+    diagram = "diagonal"
+  ) {
+    
+    # compute persistence from list column of data objects
+    if (! is.null(data$dataset)) {
+      
+      # compute persistence data from `dataset`
+      if (diameter_max == Inf) diameter_max <- -1L
+      data$dataset <- lapply(
+        data$dataset,
+        ripserr::vietoris_rips,
+        threshold = diameter_max, p = p, dim = dimension_max,
+        return_format = "df"
+      )
+      data <- tidyr::unnest(data, dataset)
+      # rename to required aesthetics
+      names(data)[match(c("birth", "death"), names(data))] <- c("start", "end")
+      
+    }
     
     # points in cartesian coordinates (un-negated from opposite filtration)
     data$x <- abs(data$start)
@@ -288,13 +364,16 @@ GeomFrontier <- ggproto(
       ))
     }
     
+    # TODO: Test non-linear coordinates.
     data$group <- seq(nrow(data))
     starts <- subset(data, select = c(-xend, -yend))
     ends <- rename(subset(data, select = c(-x, -y)), c(xend = "x", yend = "y"))
     pieces <- rbind(starts, ends)
     pieces <- pieces[order(pieces$group), ]
-    GeomPath$draw_panel(pieces, panel_params, coord,
-                        arrow = NULL, lineend = lineend)
+    GeomPath$draw_panel(
+      pieces, panel_params, coord,
+      arrow = NULL, lineend = lineend
+    )
   }
 )
 
