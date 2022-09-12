@@ -59,7 +59,7 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   # Store 1- and >1-dim simplexes seperately
   # (1-dim need to be drawn as line segments)
   df_one_simplexes <- df_simplexes[df_simplexes$dim == 1,]
-  df_k_simplexes <- df_simplexes[df_simplexes$dim > 1,]
+  df_k_simplexes <- df_simplexes[!df_simplexes$dim %in% c(0, 1),]
   
   # If user wants all one-simplexes, overwrite df_one_simplexes
   if (one_simplexes == "all") {
