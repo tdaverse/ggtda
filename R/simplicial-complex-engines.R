@@ -5,7 +5,7 @@
 simplicial_complex_simplextree <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
   # The entire set of 0-simplexes needs to come from data, not simplextree
-  df_zero_simplexes <- indeces_to_data(data)
+  df_zero_simplexes <- indices_to_data(data)
   
   
   # Compute simplicial complex up to max_dimension, encoded as a simplextree
@@ -33,8 +33,8 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   dims <- ordered(dims, levels = min(dims):max(dims))
   
   # combine ordered pairs for each simplex into dataframe
-  indeces <- unlist(simplexes)
-  df_simplexes <- data[indeces,]
+  indices <- unlist(simplexes)
+  df_simplexes <- data[indices,]
   
   # fix row names
   rownames(df_simplexes) <- NULL
@@ -70,7 +70,7 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
     # unique identifier for each edge
     edge_id <- rep(1:length(edges), each = 2)
     
-    # get indeces of edge coords
+    # get indices of edge coords
     edges <- unlist(edges)
     
     # combine ordered pairs for each edge into dataframe
@@ -83,7 +83,7 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   if (zero_simplexes == "maximal") {
     
     maximal_vertices <- setdiff(1:nrow(data), st$vertices)
-    df_zero_simplexes <- indeces_to_data(data, maximal_vertices, 1)
+    df_zero_simplexes <- indices_to_data(data, maximal_vertices, 1)
     
   } 
   
@@ -146,7 +146,7 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
 # Currently, an if statement for each complex
 simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
-  df_zero_simplexes <- indeces_to_data(data)
+  df_zero_simplexes <- indices_to_data(data)
   
   
   # Compute other data.frame objects based on complex
@@ -154,7 +154,7 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
   if (complex %in% c("Rips", "Vietoris")) {
     
     edges <- proximate_pairs(data, diameter)
-    df_one_simplexes <- indeces_to_data(data, edges)
+    df_one_simplexes <- indices_to_data(data, edges)
     
     # Now do simplexes (only of dim 1)
     # (need edges as a nice data.frame again)
@@ -175,7 +175,7 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
       sort = FALSE
     )
     
-    df_k_simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indices_to_data(data, faces)
 
   }
   
@@ -184,11 +184,11 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
   if (complex == "Cech") {
     
     edges <- proximate_pairs(data, diameter)
-    df_one_simplexes <- indeces_to_data(data, edges)
+    df_one_simplexes <- indices_to_data(data, edges)
     
     # Now do simplexes (only of dim 1)
     faces <- proximate_triples(data, diameter)
-    df_k_simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indices_to_data(data, faces)
     
     
   }
@@ -214,7 +214,7 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
 simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
   # 0-simplexes always just the point cloud
-  df_zero_simplexes <- indeces_to_data(data)
+  df_zero_simplexes <- indices_to_data(data)
   
   
   # Compute other data.frame objects based on complex
@@ -232,7 +232,7 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex,
     
     edges <- dt[edge_dists < diameter, , drop = FALSE]
     
-    df_one_simplexes <- indeces_to_data(data, edges)
+    df_one_simplexes <- indices_to_data(data, edges)
     
     
     # Now do simplexes (only of dim 2)
@@ -297,7 +297,7 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex,
 
     }
     
-    df_k_simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indices_to_data(data, faces)
     
   }
   
@@ -324,11 +324,11 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex,
  
 ## Shared helper functions:
 
-# Converts a matrix of indeces corresponding to simplexes of equal 
+# Converts a matrix of indices corresponding to simplexes of equal 
 # dimensions (0, 1, or 2) to correct representation for GeomSimplicialComplex
 # (indices arg. is missing when we want the 0-simplexes)
 # m = dim + 1, no. of points in each simplex
-indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1), m = NULL) {
+indices_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1), m = NULL) {
   
   if (is.null(m)) m <- ncol(indices)
   
