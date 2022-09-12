@@ -36,7 +36,7 @@
 #' @param one_skeleton Should the 1-skeleton be plotted?
 #' @param simplexes Should the >0-simplexes corresponding to the maximal complex
 #' be plotted?
-#' @param simplex_boundary Should the boundaries of polygons representing the simplexes be drawn?
+#' @param outlines Should the outlines of polygons representing the simplexes be drawn?
 #' (Only availabe for `engine = "simplextree"`).
 #' 
 #'
@@ -166,7 +166,7 @@ stat_simplicial_complex <- function(mapping = NULL, data = NULL, geom = "Simplic
 GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
                                  
   draw_group = function(data, panel_params, coord,
-                        zero_skeleton = TRUE, one_skeleton = FALSE, simplexes = TRUE, simplex_boundary = TRUE,
+                        zero_skeleton = TRUE, one_skeleton = FALSE, simplexes = TRUE, outlines = TRUE,
                         lineend = "butt", linejoin = "round", linemitre = 10) {
     
     n <- nrow(data)
@@ -248,7 +248,7 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
         simplex_data$x, simplex_data$y, default.units = "native",
         id = simplex_data$simplex_id,
         gp = grid::gpar(
-          col = if (simplex_boundary & !one_skeleton) first_rows$colour else NA,
+          col = if (outlines & !one_skeleton) first_rows$colour else NA,
           fill = alpha(first_rows$fill, first_rows$alpha),
           lwd = first_rows$linewidth * .pt,
           lty = first_rows$linetype,
@@ -338,7 +338,7 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
 geom_simplicial_complex <- function(mapping = NULL, data = NULL,
                                     stat = "SimplicialComplex", position = "identity",
                                     zero_skeleton = TRUE, one_skeleton = FALSE,
-                                    simplexes = TRUE, simplex_boundary = TRUE,
+                                    simplexes = TRUE, outlines = TRUE,
                                     ...,
                                     na.rm = FALSE,
                                     show.legend = NA,
@@ -354,7 +354,7 @@ geom_simplicial_complex <- function(mapping = NULL, data = NULL,
     params = list(
       na.rm = na.rm,
       zero_skeleton = zero_skeleton, one_skeleton = one_skeleton,
-      simplexes = simplexes, simplex_boundary = simplex_boundary,
+      simplexes = simplexes, outlines = outlines,
       ...
     )
   )

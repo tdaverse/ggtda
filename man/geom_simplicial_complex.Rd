@@ -29,7 +29,7 @@ geom_simplicial_complex(
   zero_skeleton = TRUE,
   one_skeleton = FALSE,
   simplexes = TRUE,
-  simplex_boundary = TRUE,
+  outlines = TRUE,
   ...,
   na.rm = FALSE,
   show.legend = NA,
@@ -100,7 +100,7 @@ layer, as a string.}
 \item{simplexes}{Should the >0-simplexes corresponding to the maximal complex
 be plotted?}
 
-\item{simplex_boundary}{Should the boundaries of polygons representing the simplexes be drawn?
+\item{outlines}{Should the outlines of polygons representing the simplexes be drawn?
 (Only availabe for \code{engine = "simplextree"}).}
 }
 \description{
