@@ -33,9 +33,7 @@
 #' @param complex The type of complex to compute (either `"Vietoris"`, `"Rips"`, `"Cech"`, or `"alpha"`).
 #' @param engine What computational engine to use. Reasonable defaults are chosen based on `complex`.
 #' @param zero_simplexes One of `"none"`, `"maximal"`, and `"all"` (default).
-#' Currently, `"maximal"` is equivalent to `"all"`.
 #' @param one_simplexes One of `"none"`, `"maximal"` (default), and `"all"`. 
-#' Currently, `"maximal"` only works as intended for `engine = "simplextree"`.
 #' @param outlines Should the outlines of polygons representing the simplexes be drawn?
 #' 
 #'

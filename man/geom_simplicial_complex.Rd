@@ -72,11 +72,9 @@ display.}
 
 \item{radius, diameter}{The radius or diameter used to construct the simplicial complex.}
 
-\item{zero_simplexes}{One of \code{"none"}, \code{"maximal"}, and \code{"all"} (default).
-Currently, \code{"maximal"} is equivalent to \code{"all"}.}
+\item{zero_simplexes}{One of \code{"none"}, \code{"maximal"}, and \code{"all"} (default).}
 
-\item{one_simplexes}{One of \code{"none"}, \code{"maximal"} (default), and \code{"all"}.
-Currently, \code{"maximal"} only works as intended for \code{engine = "simplextree"}.}
+\item{one_simplexes}{One of \code{"none"}, \code{"maximal"} (default), and \code{"all"}.}
 
 \item{max_dimension}{Compute simplexes of dimension up to \code{max_dimension}
 (only relevant for the Vietoris-Rips complex computed with the \code{simplextree} engine).}
