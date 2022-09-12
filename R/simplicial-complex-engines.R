@@ -2,10 +2,10 @@
 
 
 ## simplextree
-simplicial_complex_simplextree <- function(data, diameter, max_dimension, complex) {
+simplicial_complex_simplextree <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
-  # zero_skeleton needs to come from data, not simplextree
-  zero_skeleton <- indeces_to_data(data)
+  # The entire set of 0-simplexes needs to come from data, not simplextree
+  df_zero_simplexes <- indeces_to_data(data)
   
   
   # Compute simplicial complex up to max_dimension, encoded as a simplextree
@@ -15,10 +15,9 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   # Convert simplextree into a list
   simplexes <- as.list(simplextree::maximal(st))
   
-  # If there are no edges, just return zero-skeleton
-  # Otherwise, go on to find one_skeleton + simplexes
-  if (length(simplexes) == 0)  return(zero_skeleton)
-  
+  # If there are no edges, just return zero-simplexes
+  # Otherwise, go on to find one_simplexes + k_simplexes
+  if (length(simplexes) == 0)  return(df_zero_simplexes)
   
   
   # Convert simplexes into dataframe -----
@@ -35,67 +34,81 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   
   # combine ordered pairs for each simplex into dataframe
   indeces <- unlist(simplexes)
-  simplexes <- data[indeces,]
+  df_simplexes <- data[indeces,]
   
   # fix row names
-  rownames(simplexes) <- NULL
+  rownames(df_simplexes) <- NULL
   
   # include relevant computed values
-  simplexes$simplex_id <- simplex_id
-  simplexes$dim <- dims
+  df_simplexes$simplex_id <- simplex_id
+  df_simplexes$dim <- dims
   
   # reorder rows so that higher dim simplexes are plotted last
   # note: order among simplexes of equal dim doesn't matter
   #       b/c we split() on simplex_id
-  simplexes <- simplexes[order(simplexes$dim), ]
+  df_simplexes <- df_simplexes[order(df_simplexes$dim), ]
   
   # take convex hull of each simplex for polygon grob:
-  simplexes <- split(simplexes, simplexes$simplex_id)
-  simplexes <- lapply(simplexes, simplex_chull)
+  # (df_simplexes is brielfly a list of data.frames, each corresponding to a k-simplex)
+  df_simplexes <- split(df_simplexes, df_simplexes$simplex_id)
+  df_simplexes <- lapply(df_simplexes, simplex_chull)
   
-  simplexes <- do.call(rbind, simplexes)
+  df_simplexes <- do.call(rbind, df_simplexes)
   
   
   # Store 1- and >1-dim simplexes seperately
   # (1-dim need to be drawn as line segments)
-  simplexes_one <- simplexes[simplexes$dim == 1,]
-  simplexes <- simplexes[simplexes$dim != 1,]
+  df_one_simplexes <- df_simplexes[df_simplexes$dim == 1,]
+  df_k_simplexes <- df_simplexes[df_simplexes$dim > 1,]
   
-  if (nrow(simplexes) > 0) {
-    simplexes$type <- "simplex"
+  # If user wants all one-simplexes, overwrite df_one_simplexes
+  if (one_simplexes == "all") {
+    
+    # convert matrix of edges into a list
+    edges <- apply(st$edges, 1, function(x) x, simplify = FALSE)
+    
+    # unique identifier for each edge
+    edge_id <- rep(1:length(edges), each = 2)
+    
+    # get indeces of edge coords
+    edges <- unlist(edges)
+    
+    # combine ordered pairs for each edge into dataframe
+    df_one_simplexes <- data[edges,]
+    df_one_simplexes$simplex_id <- edge_id
+    
+  } 
+  
+  # Similar operation for zero_simplexes argument:
+  if (zero_simplexes == "maximal") {
+    
+    maximal_vertices <- setdiff(1:nrow(data), st$vertices)
+    df_zero_simplexes <- indeces_to_data(data, maximal_vertices, 1)
+    
+  } 
+  
+  
+  # fill in missing computed values:
+  
+  if (nrow(df_k_simplexes) > 0) {
+    df_k_simplexes$type <- "k_simplex"
   }
-  simplexes$dim <- droplevels(simplexes$dim)
   
-  if (nrow(simplexes_one) > 0) {
-    simplexes_one$type <- "simplex_one"
-    simplexes_one$dim <- levels(simplexes$dim)[1]
+  df_k_simplexes$dim <- droplevels(df_k_simplexes$dim)
+  
+  # dim not actually used for 0- and 1-simplexes 
+  # (but can't be NA b/c of scale)
+  if (nrow(df_one_simplexes) > 0) {
+    df_one_simplexes$type <- "one_simplex"
+    df_one_simplexes$dim <- levels(df_k_simplexes$dim)[1]
   }
   
+  if (nrow(df_zero_simplexes) > 0) {
+    df_zero_simplexes$dim <- levels(df_k_simplexes$dim)[1]
+  }
   
-  
-  # Convert 1-skeleton into dataframe -----
-  
-  # convert matrix of edges into a list
-  edges <- apply(st$edges, 1, function(x) x, simplify = FALSE)
-  
-  # unique identifier for each edge
-  edge_id <- rep(1:length(edges), each = 2)
-  
-  # get indeces of edge coords
-  edges <- unlist(edges)
-  
-  # combine ordered pairs for each edge into dataframe
-  one_skeleton <- data[edges,]
-  one_skeleton$simplex_id <- edge_id
-  
-  # fill in irrelevant computed values
-  # dim not actually used, but can't be NA b/c of scale
-  zero_skeleton$dim <- levels(simplexes$dim)[1]
-  one_skeleton$dim <- levels(simplexes$dim)[1]
-  one_skeleton$type <- "one_skeleton"
-  
-  
-  rbind(simplexes, simplexes_one, zero_skeleton, one_skeleton)
+
+  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
   
 }
 
@@ -113,7 +126,7 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
     edges <- as.data.frame(edges)
     edges <- as.list(edges)
     
-    # Construct the 1-skeleton of the complex as a simplextree
+    # Construct the 1-simplexes of the complex as a simplextree
     st <- simplextree::simplex_tree(edges)
     
     # Return flag complex
@@ -130,12 +143,10 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
 
 ## Base 
 # These should probably be factored out more cleanly
-# Currently, an if statement for each complex,
-# computes data.frame's `simplexes` and `one_skeleton` w/ relevant calc. fields
-simplicial_complex_base <- function(data, diameter, max_dimension, complex) {
+# Currently, an if statement for each complex
+simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
-  # zero_skeleton always just the point cloud
-  zero_skeleton <- indeces_to_data(data)
+  df_zero_simplexes <- indeces_to_data(data)
   
   
   # Compute other data.frame objects based on complex
@@ -143,7 +154,7 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex) {
   if (complex %in% c("Rips", "Vietoris")) {
     
     edges <- proximate_pairs(data, diameter)
-    one_skeleton <- indeces_to_data(data, edges)
+    df_one_simplexes <- indeces_to_data(data, edges)
     
     # Now do simplexes (only of dim 1)
     # (need edges as a nice data.frame again)
@@ -164,7 +175,7 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex) {
       sort = FALSE
     )
     
-    simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indeces_to_data(data, faces)
 
   }
   
@@ -173,33 +184,26 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex) {
   if (complex == "Cech") {
     
     edges <- proximate_pairs(data, diameter)
-    one_skeleton <- indeces_to_data(data, edges)
+    df_one_simplexes <- indeces_to_data(data, edges)
     
     # Now do simplexes (only of dim 1)
     faces <- proximate_triples(data, diameter)
-    simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indeces_to_data(data, faces)
     
     
   }
+    
   
- 
-  # Not determining maximal 1-simplexes currently,
-  # very computationally expensive
-  if (TRUE) {
-    
-    if (nrow(one_skeleton) > 1) one_skeleton$type <- "simplex_one"
-  
-    rbind(simplexes, zero_skeleton, one_skeleton)
-  
-  } else {
-    
-    # determine maximal 1-simplexes
-    simplexes_one <- get_simplexes_one(edges, faces, one_skeleton)
-    
-    rbind(simplexes, simplexes_one, zero_skeleton, one_skeleton)
-    
-    
+  # Not determining maximal 1-simplexes currently, very computationally expensive
+  if (FALSE & one_simplexes == "maximal") {
+    df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
+  
+  if (FALSE & zero_simplexes == "maximal") {
+    # TODO: pair down to maximal zero_simplexes via get_maximal_zero_simplexes()
+  } 
+  
+  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
   
 } 
     
@@ -207,10 +211,10 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex) {
 
 
 ## RTriangle
-simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex) {
+simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes) {
   
-  # zero_skeleton always just the point cloud
-  zero_skeleton <- indeces_to_data(data)
+  # 0-simplexes always just the point cloud
+  df_zero_simplexes <- indeces_to_data(data)
   
   
   # Compute other data.frame objects based on complex
@@ -228,10 +232,10 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex)
     
     edges <- dt[edge_dists < diameter, , drop = FALSE]
     
-    one_skeleton <- indeces_to_data(data, edges)
+    df_one_simplexes <- indeces_to_data(data, edges)
     
     
-    # Now do simplexes (only of dim 1)
+    # Now do simplexes (only of dim 2)
     
     # Delaunay triangulation, keeping only indices of edges and of triangles
     dt <- RTriangle::triangulate(RTriangle::pslg(as.matrix(data[, c("x", "y")])), Y = TRUE)[["T"]]
@@ -293,28 +297,23 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex)
 
     }
     
-    simplexes <- indeces_to_data(data, faces)
+    df_k_simplexes <- indeces_to_data(data, faces)
     
   }
   
- 
-  # Not determining maximal 1-simplexes currently,
-  # very computationally expensive
-  if (TRUE) {
-    
-    if (nrow(one_skeleton) > 1) one_skeleton$type <- "simplex_one"
-  
-    rbind(simplexes, zero_skeleton, one_skeleton)
-  
-  } else {
-    
-    # determine maximal 1-simplexes
-    simplexes_one <- get_simplexes_one(edges, faces, one_skeleton)
-    
-    rbind(simplexes, simplexes_one, zero_skeleton, one_skeleton)
-    
-    
+
+  # Not determining maximal 1-simplexes currently, very computationally expensive
+  if (FALSE & one_simplexes == "maximal") {
+    df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
+  
+  if (FALSE & zero_simplexes == "maximal") {
+    # TODO: pair down to maximal zero_simplexes via get_maximal_zero_simplexes()
+  } 
+  
+  
+  
+  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
   
 }
 
@@ -329,11 +328,11 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex)
 
 # Converts a matrix of indeces corresponding to simplexes of equal 
 # dimensions (0, 1, or 2) to correct representation for GeomSimplicialComplex
-# (indices arg. is missing when we want the 0-skeleton)
-indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1)) {
+# (indices arg. is missing when we want the 0-simplexes)
+# m = dim + 1, no. of points in each simplex
+indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1), m = NULL) {
   
-  # m = dim + 1, no. of points in each simplex
-  m <- ncol(indices)
+  if (is.null(m)) m <- ncol(indices)
   
   # want "flat" vector of indices and for each index to be a column in res
   indices <- as.vector(t(indices))
@@ -350,9 +349,9 @@ indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1)) {
     # Type of object for GeomSimplicialComplex to plot
     res$type <- 
       switch(m,
-        "zero_skeleton",
-        "one_skeleton", 
-        "simplex"
+        "zero_simplex",
+        "one_simplex", 
+        "k_simplex"
       )
     
   } else {
@@ -369,24 +368,16 @@ indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1)) {
 }
 
 
-# Get maximal one_simplexes from edges + faces (subset of one_skeleton)
-# Pretty computationally expensive: O(|one_skeleton| x |two_skeleton|)
-# Could avoid this step if we just treated one_skeleton as simplexes_one
-# -- this is reasonable if we're only plotting up to dim = 2,
-#    all edges are either maximal or an edge of a 2-dim simplex (boundary!)
-#    The only benefit is this allows for simplex_boundary = FALSE
-get_simplexes_one <- function(edges, faces, one_skeleton) {
+# Get maximal 1-simplexes from edges + faces 
+# Pretty computationally expensive: O(|1-simplexes| x |2-simplexes|)
+get_maximal_one_simplexes <- function(edges, faces, df_one_simplexes) {
   
-  simplexes_one <- one_skeleton[apply(edges, 1, is_maximal, faces),]
-  
-  if (nrow(simplexes_one) > 0) simplexes_one$type <- "simplex_one"
-  
-  simplexes_one
+  df_one_simplexes[apply(edges, 1, is_maximal_one_simplex, faces),]
     
 }
 
 # Determine if edge is contained in faces (is edge a maximal simplex)
-is_maximal <- function(edge, faces) {
+is_maximal_one_simplex <- function(edge, faces) {
   
   res <- apply(faces, 1, function(face) all(edge %in% face))
   

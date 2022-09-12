@@ -22,7 +22,7 @@
 #'
 #'   \describe{ \item{dim}{The dimension of the corresponding simplex, an ordered factor}}
 #'   \describe{ \item{type}{The type of simplex represented by each row, one of:
-#'   `"simplex"`, `"simplex_one"`, `"zero_skeleton"`, `"one_skeleton"`.}}
+#'   `"zero_simplex"`, `"one_simplex"`, `"k_simplex"`.}}
 #'   \describe{ \item{simplex_id}{A set of unique ids for each simplex, for each `type`}}
 #'
 #' @inheritParams ggplot2::geom_point
@@ -32,12 +32,11 @@
 #' (only relevant for the Vietoris-Rips complex computed with the `simplextree` engine).
 #' @param complex The type of complex to compute (either `"Vietoris"`, `"Rips"`, `"Cech"`, or `"alpha"`).
 #' @param engine What computational engine to use. Reasonable defaults are chosen based on `complex`.
-#' @param zero_skeleton Should the 0-skeleton be plotted?
-#' @param one_skeleton Should the 1-skeleton be plotted?
-#' @param simplexes Should the >0-simplexes corresponding to the maximal complex
-#' be plotted?
+#' @param zero_simplexes One of `"none"`, `"maximal"`, and `"all"` (default).
+#' Currently, `"maximal"` is equivalent to `"all"`.
+#' @param one_simplexes One of `"none"`, `"maximal"` (default), and `"all"`. 
+#' Currently, `"maximal"` only works as intended for `engine = "simplextree"`.
 #' @param outlines Should the outlines of polygons representing the simplexes be drawn?
-#' (Only availabe for `engine = "simplextree"`).
 #' 
 #'
 #' @name geom_simplicial_complex
@@ -97,9 +96,12 @@ StatSimplicialComplex <-  ggproto(
   compute_group = function(
     data, scales,
     radius = NULL, diameter = NULL, 
+    zero_simplexes = "all", one_simplexes = "maximal",
     max_dimension = 10, complex = "Rips", engine = NULL 
   ) {
     
+    # Add check for validitiy of zero_ and one_simplexes arguments
+    # move to setup params method
     # handle disk size
     if (is.null(radius) && is.null(diameter)) {
       return(data[NULL, , drop = FALSE])
@@ -119,25 +121,25 @@ StatSimplicialComplex <-  ggproto(
     
     res <- 
       switch(engine,
-        "simplextree" = simplicial_complex_simplextree(data, diameter, max_dimension, complex),
-        "base" = simplicial_complex_base(data, diameter, max_dimension, complex),
-        "RTriangle" = simplicial_complex_RTriangle(data, diameter, max_dimension, complex)
+        "simplextree" = simplicial_complex_simplextree(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes),
+        "base" = simplicial_complex_base(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes),
+        "RTriangle" = simplicial_complex_RTriangle(data, diameter, max_dimension, complex, zero_simplexes, one_simplexes)
       )
     
-    # Remove simplexes w/ dim > max_dimension
-    #  -- might be good to do this before computations happen 
-    #     (at least for max_dimension < 2)
+    
+    # Take care of zero_ or one_simplexes == "none" and remove simplexes w/ dim > max_dimension
     if (max_dimension < 2) {
-      res <- res[res$type != "simplex", ]
+      res <- res[res$type != "k_simplex", ]
     }
     
-    if (max_dimension < 1) {
-      res <- res[! res$type %in% c("simplex_one", "one_skeleton"), ]
+    if (max_dimension < 1 | one_simplexes == "none") {
+      res <- res[res$type != "one_simplex", ]
     }
     
-    if (max_dimension < 0) {
-      res <- res[NULL, ]
+    if (max_dimension < 0 | zero_simplexes == "none") {
+      res <- res[res$type != "zero_simplex", ]
     }
+    
     
     res
     
@@ -150,12 +152,28 @@ StatSimplicialComplex <-  ggproto(
 stat_simplicial_complex <- function(mapping = NULL, data = NULL, geom = "SimplicialComplex",
                                     position = "identity", na.rm = FALSE, show.legend = NA,
                                     radius = NULL, diameter = NULL, 
+                                    zero_simplexes = "all", one_simplexes = "maximal",
                                     max_dimension = 10, complex = "Rips", engine = "simplextree", 
                                     inherit.aes = TRUE, ...) {
   layer(
-    stat = StatSimplicialComplex, data = data, mapping = mapping, geom = geom,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, radius = radius, diameter = diameter, engine = engine, max_dimension = max_dimension, complex = complex, ...)
+    stat = StatSimplicialComplex, 
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius,
+      diameter = diameter,
+      zero_simplexes = zero_simplexes,
+      one_simplexes = one_simplexes,
+      max_dimension = max_dimension,
+      engine = engine,
+      complex = complex,
+      ...
+    )
   )
 }
 
@@ -166,8 +184,7 @@ stat_simplicial_complex <- function(mapping = NULL, data = NULL, geom = "Simplic
 GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
                                  
   draw_group = function(data, panel_params, coord,
-                        zero_skeleton = TRUE, one_skeleton = FALSE, simplexes = TRUE, outlines = TRUE,
-                        lineend = "butt", linejoin = "round", linemitre = 10) {
+                        outlines = TRUE, lineend = "butt", linejoin = "round", linemitre = 10) {
     
     n <- nrow(data)
     
@@ -182,10 +199,9 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
       # Sort by simplex_id to make sure that colors, fill, etc. come in same order
       munched <- munched[order(munched$simplex_id),]
       
-      zero_skeleton_data <- munched[munched$type == "zero_skeleton",]
-      one_skeleton_data <- munched[munched$type == "one_skeleton",]
-      simplex_data <- munched[munched$type == "simplex",]
-      simplex_one_data <- munched[munched$type == "simplex_one",]
+      zero_simplex_data <- data[data$type == "zero_simplex",]
+      one_simplex_data <- data[data$type == "one_simplex",]
+      k_simplex_data <- data[data$type == "k_simplex",]
       
     } else {
       
@@ -193,10 +209,9 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
       
       data <- data[order(data$simplex_id),]
       
-      zero_skeleton_data <- data[data$type == "zero_skeleton",]
-      one_skeleton_data <- data[data$type == "one_skeleton",]
-      simplex_data <- data[data$type == "simplex",]
-      simplex_one_data <- data[data$type == "simplex_one",]
+      zero_simplex_data <- data[data$type == "zero_simplex",]
+      one_simplex_data <- data[data$type == "one_simplex",]
+      k_simplex_data <- data[data$type == "k_simplex",]
       
     }
     
@@ -204,51 +219,20 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
     # List to hold various grobs (polygons, linesegments, points)
     grobs <- list()
     
-    # Drawing the simplexes w/ dim = 1 -----
-    if (simplexes & nrow(simplex_one_data) > 0) {
-      
-      # First, need to collapse pairs of rows corresponding
-      # to line segments (edges)
-      simplex_one_data <- split(simplex_one_data, simplex_one_data$simplex_id)
-      simplex_one_data <- lapply(simplex_one_data, collapse_one_simplex_pairs)
-      simplex_one_data <- do.call(rbind, simplex_one_data)
-      
-      # Currently, can't adjust alpha of zero- and one-skeleton
-      # If overplotting is an issue, set one_skeleton = FALSE
-      # (Similar to geom_density)
-      grobs$simplex_one <- grid::segmentsGrob(
-        simplex_one_data$x, simplex_one_data$y,
-        simplex_one_data$xend, simplex_one_data$yend,
-        default.units = "native",
-        gp = grid::gpar(
-          # col = alpha(one_skeleton_data$colour, one_skeleton_data$alpha),
-          # fill = alpha(one_skeleton_data$fill, one_skeleton_data$alpha),
-          col = simplex_one_data$colour,
-          fill = simplex_one_data$fill,
-          lwd = simplex_one_data$linewidth * .pt,
-          lty = simplex_one_data$linetype,
-          lineend = lineend,
-          linejoin = linejoin
-        ),
-        arrow = NULL # not directed
-      )
-      
-    }
-    
     # Drawing the simplexes w/ dim > 1 -----
-    if (simplexes & nrow(simplex_data) > 0) {
+    if (nrow(k_simplex_data) > 0) {
       
       # For gpar(), there is one entry per polygon (not one entry per point).
       # We'll pull the first value from each (simplex_id)_group, and assume all these values
       # are the same within each group.
-      first_idx <- !duplicated(simplex_data$simplex_id)
-      first_rows <- simplex_data[first_idx, ]
+      first_idx <- !duplicated(k_simplex_data$simplex_id)
+      first_rows <- k_simplex_data[first_idx, ]
       
       grobs$simplexes <- grid::polygonGrob(
-        simplex_data$x, simplex_data$y, default.units = "native",
-        id = simplex_data$simplex_id,
+        k_simplex_data$x, k_simplex_data$y, default.units = "native",
+        id = k_simplex_data$simplex_id,
         gp = grid::gpar(
-          col = if (outlines & !one_skeleton) first_rows$colour else NA,
+          col = if (outlines) first_rows$colour else NA,
           fill = alpha(first_rows$fill, first_rows$alpha),
           lwd = first_rows$linewidth * .pt,
           lty = first_rows$linetype,
@@ -260,29 +244,29 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
       
     }
     
-    # Drawing the 1-skeleton -----
-    if (one_skeleton & nrow(one_skeleton_data) > 0) {
+    # Drawing the one_simplexes -----
+    if (nrow(one_simplex_data) > 0) {
       
       # First, need to collapse pairs of rows corresponding
       # to line segments (edges)
-      one_skeleton_data <- split(one_skeleton_data, one_skeleton_data$simplex_id)
-      one_skeleton_data <- lapply(one_skeleton_data, collapse_one_simplex_pairs)
-      one_skeleton_data <- do.call(rbind, one_skeleton_data)
+      one_simplex_data <- split(one_simplex_data, one_simplex_data$simplex_id)
+      one_simplex_data <- lapply(one_simplex_data, collapse_one_simplex_pairs)
+      one_simplex_data <- do.call(rbind, one_simplex_data)
       
-      # Currently, can't adjust alpha of zero- and one-skeleton
-      # If overplotting is an issue, set one_skeleton = FALSE
+      # Currently, can't adjust alpha of zero- and one-simplexes
+      # If overplotting is an issue, set one_simplexes = "none"
       # (Similar to geom_density)
-      grobs$one_skeleton <- grid::segmentsGrob(
-        one_skeleton_data$x, one_skeleton_data$y,
-        one_skeleton_data$xend, one_skeleton_data$yend,
+      grobs$one_simplex <- grid::segmentsGrob(
+        one_simplex_data$x, one_simplex_data$y,
+        one_simplex_data$xend, one_simplex_data$yend,
         default.units = "native",
         gp = grid::gpar(
-          # col = alpha(one_skeleton_data$colour, one_skeleton_data$alpha),
-          # fill = alpha(one_skeleton_data$fill, one_skeleton_data$alpha),
-          col = one_skeleton_data$colour,
-          fill = one_skeleton_data$fill,
-          lwd = one_skeleton_data$linewidth * .pt,
-          lty = one_skeleton_data$linetype,
+          # col = alpha(one_simplex_data$colour, one_simplex_data$alpha),
+          # fill = alpha(one_simplex_data$fill, one_simplex_data$alpha),
+          col = one_simplex_data$colour,
+          fill = one_simplex_data$fill,
+          lwd = one_simplex_data$linewidth * .pt,
+          lty = one_simplex_data$linetype,
           lineend = lineend,
           linejoin = linejoin
         ),
@@ -291,27 +275,26 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
       
     }
     
-    
-    # Drawing the 0-skeleton -----
-    if (zero_skeleton) {
+    # Drawing the 0-simplexes -----
+    if (nrow(zero_simplex_data) > 0) {
       
-      stroke_size <- zero_skeleton_data$stroke
+      stroke_size <- zero_simplex_data$stroke
       stroke_size[is.na(stroke_size)] <- 0
       
-      # Currently, can't adjust alpha of zero- and one-skeleton
-      # If overplotting is an issue, set zero_skeleton = FALSE
+      # Currently, can't adjust alpha of zero- and one-simplexes
+      # If overplotting is an issue, set zero_simplexes = FALSE
       # (Similar to geom_density)
-      grobs$zero_skeleton <- grid::pointsGrob(
-        zero_skeleton_data$x, zero_skeleton_data$y,
-        pch = zero_skeleton_data$shape,
+      grobs$zero_simplex_data <- grid::pointsGrob(
+        zero_simplex_data$x, zero_simplex_data$y,
+        pch = zero_simplex_data$shape,
         gp = grid::gpar(
-          col = zero_skeleton_data$colour,
-          fill = zero_skeleton_data$fill,
-          # col = alpha(zero_skeleton_data$colour, zero_skeleton_data$alpha),
-          # fill = alpha(zero_skeleton_data$fill, zero_skeleton_data$alpha),
+          col = zero_simplex_data$colour,
+          fill = zero_simplex_data$fill,
+          # col = alpha(zero_simplex_data$colour, zero_simplex_data$alpha),
+          # fill = alpha(zero_simplex_data$fill, zero_simplex_data$alpha),
           # Stroke is added around the outside of the point
-          fontsize = zero_skeleton_data$size * .pt + stroke_size * .stroke / 2,
-          lwd = zero_skeleton_data$stroke * .stroke / 2
+          fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
+          lwd = zero_simplex_data$stroke * .stroke / 2
         )
       )
       
@@ -337,8 +320,7 @@ GeomSimplicialComplex <- ggproto("GeomSimplicialComplex", Geom,
 #' @export
 geom_simplicial_complex <- function(mapping = NULL, data = NULL,
                                     stat = "SimplicialComplex", position = "identity",
-                                    zero_skeleton = TRUE, one_skeleton = FALSE,
-                                    simplexes = TRUE, outlines = TRUE,
+                                    outlines = TRUE,
                                     ...,
                                     na.rm = FALSE,
                                     show.legend = NA,
@@ -353,8 +335,7 @@ geom_simplicial_complex <- function(mapping = NULL, data = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
-      zero_skeleton = zero_skeleton, one_skeleton = one_skeleton,
-      simplexes = simplexes, outlines = outlines,
+      outlines = outlines,
       ...
     )
   )

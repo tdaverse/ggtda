@@ -14,6 +14,8 @@ stat_simplicial_complex(
   show.legend = NA,
   radius = NULL,
   diameter = NULL,
+  zero_simplexes = "all",
+  one_simplexes = "maximal",
   max_dimension = 10,
   complex = "Rips",
   engine = "simplextree",
@@ -26,9 +28,6 @@ geom_simplicial_complex(
   data = NULL,
   stat = "SimplicialComplex",
   position = "identity",
-  zero_skeleton = TRUE,
-  one_skeleton = FALSE,
-  simplexes = TRUE,
   outlines = TRUE,
   ...,
   na.rm = FALSE,
@@ -73,6 +72,12 @@ display.}
 
 \item{radius, diameter}{The radius or diameter used to construct the simplicial complex.}
 
+\item{zero_simplexes}{One of \code{"none"}, \code{"maximal"}, and \code{"all"} (default).
+Currently, \code{"maximal"} is equivalent to \code{"all"}.}
+
+\item{one_simplexes}{One of \code{"none"}, \code{"maximal"} (default), and \code{"all"}.
+Currently, \code{"maximal"} only works as intended for \code{engine = "simplextree"}.}
+
 \item{max_dimension}{Compute simplexes of dimension up to \code{max_dimension}
 (only relevant for the Vietoris-Rips complex computed with the \code{simplextree} engine).}
 
@@ -93,15 +98,7 @@ to the paired geom/stat.}
 \item{stat}{The statistical transformation to use on the data for this
 layer, as a string.}
 
-\item{zero_skeleton}{Should the 0-skeleton be plotted?}
-
-\item{one_skeleton}{Should the 1-skeleton be plotted?}
-
-\item{simplexes}{Should the >0-simplexes corresponding to the maximal complex
-be plotted?}
-
-\item{outlines}{Should the outlines of polygons representing the simplexes be drawn?
-(Only availabe for \code{engine = "simplextree"}).}
+\item{outlines}{Should the outlines of polygons representing the simplexes be drawn?}
 }
 \description{
 Desc here
@@ -129,7 +126,7 @@ aesthetics are in bold):
 
 \describe{ \item{dim}{The dimension of the corresponding simplex, an ordered factor}}
 \describe{ \item{type}{The type of simplex represented by each row, one of:
-\code{"simplex"}, \code{"simplex_one"}, \code{"zero_skeleton"}, \code{"one_skeleton"}.}}
+\code{"zero_simplex"}, \code{"one_simplex"}, \code{"k_simplex"}.}}
 \describe{ \item{simplex_id}{A set of unique ids for each simplex, for each \code{type}}}
 }
 
