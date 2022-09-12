@@ -192,15 +192,15 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
     
     
   }
-    
   
-  # Not determining maximal 1-simplexes currently, very computationally expensive
-  if (FALSE & one_simplexes == "maximal") {
+
+  # Pair down to maximal simplexes if necessary
+  if (one_simplexes == "maximal") {
     df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (FALSE & zero_simplexes == "maximal") {
-    # TODO: pair down to maximal zero_simplexes via get_maximal_zero_simplexes()
+  if (zero_simplexes == "maximal") {
+    df_zero_simplexes <- get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
   
   rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
@@ -301,16 +301,14 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex,
     
   }
   
-
-  # Not determining maximal 1-simplexes currently, very computationally expensive
-  if (FALSE & one_simplexes == "maximal") {
+  # Pair down to maximal simplexes if necessary
+  if (one_simplexes == "maximal") {
     df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (FALSE & zero_simplexes == "maximal") {
-    # TODO: pair down to maximal zero_simplexes via get_maximal_zero_simplexes()
+  if (zero_simplexes == "maximal") {
+    df_zero_simplexes <- get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
-  
   
   
   rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
@@ -367,23 +365,39 @@ indeces_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1), m = 
   
 }
 
-
-# Get maximal 1-simplexes from edges + faces 
-# Pretty computationally expensive: O(|1-simplexes| x |2-simplexes|)
+# Get maximal one_simplexes from edges + faces (subset of df_one_simplexes)
+# Pretty computationally expensive: O(|1-simplexes| x |2-simplexes|)?
 get_maximal_one_simplexes <- function(edges, faces, df_one_simplexes) {
   
-  df_one_simplexes[apply(edges, 1, is_maximal_one_simplex, faces),]
-    
+  edges_unique <- apply(edges, 1, is_maximal, faces)
+  
+  df_one_simplexes[rep(edges_unique, each = 2),]
+  
 }
 
 # Determine if edge is contained in faces (is edge a maximal simplex)
-is_maximal_one_simplex <- function(edge, faces) {
+is_maximal <- function(edge, faces) {
   
   res <- apply(faces, 1, function(face) all(edge %in% face))
   
   !any(res)
   
 }
+
+
+# Get maximal 0-simplexes from edges + vertices (rows of df_zero_simplexes)
+# This is simple computationally as we can collapse edges into vector of unqiue indices
+get_maximal_zero_simplexes <- function(edges, df_zero_simplexes) {
+  
+  edges_unique <- as.numeric(edges)
+  edges_unique <- unique(edges_unique)
+  
+  df_zero_simplexes[-edges_unique, ]
+  
+}
+
+
+
 
 
 proximate_pairs <- function(data, diameter) {
