@@ -41,7 +41,7 @@
 #' @rdname geom_simplicial_complex
 #'
 #' @import ggplot2
-#' @importFrom simplextree maximal
+# @importFrom simplextree maximal
 #'
 #' @examples
 #'
