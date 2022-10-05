@@ -13,7 +13,13 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   st <- data_to_simplextree(data, diameter, max_dimension, complex)
   
   # Convert simplextree into a list
-  simplexes <- as.list(simplextree::maximal(st))
+  if (.simplextree_version >= "1.0.1") {
+    simplexes <- as.list(simplextree::maximal(st))
+  } else if (.simplextree_version == "0.9.1") {
+    simplexes <- st$serialize()
+  } else {
+    stop("No method available for simplextree v", .simplextree_version)
+  }
   
   # If there are no edges, just return zero-simplexes
   # Otherwise, go on to find one_simplexes + k_simplexes
@@ -126,11 +132,20 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
     edges <- as.data.frame(edges)
     edges <- as.list(edges)
     
-    # Construct the 1-simplexes of the complex as a simplextree
-    st <- simplextree::simplex_tree(edges)
+    # Construct the flag complex as a simplex tree
+    if (.simplextree_version >= "1.0.1") {
+      st <- simplextree::simplex_tree(edges)
+      st <- simplextree::expand(st, k = max_dimension)
+    } else if (.simplextree_version == "0.9.1") {
+      st <- simplextree::simplex_tree()
+      st$insert(edges)
+      st$expand(k = max_dimension)
+    } else {
+      stop("No method available for simplextree v", .simplextree_version)
+    }
     
     # Return flag complex
-    simplextree::expand(st, k = max_dimension)
+    st
     
   } else {
     

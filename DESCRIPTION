@@ -27,9 +27,10 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 2.10),
+    rlang (>= 1.0.0),
     RTriangle,
     ripserr (>= 0.1.1),
-    simplextree,
+    simplextree (>= 0.9.1),
     ggplot2 (>= 3.2.1)
 Suggests:
     tdaunif (>= 0.1.0),
