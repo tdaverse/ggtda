@@ -67,8 +67,9 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   df_one_simplexes <- df_simplexes[df_simplexes$dim == 1,]
   df_k_simplexes <- df_simplexes[!df_simplexes$dim %in% c(0, 1),]
   
-  # If user wants all one-simplexes, overwrite df_one_simplexes
-  if (one_simplexes == "all") {
+  # Overwrite df_one_simplexes to include non-maximal edges
+  # if user wants all one-simplexes or if higher-dim simplexes aren't plotted,
+  if (one_simplexes == "all" | max_dimension == 1) {
     
     # convert matrix of edges into a list
     edges <- apply(st$edges, 1, function(x) x, simplify = FALSE)
@@ -106,11 +107,20 @@ simplicial_complex_simplextree <- function(data, diameter, max_dimension, comple
   # (but can't be NA b/c of scale)
   if (nrow(df_one_simplexes) > 0) {
     df_one_simplexes$type <- "one_simplex"
-    df_one_simplexes$dim <- levels(df_k_simplexes$dim)[1]
+    
+    if (nrow(df_k_simplexes) > 0) {
+      df_one_simplexes$dim <- levels(df_k_simplexes$dim)[1]
+    } else {
+      df_one_simplexes$dim <- ordered(2) # set to 2 if no higher-dim simplexes
+    }
   }
   
   if (nrow(df_zero_simplexes) > 0) {
-    df_zero_simplexes$dim <- levels(df_k_simplexes$dim)[1]
+    if (nrow(df_k_simplexes) > 0) {
+      df_zero_simplexes$dim <- levels(df_k_simplexes$dim)[1]
+    } else {
+      df_one_simplexes$dim <- ordered(2) # set to 2 if no higher-dim simplexes
+    }
   }
   
 
@@ -210,11 +220,12 @@ simplicial_complex_base <- function(data, diameter, max_dimension, complex, zero
   
 
   # Pair down to maximal simplexes if necessary
-  if (one_simplexes == "maximal") {
+  # necessary <=> only want maximal 0/1-simplexes AND no higher-dim simplexes being plotted
+  if (one_simplexes == "maximal" & max_dimension > 1) {
     df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (zero_simplexes == "maximal") {
+  if (zero_simplexes == "maximal" & max_dimension > 0) {
     df_zero_simplexes <- get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
   
@@ -317,11 +328,12 @@ simplicial_complex_RTriangle <- function(data, diameter, max_dimension, complex,
   }
   
   # Pair down to maximal simplexes if necessary
-  if (one_simplexes == "maximal") {
+  # necessary <=> only want maximal 0/1-simplexes AND no higher-dim simplexes being plotted
+  if (one_simplexes == "maximal" & max_dimension > 1) {
     df_one_simplexes <- get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (zero_simplexes == "maximal") {
+  if (zero_simplexes == "maximal" & max_dimension > 0) {
     df_zero_simplexes <- get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
   
@@ -347,7 +359,7 @@ indices_to_data <- function(data, indices = matrix(1:nrow(data), ncol = 1), m = 
   
   if (is.null(m)) m <- ncol(indices)
   
-  # want "flat" vector of indices and for each index to be a column in res
+  # want "flat" vector of indices and for each index to be a row in res
   indices <- as.vector(t(indices))
   res <- data[indices,]
   
