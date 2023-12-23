@@ -72,7 +72,8 @@ rad_val <- 0.1
 # use stat_disk to visualize simplicial complex
 ggplot(unif_df, aes(x = x, y = y)) +
   geom_point() +
-  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  # stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  geom_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   coord_fixed() +
   theme_minimal()
 ```
@@ -84,7 +85,9 @@ Since the 0-skeleton of a Vietoris-Rips complex is not dependent on a specific r
 ```{r vietoris0}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris0() +
+  # stat_vietoris0() +
+  stat_simplicial_complex(radius = .01) +
+  # stat_simplicial_complex(radius = 0) +
   theme_minimal()
 ```
 
@@ -94,17 +97,18 @@ The `alpha` parameter is provided solely for aesthetic purposes.
 It is important to note that while `stat_vietoris1` can be used alone (left panel below), it is often most effective when used in conjunction with `stat_vietoris0` (right panel below).
 
 ```{r vietoris1, fig.show = 'hold'}
-# left panel: stat_vietoris1 alone
-ggplot(unif_df, aes(x = x, y = y)) +
-  coord_fixed() +
-  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
-  theme_minimal()
+# # left panel: stat_vietoris1 alone
+# ggplot(unif_df, aes(x = x, y = y)) +
+#   coord_fixed() +
+#   stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+#   theme_minimal()
 
 # right panel: stat_vietoris1 used with stat_vietoris0
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris0() +
-  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  # stat_vietoris0() +
+  # stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  stat_simplicial_complex(diameter = rad_val * 2, max_dimension = 1L) +
   theme_minimal()
 ```
 
@@ -117,9 +121,11 @@ Note that either parameter can be passed to each stat, and correct values must b
 # combine stat_vietoris1 with stat_disk
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  # stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  geom_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   geom_point() +
-  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  # stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  stat_simplicial_complex(diameter = rad_val * 2, max_dimension = 1L) +
   theme_minimal()
 ```
 
@@ -129,18 +135,19 @@ As was the case with `stat_vietoris1`, while `stat_vietoris2` can be used alone 
 Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.
 
 ```{r vietoris2, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
-# left panel: stat_vietoris2 alone
-ggplot(unif_df, aes(x = x, y = y)) +
-  coord_fixed() +
-  stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
-  theme_minimal()
+# # left panel: stat_vietoris2 alone
+# ggplot(unif_df, aes(x = x, y = y)) +
+#   coord_fixed() +
+#   stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
+#   theme_minimal()
 
 # right panel: stat_vietoris2 in combination with stat_vietoris1 and stat_vietoris0
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris0() +
-  stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
-  stat_vietoris2(diameter = rad_val * 2, alpha = 0.15) +
+  # stat_vietoris0() +
+  # stat_vietoris1(diameter = rad_val * 2, alpha = 0.25) +
+  # stat_vietoris2(diameter = rad_val * 2, alpha = 0.15) +
+  stat_simplicial_complex(diameter = rad_val * 2, max_dimension = 2L) +
   theme_minimal()
 ```
 
@@ -149,8 +156,10 @@ Generally, using `stat_vietoris2` in combination with `stat_disk` creates too mu
 ```{r clutter, fig.height = 5, fig.width = 5}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
-  stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  # stat_vietoris2(diameter = rad_val * 2, alpha = 0.1) +
+  stat_simplicial_complex(diameter = rad_val * 2, max_dimension = 2L) +
+  # stat_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
+  geom_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   theme_minimal()
 ```
 
@@ -168,25 +177,28 @@ diam <- 1.1
 # top left panel: VR with stat_vietoris*
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
-  stat_vietoris1(diameter = diam, alpha = 0.25) +
-  stat_vietoris0() +
+  # stat_vietoris2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
+  # stat_vietoris1(diameter = diam, alpha = 0.25) +
+  # stat_vietoris0() +
+  stat_simplicial_complex(diameter = diam, fill = "darkgoldenrod") +
   ggtitle("Vietoris-Rips complex") +
   theme_minimal()
 
 # top right panel: Čech with stat_cech*
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_cech2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
-  stat_cech1(diameter = diam, alpha = 0.25) +
-  stat_cech0() +
+  # stat_cech2(diameter = diam, fill = "darkgoldenrod", alpha = 0.1) +
+  # stat_cech1(diameter = diam, alpha = 0.25) +
+  # stat_cech0() +
+  stat_simplicial_complex(diameter = diam, fill = "darkgoldenrod", complex = "Cech") +
   ggtitle("Čech complex") +
   theme_minimal()
 
 # bottom left panel: equilateral triangle with stat_disk
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_disk(radius = diam / 2, fill = "blue", alpha = 0.1) +
+  # stat_disk(radius = diam / 2, fill = "blue", alpha = 0.1) +
+  geom_disk(radius = diam / 2, fill = "blue", alpha = 0.1) +
   geom_point() +
   theme_minimal()
 ```
@@ -268,15 +280,17 @@ ggplot(annulus_phom, aes(start = birth, end = death,
 ggplot(annulus_df, aes(x = x, y = y)) +
   geom_point() +
   coord_fixed() +
-  stat_disk(radius = rads[1], fill = "blue", alpha = 0.1) +
+  # stat_disk(radius = rads[1], fill = "blue", alpha = 0.1) +
+  geom_disk(radius = rads[1], fill = "blue", alpha = 0.1) +
   theme_minimal()
 
 # stat_vietoris*
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = diam[1], fill = "darkgoldenrod", alpha = 0.1) +
-  stat_vietoris1(diameter = diam[1], alpha = 0.25) +
-  stat_vietoris0() +
+  # stat_vietoris2(diameter = diam[1], fill = "darkgoldenrod", alpha = 0.1) +
+  # stat_vietoris1(diameter = diam[1], alpha = 0.25) +
+  # stat_vietoris0() +
+  stat_simplicial_complex(diameter = diam[1], fill = "darkgoldenrod") +
   theme_minimal()
 ```
 
@@ -332,15 +346,17 @@ ggplot(annulus_phom, aes(start = birth, end = death,
 ggplot(annulus_df, aes(x = x, y = y)) +
   geom_point() +
   coord_fixed() +
-  stat_disk(radius = rads[2], fill = "blue", alpha = 0.05) +
+  # stat_disk(radius = rads[2], fill = "blue", alpha = 0.05) +
+  geom_disk(radius = rads[2], fill = "blue", alpha = 0.05) +
   theme_minimal()
 
 # stat_vietoris*
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = diam[2], fill = "darkgoldenrod", alpha = 0.1) +
-  stat_vietoris1(diameter = diam[2], alpha = 0.25) +
-  stat_vietoris0() +
+  # stat_vietoris2(diameter = diam[2], fill = "darkgoldenrod", alpha = 0.1) +
+  # stat_vietoris1(diameter = diam[2], alpha = 0.25) +
+  # stat_vietoris0() +
+  stat_simplicial_complex(diameter = diam[2], fill = "darkgoldenrod", max_dimension = 2L) +
   theme_minimal()
 ```
 
@@ -396,14 +412,16 @@ ggplot(annulus_phom, aes(start = birth, end = death,
 ggplot(annulus_df, aes(x = x, y = y)) +
   geom_point() +
   coord_fixed() +
-  stat_disk(radius = rads[3], fill = "blue", alpha = 0.05) +
+  # stat_disk(radius = rads[3], fill = "blue", alpha = 0.05) +
+  geom_disk(radius = rads[3], fill = "blue", alpha = 0.05) +
   theme_minimal()
 
 # stat_vietoris*
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_vietoris2(diameter = diam[3], fill = "darkgoldenrod", alpha = 0.1) +
-  stat_vietoris1(diameter = diam[3], alpha = 0.25) +
-  stat_vietoris0() +
+  # stat_vietoris2(diameter = diam[3], fill = "darkgoldenrod", alpha = 0.1) +
+  # stat_vietoris1(diameter = diam[3], alpha = 0.25) +
+  # stat_vietoris0() +
+  stat_simplicial_complex(diameter = diam[3], fill = "darkgoldenrod", max_dimension = 2L) +
   theme_minimal()
 ```
