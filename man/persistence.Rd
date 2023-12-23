@@ -5,7 +5,6 @@
 \alias{stat_persistence}
 \alias{stat_frontier}
 \alias{geom_fundamental_box}
-\alias{geom_diagonal}
 \title{Persistence diagrams}
 \usage{
 stat_persistence(
@@ -44,23 +43,12 @@ geom_fundamental_box(
   inherit.aes = TRUE,
   ...
 )
-
-geom_diagonal(
-  mapping = NULL,
-  data = NULL,
-  stat = "identity",
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}} or
-\code{\link[ggplot2:aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
-default), it is combined with the default mapping at the top level of the
-plot. You must supply \code{mapping} if there is no plot mapping.}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -81,8 +69,10 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 \code{segment} in \code{geom_vietoris1()} and to \code{polygon} in \code{geom_vietoris2}. Pass
 a string to override the default.}
 
-\item{position}{Position adjustment, either as a string, or the result of
-a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string naming the adjustment
+(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
+position adjustment function. Use the latter if you need to change the
+settings of the adjustment.}
 
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
@@ -105,7 +95,9 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
 \item{stat}{The statistical transformation to use on the data for this
-layer, as a string.}
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
 
 \item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
@@ -135,14 +127,14 @@ death, and dimension.
 
 \section{Persistence diagrams}{
 
+Persistence diagrams recognize extended persistence data, with negative
+birth/death values arising from the relative part of the filtration.
 
 The original persistence diagrams plotted persistence against birth in what
 we call "flat" diagrams, but most plot death against birth in "diagonal"
 diagrams, often with a diagonal line indicating zero persistence.
 
-The convenience layer \code{geom_diagonal()} is appropriate only for the
-"diagonal" layout and accepts no aesthetics. It pairs well with the
-\code{geom_fundamental_box()} layer that renders fundamental boxes at specified
+The \code{geom_fundamental_box()} layer renders fundamental boxes at specified
 time points (Chung & Lawson, 2020).
 }
 
@@ -155,6 +147,8 @@ demarcate the Pareto frontiers of persistence diagrams. They can be
 averaged over the diagrams obtained from multiple data sets designed or
 hypothesized to have been generated from the same underlying topological
 structure.
+
+Persistence landscapes do not currently recognize extended persistence data.
 }
 
 \examples{
@@ -173,7 +167,7 @@ ggplot(toy.data,
   coord_equal() +
   stat_persistence(aes(alpha = after_stat(persistence)),
                    diagram = "diagonal", size = 3) +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = FALSE)
 # diagonal persistence diagram with fundamental boxes
@@ -182,7 +176,7 @@ ggplot(toy.data,
   theme_persist() +
   coord_equal() +
   stat_persistence() +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   geom_fundamental_box(t = c(1.5, 5.5),
                        color = "goldenrod", fill = "goldenrod") +
   lims(x = c(0, 6), y = c(0, 6))

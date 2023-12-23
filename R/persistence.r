@@ -17,14 +17,14 @@
 
 #' @section Persistence diagrams:
 
+#'   Persistence diagrams recognize extended persistence data, with negative
+#'   birth/death values arising from the relative part of the filtration.
 #'
 #'   The original persistence diagrams plotted persistence against birth in what
 #'   we call "flat" diagrams, but most plot death against birth in "diagonal"
 #'   diagrams, often with a diagonal line indicating zero persistence.
 #'
-#'   The convenience layer `geom_diagonal()` is appropriate only for the
-#'   "diagonal" layout and accepts no aesthetics. It pairs well with the
-#'   `geom_fundamental_box()` layer that renders fundamental boxes at specified
+#'   The `geom_fundamental_box()` layer renders fundamental boxes at specified
 #'   time points (Chung & Lawson, 2020).
 #'   
 
@@ -37,6 +37,8 @@
 #'   averaged over the diagrams obtained from multiple data sets designed or
 #'   hypothesized to have been generated from the same underlying topological
 #'   structure.
+#'   
+#'   Persistence landscapes do not currently recognize extended persistence data.
 #'   
 
 #' @template ref-edelsbrunner2000
@@ -102,12 +104,21 @@ StatPersistence <- ggproto(
   compute_panel = function(data, scales,
                            diagram = "diagonal") {
     
-    # points in cartesian coordinates
-    data$x <- data$start
-    data$y <- data$end
+    # points in cartesian coordinates (un-negated from opposite filtration)
+    data$x <- abs(data$start)
+    data$y <- abs(data$end)
     
-    # computed variables
+    # computed variable: `part`
+    data$part <- with(data, {
+      part <- NA_character_
+      part[start >= 0 & end >= 0] <- "ordinary"
+      part[start <  0 & end <  0] <- "relative"
+      part[start >= 0 & end <  0] <- "extended"
+      factor(part, levels = c("ordinary", "relative", "extended"))
+    })
+    # computed variable: `persistence` (infinite for extended points)
     data$persistence <- data$end - data$start
+    data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
     # diagram transformation
     data <- diagram_transform(data, diagram)
@@ -317,72 +328,3 @@ pareto_persistence_base <- function(data) {
 pareto_persistence_rPref <- function(data) {
   rPref::psel(data, rPref::low("start") * rPref::high("end"))
 }
-
-#' @rdname persistence
-#' @export
-geom_diagonal <- function(mapping = NULL,
-                          data = NULL,
-                          stat = "identity",
-                          position = "identity",
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE,
-                          ...) {
-  layer(
-    geom = GeomDiagonal,
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomDiagonal <- ggproto(
-  "GeomDiagonal", GeomAbline,
-  
-  required_aes = c(),
-  default_aes = aes(colour = "black", size = 0.5, linetype = 1, alpha = .75),
-  
-  setup_data = function(data, params) {
-    
-    # keep only columns that are constant throughout the data
-    data <- aggregate(
-      data[, setdiff(names(data), "PANEL"), drop = FALSE],
-      by = data[, "PANEL", drop = FALSE],
-      function(x) if (length(unique(x)) == 1L) unique(x) else NA
-    )
-    data[] <- lapply(data, function(x) if (all(is.na(x))) NULL else x)
-    rownames(data) <- NULL
-    
-    data
-  },
-  
-  draw_panel = function(data, panel_params, coord) {
-    
-    # adapted from `GeomAbline$draw_panel`
-    ranges <- coord$backtransform_range(panel_params)
-    if (coord$clip == "on" && coord$is_linear()) {
-      ranges$x[[2L]] <- ranges$x[[2L]] + diff(ranges$x)
-    }
-    
-    # define two points: the origin, and the largest projection to the diagonal
-    data$x <- 0
-    data$y <- 0
-    data$xend <- ranges$x[[2L]]
-    data$yend <- ranges$x[[2L]]
-    
-    GeomSegment$draw_panel(data, panel_params, coord)
-  },
-  
-  draw_key = draw_key_blank
-)

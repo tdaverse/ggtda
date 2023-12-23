@@ -13,7 +13,7 @@ ggplot(toy.data,
   coord_equal() +
   stat_persistence(aes(alpha = after_stat(persistence)),
                    diagram = "diagonal", size = 3) +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = FALSE)
 # diagonal persistence diagram with fundamental boxes
@@ -22,7 +22,7 @@ ggplot(toy.data,
   theme_persist() +
   coord_equal() +
   stat_persistence() +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   geom_fundamental_box(t = c(1.5, 5.5),
                        color = "goldenrod", fill = "goldenrod") +
   lims(x = c(0, 6), y = c(0, 6))
