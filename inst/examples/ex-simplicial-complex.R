@@ -1,3 +1,36 @@
+set.seed(1)
+
+s <- seq(0, 2*pi, length.out = 40)
+df <- data.frame(
+  x = cos(s) + rnorm(40, 0, .1),
+  y = sin(s) + rnorm(40, 0, .1)
+)
+
+# default, visualizing dim w/ alpha:
+ggplot(df, aes(x, y)) +
+  geom_simplicial_complex(radius = .4)
+
+# visualizing dim w/ fill:
+ggplot(df, aes(x, y)) +
+  geom_simplicial_complex(
+    mapping = aes(fill = after_stat(dim)),
+    alpha = .5, radius = .4
+  )
+
+# Visualizing multiple groups together
+s <- c(s, s)
+df_mix <- data.frame(
+  x = cos(s) + rnorm(80, 0, .1),
+  y = sin(s) + rnorm(80, 0, .1)
+)
+
+df_mix$x <- df_mix$x + rep(c(-2, 2), length.out = 80)
+df_mix$lab <- rep(c("a", "b"), length.out = 80)
+
+ggplot(df_mix, aes(x, y, fill = lab)) +
+  geom_simplicial_complex(radius = .4)
+
+# FIXME: incorporate or remove old examples below
 
 # function to generate noisy 2D circles
 make_noisy_circle <- function(n, sd = .01) {

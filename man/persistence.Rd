@@ -140,7 +140,6 @@ time points (Chung & Lawson, 2020).
 
 \section{Persistence landscapes}{
 
-
 Persistence landscapes, anticipated by some alternative coordinatizations
 of persistence diagrams, were proposed as Lipschitz functions that
 demarcate the Pareto frontiers of persistence diagrams. They can be
@@ -148,7 +147,8 @@ averaged over the diagrams obtained from multiple data sets designed or
 hypothesized to have been generated from the same underlying topological
 structure.
 
-Persistence landscapes do not currently recognize extended persistence data.
+Persistence landscapes do not currently recognize extended persistence
+data.
 }
 
 \examples{

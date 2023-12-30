@@ -30,15 +30,15 @@
 
 #' @section Persistence landscapes:
 
-#'
 #'   Persistence landscapes, anticipated by some alternative coordinatizations
 #'   of persistence diagrams, were proposed as Lipschitz functions that
 #'   demarcate the Pareto frontiers of persistence diagrams. They can be
 #'   averaged over the diagrams obtained from multiple data sets designed or
 #'   hypothesized to have been generated from the same underlying topological
 #'   structure.
-#'   
-#'   Persistence landscapes do not currently recognize extended persistence data.
+#'
+#'   Persistence landscapes do not currently recognize extended persistence
+#'   data.
 #'   
 
 #' @template ref-edelsbrunner2000
@@ -64,33 +64,7 @@
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
 #' @example inst/examples/ex-persistence.R
-
-#' @rdname persistence
-#' @export
-stat_persistence <- function(mapping = NULL,
-                             data = NULL,
-                             geom = "point",
-                             position = "identity",
-                             diagram = "diagonal",
-                             na.rm = FALSE,
-                             show.legend = NA,
-                             inherit.aes = TRUE,
-                             ...) {
-  layer(
-    stat = StatPersistence,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      diagram = diagram,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
+NULL
 
 #' @rdname ggtda-ggproto
 #' @format NULL
@@ -101,8 +75,10 @@ StatPersistence <- ggproto(
   
   required_aes = c("start", "end"),
   
-  compute_panel = function(data, scales,
-                           diagram = "diagonal") {
+  compute_panel = function(
+    data, scales,
+    diagram = "diagonal"
+  ) {
     
     # points in cartesian coordinates (un-negated from opposite filtration)
     data$x <- abs(data$start)
@@ -130,17 +106,17 @@ StatPersistence <- ggproto(
 
 #' @rdname persistence
 #' @export
-stat_frontier <- function(mapping = NULL,
-                          data = NULL,
-                          geom = "line",
-                          position = "identity",
-                          diagram = "diagonal",
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE,
-                          ...) {
+stat_persistence <- function(mapping = NULL,
+                             data = NULL,
+                             geom = "point",
+                             position = "identity",
+                             diagram = "diagonal",
+                             na.rm = FALSE,
+                             show.legend = NA,
+                             inherit.aes = TRUE,
+                             ...) {
   layer(
-    stat = StatFrontier,
+    stat = StatPersistence,
     data = data,
     mapping = mapping,
     geom = geom,
@@ -200,27 +176,25 @@ StatFrontier <- ggproto(
 
 #' @rdname persistence
 #' @export
-geom_fundamental_box <- function(mapping = NULL,
-                                 data = NULL,
-                                 stat = "identity",
-                                 position = "identity",
-                                 diagram = "diagonal",
-                                 t = NULL,
-                                 na.rm = FALSE,
-                                 show.legend = NA,
-                                 inherit.aes = TRUE,
-                                 ...) {
+stat_frontier <- function(mapping = NULL,
+                          data = NULL,
+                          geom = "line",
+                          position = "identity",
+                          diagram = "diagonal",
+                          na.rm = FALSE,
+                          show.legend = NA,
+                          inherit.aes = TRUE,
+                          ...) {
   layer(
-    geom = GeomFundamentalBox,
+    stat = StatFrontier,
     data = data,
     mapping = mapping,
-    stat = stat,
+    geom = geom,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
       diagram = diagram,
-      t = t,
       na.rm = na.rm,
       ...
     )
@@ -295,6 +269,37 @@ GeomFundamentalBox <- ggproto(
   
   draw_key = draw_key_blank
 )
+
+#' @rdname persistence
+#' @export
+geom_fundamental_box <- function(mapping = NULL,
+                                 data = NULL,
+                                 stat = "identity",
+                                 position = "identity",
+                                 diagram = "diagonal",
+                                 t = NULL,
+                                 na.rm = FALSE,
+                                 show.legend = NA,
+                                 inherit.aes = TRUE,
+                                 ...) {
+  layer(
+    geom = GeomFundamentalBox,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      diagram = diagram,
+      t = t,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+# Helper functions ---------------------------------------------------------
 
 diagram_transform <- function(data, diagram) {
   switch(
