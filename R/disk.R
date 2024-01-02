@@ -40,7 +40,7 @@
 #' @param diameter A positive number; the diameter of the disk to render around
 #'   each point.
 #' @param segments The number of segments to be used in drawing each disk.
-#' @example inst/examples/ex-layer-disk.r
+#' @example inst/examples/ex-disk.r
 #' @family plot layers for point clouds
 #' @seealso [ggplot2::layer()] for additional arguments.
 NULL
