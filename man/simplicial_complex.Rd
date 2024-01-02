@@ -17,7 +17,7 @@ stat_simplicial_complex(
   one_simplexes = "maximal",
   max_dimension = 10,
   complex = "Rips",
-  engine = "simplextree",
+  engine = NULL,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,

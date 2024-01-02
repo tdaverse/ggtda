@@ -99,7 +99,7 @@ StatSimplicialComplex <-  ggproto(
     
     # logic to deduce reasonable values of engine
     # + issue warnings when choices are incompatible
-    engine <- match.arg(engine, c("Vietoris", "Rips", "Cech", "alpha"))
+    complex <- match.arg(complex, c("Vietoris", "Rips", "Cech", "alpha"))
     engine <- assign_complex_engine(complex, engine, max_dimension)
     
     res <- switch(
@@ -130,15 +130,6 @@ StatSimplicialComplex <-  ggproto(
     }
     
     # make a factor variable for high-dimensional simplices
-    # if (max(res$dim >= 2L)) {
-    #   res$face <- factor(
-    #     as.character(res$dim),
-    #     levels = as.character(seq(2L, max(c(2L, res$dim))))
-    #   )
-    #   res$face[res$dim < 2L] <- "2"
-    # } else {
-    #   res$face <- NA_character_
-    # }
     if (max(res$dim >= 2L)) {
       res$face <- as.character(ifelse(res$dim < 2L, 2L, res$dim))
     } else {
@@ -161,12 +152,12 @@ stat_simplicial_complex <- function(mapping = NULL,
                                     geom = "SimplicialComplex",
                                     position = "identity",
                                     radius = NULL,
-                                    diameter = NULL, 
+                                    diameter = NULL,
                                     zero_simplexes = "all",
                                     one_simplexes = "maximal",
                                     max_dimension = 10,
                                     complex = "Rips",
-                                    engine = "simplextree", 
+                                    engine = NULL,
                                     na.rm = FALSE,
                                     show.legend = NA,
                                     inherit.aes = TRUE,
