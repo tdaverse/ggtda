@@ -8,10 +8,8 @@ NULL
 #' A *ggplot2* Extension for Persistence Data
 #'
 #' *ggtda* is a user-friendly *ggplot2* extension for visualizing data arising
-#' from topological data analysis pipelines, in particular persistence data.
-#' Once persistent homology as been computed, *tidyverse* useRs can efficiently
-#' visualize the persistence of features within the "layered grammar of
-#' graphics" framework of *ggplot2*.
+#' from topological data analysis, including persistence data and topological
+#' constructions on planar data.
 #'
 #' @import ggplot2
 #' @name ggtda
