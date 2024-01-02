@@ -66,9 +66,9 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
-\item{radius, diameter}{The radius or diameter used to construct the
-simplicial complex. Provide only one of these; if neither is provided,
-they default to zero.}
+\item{radius, diameter}{The (positive) radius or diameter used in the
+construction. Provide only one of these; if neither is provided, they
+default to zero.}
 
 \item{zero_simplexes}{Which 0-simplices (vertices) to plot; one of \code{"none"},
 \code{"maximal"}, and \code{"all"} (default).}
@@ -173,8 +173,9 @@ aesthetics (required aesthetics are in bold):
 \item \strong{\code{dim}}
 \item \strong{\code{id}}
 \item \code{group}
-\item \code{size}
+\item \code{linewidth}
 \item \code{linetype}
+\item \code{size}
 \item \code{colour}
 \item \code{fill}
 \item \code{alpha}
@@ -276,5 +277,8 @@ ggplot(d, aes(x, y)) +
 }
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
+
+Other plot layers for point clouds: 
+\code{\link{disk}}
 }
-\concept{plot layers for constructions on 2-D point clouds}
+\concept{plot layers for point clouds}

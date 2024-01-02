@@ -23,7 +23,7 @@
 #'   - **`x`**
 #'   - **`y`**
 #'   - `group`
-#'   - `size`
+#'   - `linewidth`
 #'   - `linetype`
 #'   - `colour`
 #'   - `fill`
@@ -32,47 +32,18 @@
 
 #' @name disk
 #' @import ggplot2
+#' @family plot layers for point clouds
+#' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @param na.rm Logical; ignored.
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param radius A positive number; the radius of the disk to render around each
-#'   point.
-#' @param diameter A positive number; the diameter of the disk to render around
-#'   each point.
-#' @param segments The number of segments to be used in drawing each disk.
+#' @param radius,diameter The (positive) radius or diameter used in the
+#'   construction. Provide only one of these; if neither is provided, they
+#'   default to zero.
+#' @param segments The number of segments in the regular polygon that
+#'   approximates each disk
 #' @example inst/examples/ex-disk.r
-#' @family plot layers for point clouds
-#' @seealso [ggplot2::layer()] for additional arguments.
 NULL
-
-#' @rdname disk
-#' @export
-geom_disk <- function(mapping = NULL,
-                      data = NULL,
-                      stat = "identity",
-                      position = "identity",
-                      na.rm = FALSE,
-                      radius = NULL, diameter = NULL,
-                      segments = 60L,
-                      show.legend = NA,
-                      inherit.aes = TRUE,
-                      ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    geom = GeomDisk,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      segments = segments,
-      ...
-    )
-  )
-}
 
 #' @rdname ggtda-ggproto
 #' @usage NULL
@@ -83,7 +54,7 @@ GeomDisk <- ggproto(
   required_aes = c("x", "y"),
   
   default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
-                    size = 0.5, linetype = 1),
+                    linewidth = 0.5, linetype = 1),
   
   setup_params = function(data, params) {
     
@@ -146,10 +117,44 @@ GeomDisk <- ggproto(
       gp = grid::gpar(
         col = data$colour, 
         fill = alpha(data$fill, data$alpha), 
-        lwd = data$size * .pt, lty = data$linetype
+        lwd = (data$linewidth %||% data$size) * .pt,
+        lty = data$linetype
       )
     )
     grob$name <- grid::grobName(grob, "disk")
     grob
-  }
+  },
+  
+  # https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/
+  non_missing_aes = "size",
+  rename_size = TRUE
 )
+
+#' @rdname disk
+#' @export
+geom_disk <- function(mapping = NULL,
+                      data = NULL,
+                      stat = "identity",
+                      position = "identity",
+                      na.rm = FALSE,
+                      radius = NULL, diameter = NULL,
+                      segments = 60L,
+                      show.legend = NA,
+                      inherit.aes = TRUE,
+                      ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomDisk,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      radius = radius, diameter = diameter,
+      segments = segments,
+      ...
+    )
+  )
+}

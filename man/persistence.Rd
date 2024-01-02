@@ -149,7 +149,7 @@ aesthetics are in bold):
 \item \strong{\code{x}}
 \item \strong{\code{y}}
 \item \code{group}
-\item \code{size}
+\item \code{linewidth}
 \item \code{linetype}
 \item \code{colour}
 \item \code{fill}
@@ -158,7 +158,6 @@ aesthetics are in bold):
 }
 
 \examples{
-#####EXAMPLE 1#####
 
 # toy example
 toy.data <- data.frame(
@@ -192,8 +191,6 @@ ggplot(toy.data,
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
 
-#####EXAMPLE 2#####
-
 # load library and generate dataset for comprehensive example
 library("ripserr")
 # noisy unit circle (Betti-1 number = 1)
@@ -217,6 +214,7 @@ ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_persistence(diagram = "diagonal") +
   theme_persist()
+
 # toy extended persistence data, adapted from Carriere & Oudot (2015)
 eph.data <- data.frame(
   dimension = c(0L, 1L, 0L, 1L),

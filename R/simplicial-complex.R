@@ -60,8 +60,9 @@
 #'   - **`dim`**
 #'   - **`id`**
 #'   - `group`
-#'   - `size`
+#'   - `linewidth`
 #'   - `linetype`
+#'   - `size`
 #'   - `colour`
 #'   - `fill`
 #'   - `alpha`
@@ -69,13 +70,11 @@
 
 #' @name simplicial_complex
 #' @import ggplot2
-#' @family plot layers for constructions on 2-D point clouds
+#' @family plot layers for point clouds
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::geom_point
 #' @inheritParams ggplot2::stat_identity
-#' @param radius,diameter The radius or diameter used to construct the
-#'   simplicial complex. Provide only one of these; if neither is provided,
-#'   they default to zero.
+#' @inheritParams disk
 #' @param max_dimension Compute simplexes of dimension up to `max_dimension`
 #'   (only relevant for the Vietoris--Rips complex computed with the
 #'   `simplextree` engine).
@@ -343,7 +342,7 @@ GeomSimplicialComplex <- ggproto(
           # col = alpha(zero_simplex_data$colour, zero_simplex_data$alpha),
           # fill = alpha(zero_simplex_data$fill, zero_simplex_data$alpha),
           # Stroke is added around the outside of the point
-          fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
+          # fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
           lwd = zero_simplex_data$stroke * .stroke / 2
         )
       )
@@ -356,7 +355,7 @@ GeomSimplicialComplex <- ggproto(
  
   default_aes = aes(colour = "black", fill = "grey30", alpha = NA,
                     linewidth = 0.5, linetype = 1,
-                    shape = 21, size = 1.5, stroke = .5),
+                    shape = 21L, size = 1.5, stroke = .5),
   
   required_aes = c("x", "y", "id", "dim"),
   

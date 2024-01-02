@@ -15,7 +15,7 @@
 \format{
 An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{GeomDisk} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
+An object of class \code{GeomDisk} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 8.
 
 An object of class \code{StatFrontier} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 

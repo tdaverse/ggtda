@@ -56,7 +56,7 @@
 #'   - **`x`**
 #'   - **`y`**
 #'   - `group`
-#'   - `size`
+#'   - `linewidth`
 #'   - `linetype`
 #'   - `colour`
 #'   - `fill`
@@ -157,7 +157,7 @@ GeomFundamentalBox <- ggproto(
   
   required_aes = c(),
   default_aes = aes(colour = "black", fill = "grey",
-                    size = 0.5, linetype = 1, alpha = .25),
+                    linewidth = 0.5, linetype = 1, alpha = .25),
   
   setup_data = function(data, params) {
     
@@ -214,7 +214,11 @@ GeomFundamentalBox <- ggproto(
     grob
   },
   
-  draw_key = draw_key_blank
+  draw_key = draw_key_blank,
+  
+  # https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/
+  non_missing_aes = "size",
+  rename_size = TRUE
 )
 
 #' @rdname persistence

@@ -52,13 +52,12 @@ settings of the adjustment.}
 
 \item{na.rm}{Logical; ignored.}
 
-\item{radius}{A positive number; the radius of the disk to render around each
-point.}
+\item{radius, diameter}{The (positive) radius or diameter used in the
+construction. Provide only one of these; if neither is provided, they
+default to zero.}
 
-\item{diameter}{A positive number; the diameter of the disk to render around
-each point.}
-
-\item{segments}{The number of segments to be used in drawing each disk.}
+\item{segments}{The number of segments in the regular polygon that
+approximates each disk}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -96,7 +95,7 @@ aesthetics (required aesthetics are in bold):
 \item \strong{\code{x}}
 \item \strong{\code{y}}
 \item \code{group}
-\item \code{size}
+\item \code{linewidth}
 \item \code{linetype}
 \item \code{colour}
 \item \code{fill}
@@ -134,5 +133,8 @@ ggplot(d, aes(x = x, y = y)) +
 }
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
+
+Other plot layers for point clouds: 
+\code{\link{simplicial_complex}}
 }
 \concept{plot layers for point clouds}
