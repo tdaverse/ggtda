@@ -89,6 +89,21 @@ points from a cloud.
 The convenience function \code{geom_disk()} produces a layer with the identity
 statistical transformation.
 }
+\section{Aesthetics}{
+ \code{geom_disk()} understands the following
+aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}
+\item \strong{\code{y}}
+\item \code{group}
+\item \code{size}
+\item \code{linetype}
+\item \code{colour}
+\item \code{fill}
+\item \code{alpha}
+}
+}
+
 \examples{
 
 # function to generate noisy 2D circles

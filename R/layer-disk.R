@@ -4,9 +4,9 @@
 #'
 #' @details
 #'
-#' A _ball_ of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
+#' A *ball* of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
 #' of all points whose distances from \eqn{x} are less than \eqn{r}. A ball in 2
-#' dimensions is called a _disk_.
+#' dimensions is called a *disk*.
 #'
 #' The geometric objects of `GeomDisk` can be used to illustrate disk covers of
 #' point clouds, in particular in the construction of simplicial filtrations. It
@@ -15,6 +15,19 @@
 #'
 #' The convenience function `geom_disk()` produces a layer with the identity
 #' statistical transformation.
+#' 
+
+#' @section Aesthetics: `geom_disk()` understands the following
+#'   aesthetics (required aesthetics are in bold):
+#'
+#'   - **`x`**
+#'   - **`y`**
+#'   - `group`
+#'   - `size`
+#'   - `linetype`
+#'   - `colour`
+#'   - `fill`
+#'   - `alpha`
 #' 
 
 #' @name disk

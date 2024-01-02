@@ -65,9 +65,9 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use display the data; defaults to
-\code{segment} in \code{geom_vietoris1()} and to \code{polygon} in \code{geom_vietoris2}. Pass
-a string to override the default.}
+\item{geom}{The geometric object to use display the data; defaults to \code{point}
+in \code{stat_persistence()} and to \code{line} in \code{stat_frontier}. Pass a string to
+override the default.}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
@@ -149,6 +149,37 @@ structure.
 
 Persistence landscapes do not currently recognize extended persistence
 data.
+}
+
+\section{Computed variables}{
+ \code{stat_persistence()} and \code{stat_frontier()}
+calculate the following aesthetics that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\itemize{
+\item \code{after_stat(persistence)} \cr
+(double) difference between birth and death values.
+}
+}
+
+\section{Aesthetics}{
+ \code{stat_persistence()} and \code{stat_frontier()} require the
+following aesthetics:
+\itemize{
+\item \strong{\code{start}}
+\item \strong{\code{end}}
+}
+
+\code{geom_fundamental_box()} understands the following aesthetics (required
+aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}
+\item \strong{\code{y}}
+\item \code{group}
+\item \code{size}
+\item \code{linetype}
+\item \code{colour}
+\item \code{fill}
+\item \code{alpha}
+}
 }
 
 \examples{

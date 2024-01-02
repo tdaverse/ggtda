@@ -95,6 +95,16 @@ in persistence diagrams, barcodes often separate segments corresponding to
 features of different dimension, by vertical grouping or by faceting.
 }
 
+\section{Aesthetics}{
+ \code{geom_barcode()} understands the following aesthetics (required
+aesthetics are in bold):
+\itemize{
+\item \strong{\code{start} or \code{xmin}}
+\item \strong{\code{end} or \code{xmax}}
+\item other aesthetics used by \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
+}
+}
+
 \examples{
 #####EXAMPLE 1#####
 

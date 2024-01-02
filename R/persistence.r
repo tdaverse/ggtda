@@ -48,6 +48,33 @@
 #' @template ref-chung2020
 #'   
 
+#' @section Computed variables: `stat_persistence()` and `stat_frontier()`
+#'   calculate the following aesthetics that can be accessed with [delayed
+#'   evaluation][ggplot2::aes_eval]:
+#'
+#'   - `after_stat(persistence)` \cr
+#'   (double) difference between birth and death values.
+#' 
+
+#' @section Aesthetics: `stat_persistence()` and `stat_frontier()` require the
+#'   following aesthetics:
+#'
+#'   - **`start`**
+#'   - **`end`**
+#'
+#'   `geom_fundamental_box()` understands the following aesthetics (required
+#'   aesthetics are in bold):
+#'
+#'   - **`x`**
+#'   - **`y`**
+#'   - `group`
+#'   - `size`
+#'   - `linetype`
+#'   - `colour`
+#'   - `fill`
+#'   - `alpha`
+#' 
+
 #' @name persistence
 #' @import ggplot2
 #' @family plot layers for persistence data
@@ -57,9 +84,9 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param geom The geometric object to use display the data; defaults to
-#'   `segment` in `geom_vietoris1()` and to `polygon` in `geom_vietoris2`. Pass
-#'   a string to override the default.
+#' @param geom The geometric object to use display the data; defaults to `point`
+#'   in `stat_persistence()` and to `line` in `stat_frontier`. Pass a string to
+#'   override the default.
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.

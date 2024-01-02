@@ -26,6 +26,15 @@
 #' @template ref-carlsson2014
 #' @template ref-chazal2017
 #'
+
+#' @section Aesthetics: `geom_barcode()` understands the following aesthetics (required
+#'   aesthetics are in bold):
+#'
+#'   - **`start` or `xmin`**
+#'   - **`end` or `xmax`**
+#'   - other aesthetics used by [ggplot2::geom_segment()]
+#' 
+
 #' @name barcode
 #' @import ggplot2
 #' @family plot layers for persistence data

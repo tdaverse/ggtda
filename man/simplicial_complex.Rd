@@ -115,43 +115,41 @@ Construct and plot simplicial complexes that equal or
 approximate the topology of a ball cover of a set of points.
 }
 \details{
-Persistent homology is ultimately based on the topological
-properties of regions containing a set of points. When the region is the
-union of balls of a common radius, its homology is equal to or approximated
-by that of several families of \strong{simplicial complexes} constructed on the
-point set. The simplicial complex stat constructs these simplicial
-complexes for a set of points in \eqn{xy}-space while the geom plots them
-on the same coordinates as the points.
+Persistent homology is ultimately based on the topological properties of
+regions containing a set of points. When the region is the union of balls of
+a common radius, its homology is equal to or approximated by that of several
+families of \emph{simplicial complexes} constructed on the point set. The
+simplicial complex stat constructs these simplicial complexes for a set of
+points in \eqn{xy}-space while the geom plots them on the same coordinates as
+the points.
 }
+\section{Computed variables}{
+ \code{stat_simplicial_complex()} calculates the
+following aesthetics that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\itemize{
+\item \code{after_stat(dim)} \cr
+(integer) dimension of the corresponding simplex.
+\item \code{after_stat(id)} \cr
+(integer) simplex identifiers within each \code{dim}.
+\item \code{after_stat(face)} \cr
+(factor) encoding of \code{dim} for high-dimensional simplices (\code{dim >= 2L}).
+}
+}
+
 \section{Aesthetics}{
  \code{geom_simplicial_complex()} understands the following
 aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{x}
-\item \strong{y}
-\item \strong{dim}
-\item \strong{face}
-\item \strong{id}
-\item alpha
-\item color
-\item fill
-\item group
-\item linetype
-\item size
-}
-}
-
-\section{Computed variables}{
- These are calculated by the 'stat' part of
-layers and can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
-\itemize{
-\item \code{after_stat(dim)}
-The integer dimension of the corresponding simplex.
-\item \code{after_stat(face)}
-A factor encoding of the dimensions of the high-dimensional simplices
-(\code{dim >= 2L}).
-\item \code{after_stat(id)}
-A set of unique simplex identifiers within each \code{dim}.
+\item \strong{\code{x}}
+\item \strong{\code{y}}
+\item \strong{\code{dim}}
+\item \strong{\code{id}}
+\item \code{group}
+\item \code{size}
+\item \code{linetype}
+\item \code{colour}
+\item \code{fill}
+\item \code{alpha}
 }
 }
 

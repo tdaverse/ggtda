@@ -140,7 +140,7 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
   
 }
 
-## Base 
+## base 
 # These should probably be factored out more cleanly
 # Currently, an if statement for each complex
 simplicial_complex_base <- function(
