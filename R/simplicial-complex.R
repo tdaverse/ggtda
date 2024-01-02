@@ -15,6 +15,31 @@
 #' the points.
 #' 
 
+#' @section Complexes:
+
+#'   A *Vietoris--Rips complex* of a point cloud is the simplicial complex
+#'   consisting of a simplex for each subset of points within a fixed diameter
+#'   of each other. A *Čech complex* contains the simplex for each subset that
+#'   lies within a circle of fixed diameter. (This means that the Čech complex
+#'   depends on the geometry of the ambient space containing the point cloud,
+#'   while the Vietoris complex depends only on the inter-point distances.
+#'   Moreover, a Vietoris complex contains the Čech complex of the same
+#'   diameter.) An *alpha complex* comprises those simplices of the Delaunay
+#'   triangulation within a fixed diameter.
+#'
+#'   {**ggtda**} relies on three engines to compute simplicial complexes, which
+#'   can be specified to the `engine` parameter: Vietoris--Rips and Čech
+#'   complexes are implemented in base R (`"base"`), which is slow but allows
+#'   the package to stand alone for small cases. [RTriangle::triangulate()] is
+#'   used to compute the Delaunay triangulation for alpha complexes
+#'   (`"RTriangle"`), without inserting Steiner points (so that the vertices of
+#'   the triangulation are among those of the data). Finally, the highly
+#'   optimized package
+#'   **[simplextree][simplextree::simplextree-package]** can be called
+#'   to compute Vietoris--Rips complexes (`"simplextree"`). As other complexes
+#'   are implemented in {**simplextree**}, they will be made available here.
+#'   
+
 #' @section Computed variables: `stat_simplicial_complex()` calculates the
 #'   following aesthetics that can be accessed with [delayed
 #'   evaluation][ggplot2::aes_eval]:
@@ -49,16 +74,19 @@
 #' @inheritParams ggplot2::geom_point
 #' @inheritParams ggplot2::stat_identity
 #' @param radius,diameter The radius or diameter used to construct the
-#'   simplicial complex.
+#'   simplicial complex. Provide only one of these; if neither is provided,
+#'   they default to zero.
 #' @param max_dimension Compute simplexes of dimension up to `max_dimension`
-#'   (only relevant for the Vietoris-Rips complex computed with the
+#'   (only relevant for the Vietoris--Rips complex computed with the
 #'   `simplextree` engine).
-#' @param complex The type of complex to compute (either `"Vietoris"`, `"Rips"`,
-#'   `"Cech"`, or `"alpha"`).
-#' @param engine What computational engine to use. Reasonable defaults are
-#'   chosen based on `complex`.
-#' @param zero_simplexes One of `"none"`, `"maximal"`, and `"all"` (default).
-#' @param one_simplexes One of `"none"`, `"maximal"` (default), and `"all"`.
+#' @param complex The type of complex to compute, either `"Vietoris"`, `"Rips"`,
+#'   `"Cech"`, or `"alpha"`.
+#' @param engine The computational engine to use (see 'Details'). Reasonable
+#'   defaults are chosen based on `complex`.
+#' @param zero_simplexes Which 0-simplices (vertices) to plot; one of `"none"`,
+#'   `"maximal"`, and `"all"` (default).
+#' @param one_simplexes Which 1-simplices (edges) to plot; one of `"none"`,
+#'   `"maximal"` (default), and `"all"`.
 #' @param outlines Should the outlines of polygons representing high-dimensional
 #'   simplexes be drawn?
 #' @example inst/examples/ex-simplicial-complex.R
