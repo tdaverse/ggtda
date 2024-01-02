@@ -8,9 +8,10 @@ draw_key_simplex <- function(data, params, size) {
   
   lwd <- min(data$linewidth, min(size) / 4)
   
-  grid::rectGrob(
-    width = unit(1, "npc") - unit(lwd, "mm"),
-    height = unit(1, "npc") - unit(lwd, "mm"),
+  grid::polygonGrob(
+    # equilateral triangle concentric with the unit square
+    x = c(.25 * (2 - sqrt(3)), .5, .25 * (2 + sqrt(3))),
+    y = c(.25, 1, .25),
     gp = grid::gpar(
       col = data$colour,
       fill = alpha(data$fill %||% "grey40", data$alpha),
