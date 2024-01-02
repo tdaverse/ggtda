@@ -3,7 +3,6 @@
 \name{persistence}
 \alias{persistence}
 \alias{stat_persistence}
-\alias{stat_frontier}
 \alias{geom_fundamental_box}
 \title{Persistence diagrams}
 \usage{
@@ -11,18 +10,6 @@ stat_persistence(
   mapping = NULL,
   data = NULL,
   geom = "point",
-  position = "identity",
-  diagram = "diagonal",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
-stat_frontier(
-  mapping = NULL,
-  data = NULL,
-  geom = "line",
   position = "identity",
   diagram = "diagonal",
   na.rm = FALSE,
@@ -65,9 +52,8 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use display the data; defaults to \code{point}
-in \code{stat_persistence()} and to \code{line} in \code{stat_frontier}. Pass a string to
-override the default.}
+\item{geom}{The geometric object to use display the data; defaults to
+\code{point}. Pass a string to override the default.}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
@@ -106,10 +92,9 @@ Visualize persistence data in a (flat, diagonal, or landscape)
 persistence diagram.
 }
 \details{
-\emph{Persistence diagrams} are
+{\emph{Persistence diagrams}} are
 \href{https://ggplot2.tidyverse.org/reference/geom_point.html}{scatterplots} of
-persistence data. \emph{Persistence landscapes} can be understood as rotated
-diagonal persistence diagrams.
+persistence data.
 }
 \section{Persistence data}{
 
@@ -138,31 +123,21 @@ The \code{geom_fundamental_box()} layer renders fundamental boxes at specified
 time points (Chung & Lawson, 2020).
 }
 
-\section{Persistence landscapes}{
-
-Persistence landscapes, anticipated by some alternative coordinatizations
-of persistence diagrams, were proposed as Lipschitz functions that
-demarcate the Pareto frontiers of persistence diagrams. They can be
-averaged over the diagrams obtained from multiple data sets designed or
-hypothesized to have been generated from the same underlying topological
-structure.
-
-Persistence landscapes do not currently recognize extended persistence
-data.
-}
-
 \section{Computed variables}{
- \code{stat_persistence()} and \code{stat_frontier()}
-calculate the following aesthetics that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+
+\code{stat_persistence()} calculates the following aesthetics that can be accessed
+with \link[ggplot2:aes_eval]{delayed evaluation}:
 \itemize{
 \item \code{after_stat(persistence)} \cr
-(double) difference between birth and death values.
+(double) difference between birth and death values of features.
+\item \code{after_stat(part)} \cr
+(factor) whether features belong to ordinary, relative, or extended homology.
 }
 }
 
 \section{Aesthetics}{
- \code{stat_persistence()} and \code{stat_frontier()} require the
-following aesthetics:
+
+\code{stat_persistence()} requires the following aesthetics:
 \itemize{
 \item \strong{\code{start}}
 \item \strong{\code{end}}
@@ -199,8 +174,7 @@ ggplot(toy.data,
   stat_persistence(aes(alpha = after_stat(persistence)),
                    diagram = "diagonal", size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  lims(x = c(0, 6), y = c(0, 6)) +
-  guides(alpha = FALSE)
+  lims(x = c(0, 6), y = c(0, 6))
 # diagonal persistence diagram with fundamental boxes
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -211,29 +185,15 @@ ggplot(toy.data,
   geom_fundamental_box(t = c(1.5, 5.5),
                        color = "goldenrod", fill = "goldenrod") +
   lims(x = c(0, 6), y = c(0, 6))
-# diagonal persistence diagram with frontier
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence() +
-  stat_frontier() +
-  lims(x = c(0, NA), y = c(0, NA))
 # flat persistence diagram, coding dimension to numeral
 ggplot(toy.data,
        aes(start = birth, end = death, label = dim)) +
   theme_persist() +
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
-# landscape persistence frontier
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_frontier(diagram = "landscape") +
-  lims(x = c(0, NA), y = c(0, NA))
 
 #####EXAMPLE 2#####
+
 # load library and generate dataset for comprehensive example
 library("ripserr")
 # noisy unit circle (Betti-1 number = 1)
@@ -257,11 +217,21 @@ ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_persistence(diagram = "diagonal") +
   theme_persist()
-# pretty landscape persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_frontier(diagram = "landscape") +
-  theme_persist()
+# toy extended persistence data, adapted from Carriere & Oudot (2015)
+eph.data <- data.frame(
+  dimension = c(0L, 1L, 0L, 1L),
+  birth = c(1, -9, 1, 8),
+  death = c(5, -7, -11, -3)
+)
+# extended persistence diagram
+ggplot(eph.data,
+       aes(start = birth, end = death, color = factor(dimension))) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence(aes(shape = after_stat(part)), size = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  lims(x = c(0, 11), y = c(0, 11)) +
+  labs(color = "Dimension", shape = "Homology")
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
@@ -271,14 +241,6 @@ Computer Science}, 454--463. \doi{10.1109/SFCS.2000.892133}
 H Edelsbrunner and D Morozov (2012) Persistent Homology: Theory and Practice.
 \emph{European Congress of Mathematics}, 31--50. \doi{10.4171/120}
 
-P Bubenik (2015) Statistical Topological Data Analysis using Persistence
-Landscapes. \emph{Journal of Machine Learning Research}, \strong{16} 77--102.
-\url{http://jmlr.org/papers/v16/bubenik15a.html}
-
-F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
-fundamental and practical aspects for data scientists.
-\url{https://arxiv.org/abs/1710.04019}
-
 Y-M Chung and A Lawson (2020) Persistence Curves: A Canonical Framework for
 Summarizing Persistence Diagrams. \url{https://arxiv.org/abs/1904.07768}
 }
@@ -286,6 +248,7 @@ Summarizing Persistence Diagrams. \url{https://arxiv.org/abs/1904.07768}
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other plot layers for persistence data: 
-\code{\link{barcode}}
+\code{\link{barcode}},
+\code{\link{frontier}}
 }
 \concept{plot layers for persistence data}
