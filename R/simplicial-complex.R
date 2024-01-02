@@ -19,8 +19,8 @@
 #'   - **x**
 #'   - **y**
 #'   - **dim**
-#'   - **type**
-#'   - **simplex_id**
+#'   - **face**
+#'   - **id**
 #'   - alpha
 #'   - color
 #'   - fill
@@ -33,14 +33,12 @@
 #'   layers and can be accessed with [delayed evaluation][ggplot2::aes_eval].
 #' 
 #'   - `after_stat(dim)`
-#'     The dimension of the corresponding simplex, an ordered factor.
-#'   - `after_stat(type)`
-#'     The type of simplex represented by each row, one of:
-#'     `"zero_simplex"`, `"one_simplex"`, `"k_simplex"`.
-#'     The type determines the graphical element used to represent the simplex
-#'     (point/marker, segment, polygon).
-#'   - `after_stat(simplex_id)`
-#'     A set of unique simplex identifiers within each `type`.
+#'     The integer dimension of the corresponding simplex.
+#'   - `after_stat(face)`
+#'     A factor encoding of the dimensions of the high-dimensional simplices
+#'     (`dim >= 2L`).
+#'   - `after_stat(id)`
+#'     A set of unique simplex identifiers within each `dim`.
 #'
 
 #' @name simplicial_complex
@@ -60,8 +58,8 @@
 #'   chosen based on `complex`.
 #' @param zero_simplexes One of `"none"`, `"maximal"`, and `"all"` (default).
 #' @param one_simplexes One of `"none"`, `"maximal"` (default), and `"all"`.
-#' @param outlines Should the outlines of polygons representing the simplexes be
-#'   drawn?
+#' @param outlines Should the outlines of polygons representing high-dimensional
+#'   simplexes be drawn?
 #' @example inst/examples/ex-simplicial-complex.R
 NULL
 
@@ -74,7 +72,7 @@ StatSimplicialComplex <-  ggproto(
   required_aes = c("x", "y"),
   
   # Alternatively, could assign fill = after_stat(dim)
-  default_aes = aes(alpha = after_stat(dim)),
+  default_aes = aes(alpha = after_stat(face)),
   
   compute_group = function(
     data, scales,
@@ -101,17 +99,18 @@ StatSimplicialComplex <-  ggproto(
     
     # logic to deduce reasonable values of engine
     # + issue warnings when choices are incompatible
+    engine <- match.arg(engine, c("Vietoris", "Rips", "Cech", "alpha"))
     engine <- assign_complex_engine(complex, engine, max_dimension)
     
     res <- switch(
       engine,
-      base = simplicial_complex_base(
+      "base" = simplicial_complex_base(
         data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
       ),
-      RTriangle = simplicial_complex_RTriangle(
+      "RTriangle" = simplicial_complex_RTriangle(
         data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
       ),
-      simplextree = simplicial_complex_simplextree(
+      "simplextree" = simplicial_complex_simplextree(
         data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
       )
     )
@@ -119,16 +118,36 @@ StatSimplicialComplex <-  ggproto(
     # TODO:
     # Take care of zero_ or one_simplexes == "none"
     # and remove simplexes w/ dim > max_dimension
-    if (max_dimension < 2) {
-      res <- res[res$type != "k_simplex", ]
+    if (max_dimension < 2L) {
+      res <- res[res$dim < 2L, , drop = FALSE]
     }
-    if (max_dimension < 1 | one_simplexes == "none") {
-      res <- res[res$type != "one_simplex", ]
+    if (max_dimension < 1L | one_simplexes == "none") {
+      res <- res[res$dim != 1L, , drop = FALSE]
     }
     # QUESTION: Require upstream that `max_dimension >= 0`?
-    if (max_dimension < 0 | zero_simplexes == "none") {
-      res <- res[res$type != "zero_simplex", ]
+    if (max_dimension < 0L | zero_simplexes == "none") {
+      res <- res[res$dim != 0L, , drop = FALSE]
     }
+    
+    # make a factor variable for high-dimensional simplices
+    # if (max(res$dim >= 2L)) {
+    #   res$face <- factor(
+    #     as.character(res$dim),
+    #     levels = as.character(seq(2L, max(c(2L, res$dim))))
+    #   )
+    #   res$face[res$dim < 2L] <- "2"
+    # } else {
+    #   res$face <- NA_character_
+    # }
+    if (max(res$dim >= 2L)) {
+      res$face <- as.character(ifelse(res$dim < 2L, 2L, res$dim))
+    } else {
+      res$face <- NA_character_
+    }
+    res$face <- factor(
+      res$face,
+      levels = as.character(seq(2L, max(c(2L, res$dim))))
+    )
     
     res
   }
@@ -180,13 +199,23 @@ stat_simplicial_complex <- function(mapping = NULL,
 GeomSimplicialComplex <- ggproto(
   "GeomSimplicialComplex", Geom,
   
+  # NOTE: might want to use this if legends are otherwise printed without
+  # high-dimenisonal simplices
+  # setup_params = function(data, params) {
+  #   
+  #   # only show legend if high-dimensional simplices exist
+  #   if (all(is.na(data$face))) params$show.legend <- FALSE
+  #   
+  #   params
+  # },
+  
   draw_group = function(data, panel_params, coord,
                         outlines = TRUE,
                         lineend = "butt", linejoin = "round", linemitre = 10) {
     
     n <- nrow(data)
     
-    if (n == 0) return(zeroGrob())
+    if (n == 0L) return(zeroGrob())
     
     # TODO:
     # Munching happens at the group level,
@@ -195,23 +224,25 @@ GeomSimplicialComplex <- ggproto(
       
       munched <- coord_munch(coord, data, panel_params)
       
-      # Sort by simplex_id to make sure that colors, fill, etc. come in same
+      # Sort by id to make sure that colors, fill, etc. come in same
       # order
-      munched <- munched[order(munched$simplex_id),]
+      munched <- munched[order(munched$id),]
       
-      zero_simplex_data <- data[data$type == "zero_simplex",]
-      one_simplex_data <- data[data$type == "one_simplex",]
-      k_simplex_data <- data[data$type == "k_simplex",]
+      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      high_simplex_data <- 
+        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
       
     } else {
       
       data <- coord$transform(data, panel_params)
       
-      data <- data[order(data$simplex_id),]
+      data <- data[order(data$id), , drop = FALSE]
       
-      zero_simplex_data <- data[data$type == "zero_simplex",]
-      one_simplex_data <- data[data$type == "one_simplex",]
-      k_simplex_data <- data[data$type == "k_simplex",]
+      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      high_simplex_data <- 
+        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
       
     }
     
@@ -219,17 +250,17 @@ GeomSimplicialComplex <- ggproto(
     grobs <- list()
     
     # Drawing the simplexes w/ dim > 1 -----
-    if (nrow(k_simplex_data) > 0) {
+    if (nrow(high_simplex_data) > 0L) {
       
       # For gpar(), there is one entry per polygon (not one entry per point).
-      # We'll pull the first value from each (simplex_id)_group, and assume all
+      # We'll pull the first value from each (id)_group, and assume all
       # these values are the same within each group.
-      first_idx <- !duplicated(k_simplex_data$simplex_id)
-      first_rows <- k_simplex_data[first_idx, ]
+      first_idx <- ! duplicated(high_simplex_data$id)
+      first_rows <- high_simplex_data[first_idx, , drop = FALSE]
       
       grobs$simplexes <- grid::polygonGrob(
-        k_simplex_data$x, k_simplex_data$y, default.units = "native",
-        id = k_simplex_data$simplex_id,
+        high_simplex_data$x, high_simplex_data$y, default.units = "native",
+        id = high_simplex_data$id,
         gp = grid::gpar(
           col = if (outlines) first_rows$colour else NA,
           fill = alpha(first_rows$fill, first_rows$alpha),
@@ -244,11 +275,11 @@ GeomSimplicialComplex <- ggproto(
     }
     
     # Drawing the one_simplexes -----
-    if (nrow(one_simplex_data) > 0) {
+    if (nrow(one_simplex_data) > 0L) {
       
       # First, need to collapse pairs of rows corresponding
       # to line segments (edges)
-      one_simplex_data <- split(one_simplex_data, one_simplex_data$simplex_id)
+      one_simplex_data <- split(one_simplex_data, one_simplex_data$id)
       one_simplex_data <- lapply(one_simplex_data, collapse_one_simplex_pairs)
       one_simplex_data <- do.call(rbind, one_simplex_data)
       
@@ -275,7 +306,7 @@ GeomSimplicialComplex <- ggproto(
     }
     
     # Drawing the 0-simplexes -----
-    if (nrow(zero_simplex_data) > 0) {
+    if (nrow(zero_simplex_data) > 0L) {
       
       stroke_size <- zero_simplex_data$stroke
       stroke_size[is.na(stroke_size)] <- 0
@@ -307,7 +338,7 @@ GeomSimplicialComplex <- ggproto(
                     linewidth = 0.5, linetype = 1,
                     shape = 21, size = 1.5, stroke = .5),
   
-  required_aes = c("x", "y", "simplex_id", "dim", "type"),
+  required_aes = c("x", "y", "id", "dim"),
   
   draw_key = draw_key_simplex,
   
@@ -343,7 +374,7 @@ geom_simplicial_complex <- function(mapping = NULL, data = NULL,
 # Helper functions ---------------------------------------------------------
 
 collapse_one_simplex_pairs <- function(df) {
-  res <- df[1,]
+  res <- df[1, , drop = FALSE]
   res$xend <- df[2, "x"]
   res$yend <- df[2, "y"]
   

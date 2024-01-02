@@ -6,7 +6,9 @@ simplicial_complex_simplextree <- function(
 ) {
   
   # The entire set of 0-simplexes needs to come from data, not simplextree
-  df_zero_simplexes <- indices_to_data(data)
+  df_zero_simplexes <- data
+  df_zero_simplexes$id <- seq(nrow(data))
+  df_zero_simplexes$dim <- 0L
   
   # Compute simplicial complex up to max_dimension, encoded as a simplextree
   # (all further computed values derive from st)
@@ -22,8 +24,8 @@ simplicial_complex_simplextree <- function(
   }
   
   # If there are no edges, just return zero-simplexes
-  # Otherwise, go on to find one_simplexes + k_simplexes
-  if (length(simplexes) == 0)  return(df_zero_simplexes)
+  # Otherwise, go on to find one_simplexes + high_simplexes
+  if (length(simplexes) == 0) return(df_zero_simplexes)
   
   # Convert simplexes into dataframe -----
   
@@ -31,11 +33,11 @@ simplicial_complex_simplextree <- function(
   sizes <- vapply(simplexes, length, numeric(1))
   
   # unique identifier for each simplex
-  simplex_id <- rep(1:length(simplexes), times = sizes)
+  ids <- rep(1:length(simplexes), times = sizes)
   
   # dimension of each simplex as ordered factor
-  dims <- rep(sizes, times = sizes) - 1
-  dims <- ordered(dims, levels = min(dims):max(dims))
+  dims <- rep(sizes, times = sizes) - 1L
+  # dims <- ordered(dims, levels = seq(min(dims), max(dims)))
   
   # combine ordered pairs for each simplex into dataframe
   indices <- unlist(simplexes)
@@ -45,83 +47,58 @@ simplicial_complex_simplextree <- function(
   rownames(df_simplexes) <- NULL
   
   # include relevant computed values
-  df_simplexes$simplex_id <- simplex_id
+  df_simplexes$id <- ids
   df_simplexes$dim <- dims
   
   # reorder rows so that higher dim simplexes are plotted last
   # note: order among simplexes of equal dim doesn't matter
-  #       b/c we split() on simplex_id
-  df_simplexes <- df_simplexes[order(df_simplexes$dim), ]
+  #       b/c we split() on id
+  df_simplexes <- df_simplexes[order(df_simplexes$dim), , drop = FALSE]
   
   # take convex hull of each simplex for polygon grob:
   # (df_simplexes is brielfly a list of data.frames, each corresponding to a
   # k-simplex)
-  df_simplexes <- split(df_simplexes, df_simplexes$simplex_id)
+  df_simplexes <- split(df_simplexes, df_simplexes$id)
   df_simplexes <- lapply(df_simplexes, simplex_chull)
-  
   df_simplexes <- do.call(rbind, df_simplexes)
   
   # Store 1- and >1-dim simplexes seperately
   # (1-dim need to be drawn as line segments)
-  df_one_simplexes <- df_simplexes[df_simplexes$dim == 1,]
-  df_k_simplexes <- df_simplexes[!df_simplexes$dim %in% c(0, 1),]
+  df_one_simplexes <- df_simplexes[df_simplexes$dim == 1L, , drop = FALSE]
+  df_high_simplexes <- df_simplexes[df_simplexes$dim > 1L, , drop = FALSE]
   
   # Overwrite df_one_simplexes to include non-maximal edges
   # if user wants all one-simplexes or if higher-dim simplexes aren't plotted,
-  if (one_simplexes == "all" | max_dimension == 1) {
+  if (one_simplexes == "all" | max_dimension == 1L) {
     
     # convert matrix of edges into a list
-    edges <- apply(st$edges, 1, function(x) x, simplify = FALSE)
+    edges <- apply(st$edges, 1L, identity, simplify = FALSE)
     
     # unique identifier for each edge
-    edge_id <- rep(1:length(edges), each = 2)
+    edge_id <- rep(seq(length(edges)), each = 2L)
     
     # get indices of edge coords
     edges <- unlist(edges)
     
     # combine ordered pairs for each edge into dataframe
-    df_one_simplexes <- data[edges,]
-    df_one_simplexes$simplex_id <- edge_id
+    df_one_simplexes <- data[edges, , drop = FALSE]
+    df_one_simplexes$id <- edge_id
+    df_one_simplexes$dim <- 1L
     
-  } 
+  }
   
   # Similar operation for zero_simplexes argument:
   if (zero_simplexes == "maximal") {
     
-    maximal_vertices <- setdiff(1:nrow(data), st$vertices)
-    df_zero_simplexes <- indices_to_data(data, maximal_vertices, 1)
+    maximal_vertices <- setdiff(seq(nrow(data)), st$vertices)
+    
+    df_zero_simplexes <- data[maximal_vertices, , drop = FALSE]
+    df_zero_simplexes$dim <- 0L
+    df_zero_simplexes$id <- seq(nrow(data))
     
   } 
   
-  # fill in missing computed values:
-  
-  if (nrow(df_k_simplexes) > 0) {
-    df_k_simplexes$type <- "k_simplex"
-  }
-  
-  df_k_simplexes$dim <- droplevels(df_k_simplexes$dim)
-  
-  # dim not actually used for 0- and 1-simplexes 
-  # (but can't be NA b/c of scale)
-  if (nrow(df_one_simplexes) > 0) {
-    df_one_simplexes$type <- "one_simplex"
-    
-    if (nrow(df_k_simplexes) > 0) {
-      df_one_simplexes$dim <- levels(df_k_simplexes$dim)[1]
-    } else {
-      df_one_simplexes$dim <- ordered(2) # set to 2 if no higher-dim simplexes
-    }
-  }
-  
-  if (nrow(df_zero_simplexes) > 0) {
-    if (nrow(df_k_simplexes) > 0) {
-      df_zero_simplexes$dim <- levels(df_k_simplexes$dim)[1]
-    } else {
-      df_one_simplexes$dim <- ordered(2) # set to 2 if no higher-dim simplexes
-    }
-  }
-  
-  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
+  rbind(df_high_simplexes, df_one_simplexes, df_zero_simplexes)
   
 }
 
@@ -145,7 +122,8 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
     } else if (.simplextree_version == "0.9.1") {
       st <- simplextree::simplex_tree()
       st$insert(edges)
-      st$expand(k = max_dimension)
+      # strange behavior in this archived version must be worked around
+      if (! is.null(st$dimension)) st$expand(k = max_dimension)
     } else {
       stop("No method available for simplextree v", .simplextree_version)
     }
@@ -169,8 +147,11 @@ simplicial_complex_base <- function(
     data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
 ) {
   
-  df_zero_simplexes <- indices_to_data(data)
-
+  # df_zero_simplexes <- indices_to_data(data)
+  df_zero_simplexes <- data
+  df_zero_simplexes$dim <- 0L
+  df_zero_simplexes$id <- seq(nrow(data))
+  
   # Compute other data.frame objects based on complex
   
   if (complex %in% c("Rips", "Vietoris")) {
@@ -197,10 +178,10 @@ simplicial_complex_base <- function(
       sort = FALSE
     )
     
-    df_k_simplexes <- indices_to_data(data, faces)
-
+    df_high_simplexes <- indices_to_data(data, faces)
+    
   }
-
+  
   if (complex == "Cech") {
     
     edges <- proximate_pairs(data, diameter)
@@ -208,24 +189,24 @@ simplicial_complex_base <- function(
     
     # Now do simplexes (only of dim 1)
     faces <- proximate_triples(data, diameter)
-    df_k_simplexes <- indices_to_data(data, faces)
+    df_high_simplexes <- indices_to_data(data, faces)
     
   }
-
+  
   # Pair down to maximal simplexes if necessary
   # necessary <=> only want maximal 0/1-simplexes AND no higher-dim simplexes
   # being plotted
-  if (one_simplexes == "maximal" & max_dimension > 1) {
+  if (one_simplexes == "maximal" & max_dimension > 1L) {
     df_one_simplexes <- 
       get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (zero_simplexes == "maximal" & max_dimension > 0) {
+  if (zero_simplexes == "maximal" & max_dimension > 0L) {
     df_zero_simplexes <- 
       get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
   
-  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
+  rbind(df_high_simplexes, df_one_simplexes, df_zero_simplexes)
   
 } 
 
@@ -236,7 +217,7 @@ simplicial_complex_RTriangle <- function(
   
   # 0-simplexes always just the point cloud
   df_zero_simplexes <- indices_to_data(data)
-
+  
   # Compute other data.frame objects based on complex
   
   if (complex == "alpha") {
@@ -255,7 +236,7 @@ simplicial_complex_RTriangle <- function(
     edges <- dt[edge_dists < diameter, , drop = FALSE]
     
     df_one_simplexes <- indices_to_data(data, edges)
-
+    
     # Now do simplexes (only of dim 2)
     
     # Delaunay triangulation, keeping only indices of edges and of triangles
@@ -316,29 +297,29 @@ simplicial_complex_RTriangle <- function(
         apply(face_dists, 1L, max),
         face_cd
       )
-
+      
       faces <- faces[face_diam < diameter, , drop = FALSE]
-
+      
     }
     
-    df_k_simplexes <- indices_to_data(data, faces)
+    df_high_simplexes <- indices_to_data(data, faces)
     
   }
   
   # Pair down to maximal simplexes if necessary
   # necessary <=> only want maximal 0/1-simplexes AND no higher-dim simplexes
   # being plotted
-  if (one_simplexes == "maximal" & max_dimension > 1) {
+  if (one_simplexes == "maximal" & max_dimension > 1L) {
     df_one_simplexes <- 
       get_maximal_one_simplexes(edges, faces, df_one_simplexes)
   }
   
-  if (zero_simplexes == "maximal" & max_dimension > 0) {
+  if (zero_simplexes == "maximal" & max_dimension > 0L) {
     df_zero_simplexes <- 
       get_maximal_zero_simplexes(edges, df_zero_simplexes)
   } 
-
-  rbind(df_k_simplexes, df_one_simplexes, df_zero_simplexes)
+  
+  rbind(df_high_simplexes, df_one_simplexes, df_zero_simplexes)
   
 }
 
@@ -349,37 +330,39 @@ simplicial_complex_RTriangle <- function(
 # (indices arg. is missing when we want the 0-simplexes)
 # m = dim + 1, no. of points in each simplex
 indices_to_data <- function(
-    data, indices = matrix(1:nrow(data), ncol = 1), m = NULL
+    data, indices = matrix(seq(nrow(data)), ncol = 1L), m = NULL
 ) {
   
   if (is.null(m)) m <- ncol(indices)
   
   # want "flat" vector of indices and for each index to be a row in res
   indices <- as.vector(t(indices))
-  res <- data[indices,]
+  res <- data[indices, ]
   
-  if (nrow(res) > 0) {
+  if (nrow(res) > 0L) {
     
-    res$simplex_id <- rep(1:(length(indices)/m), each = m)
+    res$id <- rep(seq(length(indices) / m), each = m)
     
     # Always needs to be 2 -- GeomSimplicialComplex only wants different values
     # if simplexes of dim > 2 being plotted (i.e. engine = "simplextree")
-    res$dim <- ordered(2)
+    # res$dim <- ordered(2)
+    res$dim <- m - 1L
     
     # Type of object for GeomSimplicialComplex to plot
-    res$type <- 
-      switch(m,
-        "zero_simplex",
-        "one_simplex", 
-        "k_simplex"
-      )
+    # res$type <- switch(
+    #   m,
+    #   "zero_simplex",
+    #   "one_simplex", 
+    #   "high_simplex"
+    # )
     
   } else {
     
     # If res is empty, still need columns
-    res$simplex_id <- vector("numeric")
-    res$dim <- ordered(x = character(), levels = 2)
-    res$type <- vector("character")
+    res$id <- vector("numeric")
+    # res$dim <- ordered(x = character(), levels = 2)
+    res$dim <- vector("integer")
+    # res$type <- vector("character")
     
   }
   
@@ -391,18 +374,18 @@ indices_to_data <- function(
 # Pretty computationally expensive: O(|1-simplexes| x |2-simplexes|)?
 get_maximal_one_simplexes <- function(edges, faces, df_one_simplexes) {
   
-  edges_unique <- apply(edges, 1, is_maximal, faces)
+  edges_unique <- apply(edges, 1L, is_maximal, faces)
   
-  df_one_simplexes[rep(edges_unique, each = 2),]
+  df_one_simplexes[rep(edges_unique, each = 2L),]
   
 }
 
 # Determine if edge is contained in faces (is edge a maximal simplex)
 is_maximal <- function(edge, faces) {
   
-  res <- apply(faces, 1, function(face) all(edge %in% face))
+  res <- apply(faces, 1L, function(face) all(edge %in% face))
   
-  !any(res)
+  ! any(res)
   
 }
 
@@ -414,7 +397,7 @@ get_maximal_zero_simplexes <- function(edges, df_zero_simplexes) {
   edges_unique <- as.numeric(edges)
   edges_unique <- unique(edges_unique)
   
-  df_zero_simplexes[-edges_unique, ]
+  df_zero_simplexes[setdiff(seq(nrow(df_zero_simplexes)), edges_unique), ]
   
 }
 
@@ -433,8 +416,8 @@ proximate_triples <- function(data, diameter) {
   
   # distances between pairs
   dists <- data.frame(
-    a = rep(1:(nrow(data) - 1), rep((nrow(data) - 1):1)),
-    b = unlist(lapply(2:nrow(data), function(k) k:nrow(data))),
+    a = rep(seq((nrow(data) - 1L)), rep(seq(nrow(data) - 1L, 1L))),
+    b = unlist(lapply(seq(2L, nrow(data)), function(k) seq(k, nrow(data)))),
     d = as.vector(stats::dist(data))
   )
   
@@ -489,7 +472,7 @@ assign_complex_engine <- function(complex, engine, max_dimension) {
   if (complex %in% c("Rips", "Vietoris")) {
     
     # Default to "base" engine if not plotting high dim simplexes
-    if (max_dimension < 3 & is.null(engine)) return("base")
+    if (max_dimension < 3L & is.null(engine)) return("base")
     
     return(
       complex_engine_rules("Vietoris-Rips", engine, c("simplextree", "base"))
@@ -504,40 +487,31 @@ assign_complex_engine <- function(complex, engine, max_dimension) {
   }
   
   if (complex == "alpha") {
-
+    
     return(complex_engine_rules("alpha", engine, "RTriangle"))
     
   }
   
-  stop(
-    "Invalid choice of `complex`; see `?geom_simplicial_complex` for details.",
-    call. = FALSE
-  )
-  
 }
 
 complex_engine_rules <- function(
-    complex_name, engine, engine_options, engine_default = engine_options[1]
+    complex_name, engine, engine_options, engine_default = engine_options[[1L]]
 ) {
   
   if (is.null(engine)) {
     
     engine <- engine_default
     
-  } else {
+  } else if (! engine %in% engine_options) {
     
-    if (! engine %in% engine_options) {
-      
-      msg <- paste0(
-        'Specified engine incompatible with ', complex_name, ' complex,', '\n',
-        'defaulting to `engine = "', engine_default, '"`.'
-      )
-      
-      warning(msg, call. = FALSE)
-      
-      engine <- engine_default
-      
-    }
+    msg <- paste0(
+      'The ', engine, ' engine cannot construct ', complex_name, ' complexes;',
+      '\n', 'defaulting to `engine = "', engine_default, '"`.'
+    )
+    
+    warning(msg, call. = FALSE)
+    
+    engine <- engine_default
     
   }
   

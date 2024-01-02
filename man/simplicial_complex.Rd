@@ -107,8 +107,8 @@ layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
 stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
 \code{"stat_count"})}
 
-\item{outlines}{Should the outlines of polygons representing the simplexes be
-drawn?}
+\item{outlines}{Should the outlines of polygons representing high-dimensional
+simplexes be drawn?}
 }
 \description{
 Construct and plot simplicial complexes that equal or
@@ -130,8 +130,8 @@ aesthetics (required aesthetics are in bold):
 \item \strong{x}
 \item \strong{y}
 \item \strong{dim}
-\item \strong{type}
-\item \strong{simplex_id}
+\item \strong{face}
+\item \strong{id}
 \item alpha
 \item color
 \item fill
@@ -146,14 +146,12 @@ aesthetics (required aesthetics are in bold):
 layers and can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(dim)}
-The dimension of the corresponding simplex, an ordered factor.
-\item \code{after_stat(type)}
-The type of simplex represented by each row, one of:
-\code{"zero_simplex"}, \code{"one_simplex"}, \code{"k_simplex"}.
-The type determines the graphical element used to represent the simplex
-(point/marker, segment, polygon).
-\item \code{after_stat(simplex_id)}
-A set of unique simplex identifiers within each \code{type}.
+The integer dimension of the corresponding simplex.
+\item \code{after_stat(face)}
+A factor encoding of the dimensions of the high-dimensional simplices
+(\code{dim >= 2L}).
+\item \code{after_stat(id)}
+A set of unique simplex identifiers within each \code{dim}.
 }
 }
 
