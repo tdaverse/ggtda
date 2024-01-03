@@ -32,36 +32,18 @@
 #' @template ref-chung2020
 #'   
 
-#' @section Computed variables:
+#' @eval rd_sec_aesthetics(
+#'   stat_persistence = StatPersistence,
+#'   geom_fundamental_box = GeomFundamentalBox
+#' )
 
-#' `stat_persistence()` calculates the following aesthetics that can be accessed
-#' with [delayed evaluation][ggplot2::aes_eval]:
-#'
-#'   - `after_stat(persistence)` \cr
-#' (double) difference between birth and death values of features.
-#'   - `after_stat(part)` \cr
-#' (factor) whether features belong to ordinary, relative, or extended homology.
-#' 
-
-#' @section Aesthetics:
-
-#' `stat_persistence()` requires the following aesthetics:
-#'
-#'   - **`start`**
-#'   - **`end`**
-#'
-#' `geom_fundamental_box()` understands the following aesthetics (required
-#' aesthetics are in bold):
-#'
-#'   - **`x`**
-#'   - **`y`**
-#'   - `group`
-#'   - `linewidth`
-#'   - `linetype`
-#'   - `colour`
-#'   - `fill`
-#'   - `alpha`
-#' 
+#' @eval rd_sec_computed_vars(
+#'   stat = "persistence",
+#'   part =
+#'   "whether features belong to ordinary, relative, or extended homology.",
+#'   persistence =
+#'   "differences between birth and death values of features."
+#' )
 
 #' @name persistence
 #' @import ggplot2

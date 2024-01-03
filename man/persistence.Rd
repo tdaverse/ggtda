@@ -123,37 +123,32 @@ The \code{geom_fundamental_box()} layer renders fundamental boxes at specified
 time points (Chung & Lawson, 2020).
 }
 
-\section{Computed variables}{
-
-\code{stat_persistence()} calculates the following aesthetics that can be accessed
-with \link[ggplot2:aes_eval]{delayed evaluation}:
-\itemize{
-\item \code{after_stat(persistence)} \cr
-(double) difference between birth and death values of features.
-\item \code{after_stat(part)} \cr
-(factor) whether features belong to ordinary, relative, or extended homology.
-}
-}
-
 \section{Aesthetics}{
 
-\code{stat_persistence()} requires the following aesthetics:
+\code{stat_persistence()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{start}}
 \item \strong{\code{end}}
-}
-
-\code{geom_fundamental_box()} understands the following aesthetics (required
-aesthetics are in bold):
-\itemize{
-\item \strong{\code{x}}
-\item \strong{\code{y}}
 \item \code{group}
-\item \code{linewidth}
-\item \code{linetype}
+}
+\code{geom_fundamental_box()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \code{alpha}
 \item \code{colour}
 \item \code{fill}
-\item \code{alpha}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
+}
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
+}
+
+\section{Computed variables}{
+
+\code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\itemize{
+\item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
+\item \code{after_stat(persistence)}\cr differences between birth and death values of features.
 }
 }
 

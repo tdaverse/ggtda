@@ -87,25 +87,25 @@ each feature.
 death, and dimension.
 }
 
-\section{Computed variables}{
-
-\code{stat_frontier()} calculates the following aesthetics that can be accessed
-with \link[ggplot2:aes_eval]{delayed evaluation}:
-\itemize{
-\item \code{after_stat(x)} and \code{after_stat(y)} \cr
-(double) coordinates of segment endpoints of each frontier.
-}
-}
-
 \section{Aesthetics}{
 
-\code{stat_frontier()} requires the following aesthetics:
+\code{stat_frontier()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{start}}
 \item \strong{\code{end}}
+\item \code{group}
+}
+\code{start} and \code{end} are dropped during the statistical transformation.
+
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
 }
 
-Note that these aesthetics are dropped during the statistical transformation.
+\section{Computed variables}{
+
+\code{stat_frontier} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\itemize{
+\item \code{after_stat(x)}, \code{after_stat(y)}\cr coordinates of segment endpoints of each frontier.
+}
 }
 
 \examples{

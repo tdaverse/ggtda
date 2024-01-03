@@ -89,18 +89,19 @@ The convenience function \code{geom_disk()} produces a layer with the identity
 statistical transformation.
 }
 \section{Aesthetics}{
- \code{geom_disk()} understands the following
-aesthetics (required aesthetics are in bold):
+
+\code{geom_disk()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{x}}
 \item \strong{\code{y}}
-\item \code{group}
-\item \code{linewidth}
-\item \code{linetype}
+\item \code{alpha}
 \item \code{colour}
 \item \code{fill}
-\item \code{alpha}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
 }
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
 }
 
 \examples{

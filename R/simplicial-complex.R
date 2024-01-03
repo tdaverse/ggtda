@@ -40,33 +40,16 @@
 #'   are implemented in {**simplextree**}, they will be made available here.
 #'   
 
-#' @section Computed variables: `stat_simplicial_complex()` calculates the
-#'   following aesthetics that can be accessed with [delayed
-#'   evaluation][ggplot2::aes_eval]:
-#'
-#'   - `after_stat(dim)` \cr
-#'   (integer) dimension of the corresponding simplex.
-#'   - `after_stat(id)` \cr
-#'   (integer) simplex identifiers within each `dim`.
-#'   - `after_stat(face)` \cr
-#'   (factor) encoding of `dim` for high-dimensional simplices (`dim >= 2L`).
-#'   
+#' @eval rd_sec_aesthetics(
+#'   geom_simplicial_complex = GeomSimplicialComplex
+#' )
 
-#' @section Aesthetics: `geom_simplicial_complex()` understands the following
-#'   aesthetics (required aesthetics are in bold):
-#'
-#'   - **`x`**
-#'   - **`y`**
-#'   - **`dim`**
-#'   - **`id`**
-#'   - `group`
-#'   - `linewidth`
-#'   - `linetype`
-#'   - `size`
-#'   - `colour`
-#'   - `fill`
-#'   - `alpha`
-#' 
+#' @eval rd_sec_computed_vars(
+#'   stat = "simplicial_complex",
+#'   dim = "dimension of the corresponding simplex.",
+#'   id = "simplex identifiers within each `dim`.",
+#'   face = "encoding of `dim` for high-dimensional simplices (`dim >= 2L`)."
+#' )
 
 #' @name simplicial_complex
 #' @import ggplot2

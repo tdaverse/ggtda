@@ -17,18 +17,9 @@
 #' statistical transformation.
 #' 
 
-#' @section Aesthetics: `geom_disk()` understands the following
-#'   aesthetics (required aesthetics are in bold):
-#'
-#'   - **`x`**
-#'   - **`y`**
-#'   - `group`
-#'   - `linewidth`
-#'   - `linetype`
-#'   - `colour`
-#'   - `fill`
-#'   - `alpha`
-#' 
+#' @eval rd_sec_aesthetics(
+#'   geom_disk = GeomDisk
+#' )
 
 #' @name disk
 #' @import ggplot2

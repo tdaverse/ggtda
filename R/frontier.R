@@ -14,24 +14,17 @@
 
 #' @template ref-bubenik2015
 
-#' @section Computed variables:
+#' @eval rd_sec_aesthetics(
+#'   stat_frontier = StatFrontier,
+#'   extra_note = paste0(
+#'     "`start` and `end` are dropped during the statistical transformation."
+#'   )
+#' )
 
-#' `stat_frontier()` calculates the following aesthetics that can be accessed
-#' with [delayed evaluation][ggplot2::aes_eval]:
-#'
-#'   - `after_stat(x)` and `after_stat(y)` \cr
-#' (double) coordinates of segment endpoints of each frontier.
-#' 
-
-#' @section Aesthetics:
-
-#' `stat_frontier()` requires the following aesthetics:
-#'
-#'   - **`start`**
-#'   - **`end`**
-#'
-#' Note that these aesthetics are dropped during the statistical transformation.
-#' 
+#' @eval rd_sec_computed_vars(
+#'   stat = "frontier",
+#'   "x,y" = "coordinates of segment endpoints of each frontier."
+#' )
 
 #' @name frontier
 #' @import ggplot2

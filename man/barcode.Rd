@@ -96,13 +96,18 @@ features of different dimension, by vertical grouping or by faceting.
 }
 
 \section{Aesthetics}{
- \code{geom_barcode()} understands the following aesthetics (required
-aesthetics are in bold):
+
+\code{geom_barcode()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start} or \code{xmin}}
-\item \strong{\code{end} or \code{xmax}}
-\item other aesthetics used by \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
+\item \strong{\code{start} \emph{or} \code{xmin}}
+\item \strong{\code{end} \emph{or} \code{xmax}}
+\item \code{alpha}
+\item \code{colour}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
 }
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
 }
 
 \examples{

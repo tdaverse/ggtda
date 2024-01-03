@@ -151,34 +151,34 @@ to compute Vietoris--Rips complexes (\code{"simplextree"}). As other complexes
 are implemented in {\strong{simplextree}}, they will be made available here.
 }
 
-\section{Computed variables}{
- \code{stat_simplicial_complex()} calculates the
-following aesthetics that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
-\itemize{
-\item \code{after_stat(dim)} \cr
-(integer) dimension of the corresponding simplex.
-\item \code{after_stat(id)} \cr
-(integer) simplex identifiers within each \code{dim}.
-\item \code{after_stat(face)} \cr
-(factor) encoding of \code{dim} for high-dimensional simplices (\code{dim >= 2L}).
-}
-}
-
 \section{Aesthetics}{
- \code{geom_simplicial_complex()} understands the following
-aesthetics (required aesthetics are in bold):
+
+\code{geom_simplicial_complex()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{x}}
 \item \strong{\code{y}}
-\item \strong{\code{dim}}
 \item \strong{\code{id}}
-\item \code{group}
-\item \code{linewidth}
-\item \code{linetype}
-\item \code{size}
+\item \strong{\code{dim}}
+\item \code{alpha}
 \item \code{colour}
 \item \code{fill}
-\item \code{alpha}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
+\item \code{shape}
+\item \code{size}
+\item \code{stroke}
+}
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
+}
+
+\section{Computed variables}{
+
+\code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\itemize{
+\item \code{after_stat(dim)}\cr dimension of the corresponding simplex.
+\item \code{after_stat(id)}\cr simplex identifiers within each \code{dim}.
+\item \code{after_stat(face)}\cr encoding of \code{dim} for high-dimensional simplices (\code{dim >= 2L}).
 }
 }
 
