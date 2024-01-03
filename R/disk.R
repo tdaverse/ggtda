@@ -34,6 +34,7 @@
 #' @param segments The number of segments in the regular polygon that
 #'   approximates each disk
 #' @example inst/examples/ex-disk.r
+#' @example inst/examples/ex-disk-simplicial-complex.R
 NULL
 
 #' @rdname ggtda-ggproto

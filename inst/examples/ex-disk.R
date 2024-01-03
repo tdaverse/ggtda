@@ -17,7 +17,6 @@ ggplot(d, aes(x = x, y = y)) +
   coord_fixed() +
   geom_disk(radius = r, fill = "aquamarine3") +
   geom_point()
-
 # use `diameter` parameter
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +

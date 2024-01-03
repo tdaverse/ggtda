@@ -29,12 +29,12 @@
 #'
 #'   {**ggtda**} relies on three engines to compute simplicial complexes, which
 #'   can be specified to the `engine` parameter: Vietoris--Rips and Čech
-#'   complexes are implemented in base R (`"base"`), which is slow but allows
-#'   the package to stand alone for small cases. [RTriangle::triangulate()] is
-#'   used to compute the Delaunay triangulation for alpha complexes
-#'   (`"RTriangle"`), without inserting Steiner points (so that the vertices of
-#'   the triangulation are among those of the data). Finally, the highly
-#'   optimized package
+#'   complexes of dimension at most 2 are implemented in base R (`"base"`),
+#'   which is slow but allows the package to stand alone for small cases.
+#'   [RTriangle::triangulate()] is used to compute the Delaunay triangulation
+#'   for alpha complexes (`"RTriangle"`), without inserting Steiner points (so
+#'   that the vertices of the triangulation are among those of the data).
+#'   Finally, the highly optimized package
 #'   **[simplextree][simplextree::simplextree-package]** can be called
 #'   to compute Vietoris--Rips complexes (`"simplextree"`). As other complexes
 #'   are implemented in {**simplextree**}, they will be made available here.
@@ -72,6 +72,7 @@
 #' @param outlines Should the outlines of polygons representing high-dimensional
 #'   simplexes be drawn?
 #' @example inst/examples/ex-simplicial-complex.R
+#' @example inst/examples/ex-disk-simplicial-complex.R
 NULL
 
 #' @rdname ggtda-ggproto

@@ -140,12 +140,12 @@ triangulation within a fixed diameter.
 
 {\strong{ggtda}} relies on three engines to compute simplicial complexes, which
 can be specified to the \code{engine} parameter: Vietoris--Rips and Čech
-complexes are implemented in base R (\code{"base"}), which is slow but allows
-the package to stand alone for small cases. \code{\link[RTriangle:triangulate]{RTriangle::triangulate()}} is
-used to compute the Delaunay triangulation for alpha complexes
-(\code{"RTriangle"}), without inserting Steiner points (so that the vertices of
-the triangulation are among those of the data). Finally, the highly
-optimized package
+complexes of dimension at most 2 are implemented in base R (\code{"base"}),
+which is slow but allows the package to stand alone for small cases.
+\code{\link[RTriangle:triangulate]{RTriangle::triangulate()}} is used to compute the Delaunay triangulation
+for alpha complexes (\code{"RTriangle"}), without inserting Steiner points (so
+that the vertices of the triangulation are among those of the data).
+Finally, the highly optimized package
 \strong{\link[simplextree:simplextree-package]{simplextree}} can be called
 to compute Vietoris--Rips complexes (\code{"simplextree"}). As other complexes
 are implemented in {\strong{simplextree}}, they will be made available here.
@@ -183,8 +183,8 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
-set.seed(1)
 
+set.seed(1)
 s <- seq(0, 2*pi, length.out = 40)
 df <- data.frame(
   x = cos(s) + rnorm(40, 0, .1),
@@ -193,14 +193,24 @@ df <- data.frame(
 
 # default, visualizing dim w/ alpha:
 ggplot(df, aes(x, y)) +
+  coord_fixed() +
   geom_simplicial_complex(radius = .4)
-
 # visualizing dim w/ fill:
 ggplot(df, aes(x, y)) +
+  coord_fixed() +
   geom_simplicial_complex(
     mapping = aes(fill = after_stat(dim)),
     alpha = .5, radius = .4
   )
+
+# with a zero radius or diameter
+ggplot(df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_simplicial_complex(radius = 0)
+# with a too-small radius or diameter
+ggplot(df, aes(x = x, y = y)) +
+  coord_fixed() +
+  stat_simplicial_complex(radius = 0.01)
 
 # Visualizing multiple groups together
 s <- c(s, s)
@@ -208,72 +218,39 @@ df_mix <- data.frame(
   x = cos(s) + rnorm(80, 0, .1),
   y = sin(s) + rnorm(80, 0, .1)
 )
-
 df_mix$x <- df_mix$x + rep(c(-2, 2), length.out = 80)
 df_mix$lab <- rep(c("a", "b"), length.out = 80)
 
 ggplot(df_mix, aes(x, y, fill = lab)) +
   geom_simplicial_complex(radius = .4)
 
-# FIXME: incorporate or remove old examples below
-
-# function to generate noisy 2D circles
-make_noisy_circle <- function(n, sd = .01) {
-  theta <- stats::runif(n = n, min = 0, max = 2*pi)
-  cbind(x = cos(theta) + stats::rnorm(n, 0, sd),
-        y = sin(theta) + stats::rnorm(n, 0, sd))
-}
-
 # generate a noisy 2D circle
-set.seed(1)
-d <- as.data.frame(make_noisy_circle(n = 40, sd = .15))
+set.seed(2)
+theta <- stats::runif(n = 40L, min = 0, max = 2*pi)
+d <- data.frame(x = cos(theta) + stats::rnorm(40L, 0, .15),
+                y = sin(theta) + stats::rnorm(40L, 0, .15))
 r <- 1/3
 
-# plot balls beneath points
+# overlay ball cover and Vietoris-Rips complex with points
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
+  geom_disk(radius = r, fill = "aquamarine3") +
+  geom_simplicial_complex(
+    radius = r, fill = "darkgoldenrod",
+    complex = "Vietoris", engine = "base"
+  ) +
   geom_point()
-
-# plot Vietoris 1-skeleton
+# use the Čech complex instead
 ggplot(d, aes(x = x, y = y)) +
   theme_bw() +
   coord_fixed() +
-  stat_vietoris1(diameter = 2*r, alpha = .25) +
-  stat_vietoris0()
-
-# plot Vietoris 2-skeleton
-ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_vietoris2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_vietoris1(diameter = 2*r, alpha = .25) +
-  stat_vietoris0()
-
-# plot Čech 2-skeleton
-ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_cech2(diameter = 2*r, fill = "darkgoldenrod") +
-  stat_cech1(diameter = 2*r, alpha = .25) +
-  stat_cech0()
-
-# plot Vietoris 1-skeleton atop balls
-ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_disk(radius = r, fill = "aquamarine3") +
-  stat_vietoris1(diameter = 2*r, size = .2) +
-  stat_vietoris0(size = .3)
-
-# plot alpha 1-skeleton
-ggplot(d, aes(x, y)) +
-  theme_bw() +
-  coord_fixed() +
-  stat_alpha2(radius = r, fill = "darkgoldenrod") +
-  stat_alpha1(radius = r, size = .2) +
-  stat_alpha0()
+  geom_disk(radius = r, fill = "aquamarine3") +
+  geom_simplicial_complex(
+    radius = r, fill = "darkgoldenrod",
+    complex = "Cech", engine = "base"
+  ) +
+  geom_point()
 }
 \seealso{
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.

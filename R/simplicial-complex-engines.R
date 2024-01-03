@@ -337,7 +337,7 @@ indices_to_data <- function(
   
   # want "flat" vector of indices and for each index to be a row in res
   indices <- as.vector(t(indices))
-  res <- data[indices, ]
+  res <- data[indices, , drop = FALSE]
   
   if (nrow(res) > 0L) {
     
@@ -359,7 +359,7 @@ indices_to_data <- function(
   } else {
     
     # If res is empty, still need columns
-    res$id <- vector("numeric")
+    res$id <- vector("integer")
     # res$dim <- ordered(x = character(), levels = 2)
     res$dim <- vector("integer")
     # res$type <- vector("character")
@@ -376,7 +376,8 @@ get_maximal_one_simplexes <- function(edges, faces, df_one_simplexes) {
   
   edges_unique <- apply(edges, 1L, is_maximal, faces)
   
-  df_one_simplexes[rep(edges_unique, each = 2L),]
+  are_maximal <- rep(edges_unique, each = 2L)
+  df_one_simplexes[are_maximal, , drop = FALSE]
   
 }
 
@@ -397,7 +398,8 @@ get_maximal_zero_simplexes <- function(edges, df_zero_simplexes) {
   edges_unique <- as.numeric(edges)
   edges_unique <- unique(edges_unique)
   
-  df_zero_simplexes[setdiff(seq(nrow(df_zero_simplexes)), edges_unique), ]
+  are_maximal <- setdiff(seq(nrow(df_zero_simplexes)), edges_unique)
+  df_zero_simplexes[are_maximal, , drop = FALSE]
   
 }
 
@@ -469,10 +471,19 @@ proximate_triples <- function(data, diameter) {
 # Logic for matching params w/ optimal engine
 assign_complex_engine <- function(complex, engine, max_dimension) {
   
+  if (! is.null(engine) && engine == "base" && max_dimension > 2L) {
+    
+    warning(
+      "The base engine cannot construct complexes of `max_dimension` > 2.",
+      call. = FALSE
+    )
+    
+  }
+  
   if (complex %in% c("Rips", "Vietoris")) {
     
     # Default to "base" engine if not plotting high dim simplexes
-    if (max_dimension < 3L & is.null(engine)) return("base")
+    # if (max_dimension < 3L & is.null(engine)) return("base")
     
     return(
       complex_engine_rules("Vietoris-Rips", engine, c("simplextree", "base"))
@@ -506,9 +517,8 @@ complex_engine_rules <- function(
     
     msg <- paste0(
       'The ', engine, ' engine cannot construct ', complex_name, ' complexes;',
-      '\n', 'defaulting to `engine = "', engine_default, '"`.'
+      '\n', 'switching to `engine = "', engine_default, '"`.'
     )
-    
     warning(msg, call. = FALSE)
     
     engine <- engine_default
