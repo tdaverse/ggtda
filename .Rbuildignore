@@ -9,6 +9,7 @@ man-roxygen
 ^NEWS\.md$
 ^cran-comments\.md$
 ^docs$
+^sandbox$
 
 # R project metadata
 ^.*\.Rproj$
