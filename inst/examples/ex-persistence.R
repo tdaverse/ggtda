@@ -30,27 +30,3 @@ ggplot(toy.data,
   theme_persist() +
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
-
-# load library and generate dataset for comprehensive example
-library("ripserr")
-# noisy unit circle (Betti-1 number = 1)
-n <- 100L; sd <- 0.1
-set.seed(7)
-t <- stats::runif(n = n, min = 0, max = 2*pi)
-annulus.df <- data.frame(
-  x = cos(t) + stats::rnorm(n = n, mean = 0, sd = sd),
-  y = sin(t) + stats::rnorm(n = n, mean = 0, sd = sd)
-)
-# calculate persistence homology and format
-annulus.phom <- as.data.frame(vietoris_rips(annulus.df))
-annulus.phom$dimension <- as.factor(annulus.phom$dimension)
-# pretty flat persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence(diagram = "flat") +
-  theme_persist()
-# pretty diagonal persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence(diagram = "diagonal") +
-  theme_persist()

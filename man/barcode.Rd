@@ -155,7 +155,7 @@ fundamental and practical aspects for data scientists.
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other plot layers for persistence data: 
-\code{\link{frontier}},
+\code{\link{landscape}},
 \code{\link{persistence}}
 }
 \concept{plot layers for persistence data}
