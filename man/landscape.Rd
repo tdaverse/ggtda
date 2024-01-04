@@ -3,14 +3,30 @@
 \name{landscape}
 \alias{landscape}
 \alias{stat_landscape}
+\alias{geom_landscape}
 \title{Persistence landscapes}
 \usage{
 stat_landscape(
   mapping = NULL,
   data = NULL,
-  geom = "line",
+  geom = "landscape",
+  position = "identity",
+  diagram = "landscape",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+geom_landscape(
+  mapping = NULL,
+  data = NULL,
+  stat = "landscape",
   position = "identity",
   diagram = "diagonal",
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -65,6 +81,11 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+
+\item{stat}{The statistical transformation to use on the data for this
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
 }
 \description{
 Visualize persistence data as a persistence landscape.
@@ -86,6 +107,16 @@ Persistence landscapes do not currently recognize extended persistence data.
 \item \strong{\code{end}}
 \item \code{group}
 }
+\code{geom_landscape()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}
+\item \strong{\code{y}}
+\item \code{alpha}
+\item \code{colour}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
+}
 \code{start} and \code{end} are dropped during the statistical transformation.
 
 Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
@@ -93,11 +124,13 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \section{Computed variables}{
 
-\code{stat_landscape} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\code{stat_landscape} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(x)}, \code{after_stat(y)}\cr coordinates of segment endpoints of each frontier.
 \item \code{after_stat(level)}\cr position of each frontier, starting from the outermost.
 }
+
+Note that \code{start} and \code{end} are dropped during the statistical transformation.
 }
 
 \examples{
@@ -107,14 +140,23 @@ toy.data <- data.frame(
   death = c(5, 3, 5, 4, 6, 3),
   dim = factor(c(0, 0, 1, 1, 2, 2))
 )
-# diagonal persistence diagram with frontier
+# persistence diagram with landscape overlaid
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_landscape(aes(alpha = -after_stat(level)), diagram = "landscape") +
+  stat_persistence() +
+  stat_landscape(aes(alpha = -after_stat(level)), diagram = "diagonal") +
+  lims(x = c(0, 8), y = c(0, NA)) +
+  guides(alpha = "none")
+# persistence landscape with diagram overlaid
+ggplot(toy.data,
+       aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_persist() +
+  coord_equal() +
+  stat_landscape(aes(alpha = -after_stat(level))) +
   stat_persistence(diagram = "landscape") +
-  lims(x = c(0, NA), y = c(0, NA)) +
+  lims(x = c(0, 8), y = c(0, NA)) +
   guides(alpha = "none")
 
 # load library and generate dataset for comprehensive example

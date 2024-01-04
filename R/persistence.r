@@ -61,6 +61,8 @@
 #' @param t A numeric vector of time points at which to place fundamental boxes.
 #' @example inst/examples/ex-persistence.R
 #' @example inst/examples/ex-persistence-extended.R
+# file.edit("inst/examples/ex-persistence.R")
+# file.edit("inst/examples/ex-persistence-extended.R")
 NULL
 
 #' @rdname ggtda-ggproto
@@ -245,7 +247,20 @@ diagram_transform <- function(data, diagram) {
     landscape = transform(
       data,
       x = (data$x + data$y) / 2,
-      y = (data$y - data$x) / 2
+      y = ifelse(
+        is.infinite(data$x) & is.infinite(data$y),
+        0,
+        (data$y - data$x) / 2
+      )
     )
+  )
+}
+
+diagram_slope <- function(diagram) {
+  switch(
+    match.arg(diagram, c("flat", "diagonal", "landscape")),
+    flat = 0,
+    diagonal = 1,
+    landscape = 0
   )
 }

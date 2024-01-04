@@ -5,7 +5,9 @@ NULL
 `%||%` <- getFromNamespace("%||%", "ggplot2")
 
 # adapted from {ggplot2}
-rd_sec_computed_vars <- function(stat, ..., .details = "", .skip_intro = FALSE) {
+rd_sec_computed_vars <- function(
+    stat, ..., .details = "", .skip_intro = FALSE, extra_note = NULL
+) {
   args  <- list(...)
   items <- names(args)
   descr <- unname(args)
@@ -14,7 +16,7 @@ rd_sec_computed_vars <- function(stat, ..., .details = "", .skip_intro = FALSE) 
   header <- "@section Computed variables: "
   intro  <- paste0(
     "`stat_", stat, "` calculates the following variables ",
-    "that can be accessed with [delayed evaluation][ggplot2::aes_eval]:"
+    "that can be accessed with [delayed evaluation][ggplot2::aes_eval]. "
   )
   if (.skip_intro) intro <- ""
   preamble <- c(header, paste0(intro, gsub("\n", "", .details)))
@@ -29,7 +31,11 @@ rd_sec_computed_vars <- function(stat, ..., .details = "", .skip_intro = FALSE) 
   fmt_descr <- gsub("\n", "", descr)
   fmt_list  <- paste(fmt_items, fmt_descr, sep = "\\cr ")
   
-  c(preamble, fmt_list)
+  c(
+    preamble,
+    fmt_list,
+    if (!is.null(extra_note)) paste0("\n", extra_note)
+  )
 }
 
 # adapted from {ggplot2}

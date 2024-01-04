@@ -7,6 +7,7 @@
 \alias{GeomDisk}
 \alias{ggtda-ggproto}
 \alias{StatLandscape}
+\alias{GeomLandscape}
 \alias{StatPersistence}
 \alias{GeomFundamentalBox}
 \alias{StatSimplicialComplex}
@@ -18,6 +19,8 @@ An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{G
 An object of class \code{GeomDisk} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 8.
 
 An object of class \code{StatLandscape} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{GeomLandscape} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.
 
 An object of class \code{StatSimplicialComplex} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 

@@ -153,6 +153,13 @@ are implemented in {\strong{simplextree}}, they will be made available here.
 
 \section{Aesthetics}{
 
+\code{stat_simplicial_complex()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}
+\item \strong{\code{y}}
+\item \code{alpha}
+\item \code{group}
+}
 \code{geom_simplicial_complex()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{x}}
@@ -174,7 +181,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \section{Computed variables}{
 
-\code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(dim)}\cr dimension of the corresponding simplex.
 \item \code{after_stat(id)}\cr simplex identifiers within each \code{dim}.
@@ -183,6 +190,35 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
+
+# equilateral triangle
+et <- data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
+# small perturbations from key values
+eps <- .00000001
+
+# Vietoris-Rips
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(diameter = sqrt(3) - eps)
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(diameter = sqrt(3) + eps)
+
+# Čech
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(complex = "Cech", diameter = sqrt(3) - eps)
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(complex = "Cech", diameter = sqrt(3) + eps)
+
+# alpha
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(complex = "alpha", diameter = sqrt(3) - eps)
+ggplot(et, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(complex = "alpha", diameter = sqrt(3) + eps)
 
 set.seed(1)
 s <- seq(0, 2*pi, length.out = 40)

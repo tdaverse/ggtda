@@ -41,6 +41,7 @@
 #'   
 
 #' @eval rd_sec_aesthetics(
+#'   stat_simplicial_complex = StatSimplicialComplex,
 #'   geom_simplicial_complex = GeomSimplicialComplex
 #' )
 
@@ -71,8 +72,12 @@
 #'   `"maximal"` (default), and `"all"`.
 #' @param outlines Should the outlines of polygons representing high-dimensional
 #'   simplexes be drawn?
+#' @example inst/examples/ex-simplicial-complex-equilateral.R
 #' @example inst/examples/ex-simplicial-complex.R
 #' @example inst/examples/ex-disk-simplicial-complex.R
+# file.edit("inst/examples/ex-simplicial-complex-equilateral.R")
+# file.edit("inst/examples/ex-simplicial-complex.R")
+# file.edit("inst/examples/ex-disk-simplicial-complex.R")
 NULL
 
 #' @rdname ggtda-ggproto
@@ -333,8 +338,9 @@ GeomSimplicialComplex <- ggproto(
       
     }
     
-    grid::gTree(children = do.call(grid::gList, grobs))
-    
+    grob <- grid::gTree(children = do.call(grid::gList, grobs))
+    grob$name <- grid::grobName(grob, "geom_simplicial_complex")
+    grob
   },
  
   default_aes = aes(colour = "black", fill = "grey30", alpha = NA,

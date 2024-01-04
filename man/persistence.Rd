@@ -145,7 +145,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \section{Computed variables}{
 
-\code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}:
+\code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
