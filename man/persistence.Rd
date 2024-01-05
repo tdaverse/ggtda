@@ -3,8 +3,6 @@
 \name{persistence}
 \alias{persistence}
 \alias{stat_persistence}
-\alias{stat_frontier}
-\alias{geom_frontier}
 \alias{geom_fundamental_box}
 \title{Persistence diagrams}
 \usage{
@@ -25,29 +23,6 @@ stat_persistence(
   ...
 )
 
-stat_frontier(
-  mapping = NULL,
-  data = NULL,
-  geom = "line",
-  position = "identity",
-  diagram = "diagonal",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
-geom_frontier(
-  mapping = NULL,
-  data = NULL,
-  stat = "persistence",
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
 geom_fundamental_box(
   mapping = NULL,
   data = NULL,
@@ -62,10 +37,10 @@ geom_fundamental_box(
 )
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}} or
-\code{\link[ggplot2:aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
-default), it is combined with the default mapping at the top level of the
-plot. You must supply \code{mapping} if there is no plot mapping.}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -83,11 +58,12 @@ will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
 \item{geom}{The geometric object to use display the data; defaults to
-\code{segment} in \code{geom_vietoris1()} and to \code{polygon} in \code{geom_vietoris2}. Pass
-a string to override the default.}
+\code{point}. Pass a string to override the default.}
 
-\item{position}{Position adjustment, either as a string, or the result of
-a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string naming the adjustment
+(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
+position adjustment function. Use the latter if you need to change the
+settings of the adjustment.}
 
 \item{diameter_max, radius_max}{(Document.)}
 
@@ -118,7 +94,9 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
 \item{stat}{The statistical transformation to use on the data for this
-layer, as a string.}
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
 
 \item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
@@ -127,8 +105,9 @@ Visualize persistence data in a (flat, diagonal, or landscape)
 persistence diagram.
 }
 \details{
-\emph{Persistence diagrams} are scatterplots of persistence data. \emph{Persistence
-landscapes} can be understood as rotated diagonal persistence diagrams.
+{\emph{Persistence diagrams}} are
+\href{https://ggplot2.tidyverse.org/reference/geom_point.html}{scatterplots} of
+persistence data.
 }
 \section{Persistence data}{
 
@@ -157,21 +136,36 @@ The \code{geom_fundamental_box()} layer renders fundamental boxes at specified
 time points (Chung & Lawson, 2020).
 }
 
-\section{Persistence landscapes}{
+\section{Aesthetics}{
 
+\code{stat_persistence()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{start}}
+\item \strong{\code{end}}
+\item \code{group}
+}
+\code{geom_fundamental_box()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \code{alpha}
+\item \code{colour}
+\item \code{fill}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
+}
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
+}
 
-Persistence landscapes, anticipated by some alternative coordinatizations
-of persistence diagrams, were proposed as Lipschitz functions that
-demarcate the Pareto frontiers of persistence diagrams. They can be
-averaged over the diagrams obtained from multiple data sets designed or
-hypothesized to have been generated from the same underlying topological
-structure.
+\section{Computed variables}{
 
-Persistence landscapes do not currently recognize extended persistence data.
+\code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
+\itemize{
+\item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
+\item \code{after_stat(persistence)}\cr differences between birth and death values of features.
+}
 }
 
 \examples{
-#####EXAMPLE 1#####
 
 # toy example
 toy.data <- data.frame(
@@ -189,6 +183,7 @@ ggplot(toy.data,
   geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = "none")
+  lims(x = c(0, 6), y = c(0, 6))
 # diagonal persistence diagram with fundamental boxes
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -198,58 +193,21 @@ ggplot(toy.data,
   geom_abline(intercept = 0, slope = 1) +
   geom_fundamental_box(t = c(1.5, 5.5),
                        color = "goldenrod", fill = "goldenrod") +
-  lims(x = c(0, 6), y = c(0, 6))
-# diagonal persistence diagram with frontier
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence() +
-  stat_frontier() +
-  lims(x = c(0, NA), y = c(0, NA))
+  lims(x = c(0, 6), y = c(0, 6)) +
+  guides(alpha = "none")
 # flat persistence diagram, coding dimension to numeral
 ggplot(toy.data,
        aes(start = birth, end = death, label = dim)) +
   theme_persist() +
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
-# landscape persistence frontier
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_frontier(diagram = "landscape") +
-  lims(x = c(0, NA), y = c(0, NA))
 
-#####EXAMPLE 2#####
-# load library and generate dataset for comprehensive example
-library("ripserr")
-# noisy unit circle (Betti-1 number = 1)
-n <- 100L; sd <- 0.1
-set.seed(7)
-t <- stats::runif(n = n, min = 0, max = 2*pi)
-annulus.df <- data.frame(
-  x = cos(t) + stats::rnorm(n = n, mean = 0, sd = sd),
-  y = sin(t) + stats::rnorm(n = n, mean = 0, sd = sd)
+# toy extended persistence data, adapted from Carriere & Oudot (2015)
+eph.data <- data.frame(
+  dimension = c(0L, 1L, 0L, 1L),
+  birth = c(1, -9, 1, 8),
+  death = c(5, -7, -11, -3)
 )
-# calculate persistence homology and format
-annulus.phom <- as.data.frame(vietoris_rips(annulus.df))
-annulus.phom$dimension <- as.factor(annulus.phom$dimension)
-# pretty flat persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence(diagram = "flat") +
-  theme_persist()
-# pretty diagonal persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_persistence(diagram = "diagonal") +
-  theme_persist()
-# pretty landscape persistence diagram
-ggplot(annulus.phom, aes(start = birth, end = death,
-                         shape = dimension, colour = dimension)) +
-  stat_frontier(diagram = "landscape") +
-  theme_persist()
 
 ## Experimental examples to test new functionality
 
@@ -280,6 +238,16 @@ raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
 raw_data$class <- vapply(raw_data$obj, class, "")
 ggplot(raw_data, aes(dataset = obj)) +
   stat_persistence(aes(shape = factor(after_stat(dimension)), color = class))
+
+# extended persistence diagram
+ggplot(eph.data,
+       aes(start = birth, end = death, color = factor(dimension))) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence(aes(shape = after_stat(part)), size = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  lims(x = c(0, 11), y = c(0, 11)) +
+  labs(color = "Dimension", shape = "Homology")
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
@@ -289,14 +257,6 @@ Computer Science}, 454--463. \doi{10.1109/SFCS.2000.892133}
 H Edelsbrunner and D Morozov (2012) Persistent Homology: Theory and Practice.
 \emph{European Congress of Mathematics}, 31--50. \doi{10.4171/120}
 
-P Bubenik (2015) Statistical Topological Data Analysis using Persistence
-Landscapes. \emph{Journal of Machine Learning Research}, \strong{16} 77--102.
-\url{http://jmlr.org/papers/v16/bubenik15a.html}
-
-F Chazal and B Michel (2017) An introduction to Topological Data Analysis:
-fundamental and practical aspects for data scientists.
-\url{https://arxiv.org/abs/1710.04019}
-
 Y-M Chung and A Lawson (2020) Persistence Curves: A Canonical Framework for
 Summarizing Persistence Diagrams. \url{https://arxiv.org/abs/1904.07768}
 }
@@ -304,6 +264,7 @@ Summarizing Persistence Diagrams. \url{https://arxiv.org/abs/1904.07768}
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other plot layers for persistence data: 
-\code{\link{barcode}}
+\code{\link{barcode}},
+\code{\link{landscape}}
 }
 \concept{plot layers for persistence data}

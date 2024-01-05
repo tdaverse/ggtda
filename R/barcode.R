@@ -26,6 +26,11 @@
 #' @template ref-carlsson2014
 #' @template ref-chazal2017
 #'
+
+#' @eval rd_sec_aesthetics(
+#'   geom_barcode = GeomBarcode
+#' )
+
 #' @name barcode
 #' @import ggplot2
 #' @family plot layers for persistence data
@@ -39,30 +44,8 @@
 #' @param stat The The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
 #' @example inst/examples/ex-barcode.R
-#' @rdname barcode
-#' @export
-geom_barcode <- function(mapping = NULL,
-                         data = NULL,
-                         stat = "identity",
-                         position = "identity",
-                         na.rm = FALSE,
-                         show.legend = NA,
-                         inherit.aes = TRUE,
-                         ...) {
-  layer(
-    geom = GeomBarcode,
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
+# file.edit("inst/examples/ex-barcode.R")
+NULL
 
 #' @rdname ggtda-ggproto
 #' @usage NULL
@@ -118,3 +101,28 @@ GeomBarcode <- ggproto(
     grob
   }
 )
+
+#' @rdname barcode
+#' @export
+geom_barcode <- function(mapping = NULL,
+                         data = NULL,
+                         stat = "identity",
+                         position = "identity",
+                         na.rm = FALSE,
+                         show.legend = NA,
+                         inherit.aes = TRUE,
+                         ...) {
+  layer(
+    geom = GeomBarcode,
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
+  )
+}

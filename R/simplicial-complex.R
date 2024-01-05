@@ -1,711 +1,399 @@
-#' @title Disks and skeletons of Vietoris, Čech, and alpha complexes
+#' @title Simplicial complexes from 2-D point clouds
 #'
-#' @description Annotate 2-dimensional point clouds with TDA constructions.
-#'
+#' @description Construct and plot simplicial complexes that equal or
+#' approximate the topology of a ball cover of a set of points.
+#' 
+
 #' @details
 #'
-#' These plot layers are useful for exposition and education; they illustrate
-#' constructions used by TDA methods but cannot be pipelined into those methods.
+#' Persistent homology is ultimately based on the topological properties of
+#' regions containing a set of points. When the region is the union of balls of
+#' a common radius, its homology is equal to or approximated by that of several
+#' families of *simplicial complexes* constructed on the point set. The
+#' simplicial complex stat constructs these simplicial complexes for a set of
+#' points in \eqn{xy}-space while the geom plots them on the same coordinates as
+#' the points.
 #' 
 
-#' @section Definitions:
+#' @section Complexes:
+
+#'   A *Vietoris--Rips complex* of a point cloud is the simplicial complex
+#'   consisting of a simplex for each subset of points within a fixed diameter
+#'   of each other. A *Čech complex* contains the simplex for each subset that
+#'   lies within a circle of fixed diameter. (This means that the Čech complex
+#'   depends on the geometry of the ambient space containing the point cloud,
+#'   while the Vietoris complex depends only on the inter-point distances.
+#'   Moreover, a Vietoris complex contains the Čech complex of the same
+#'   diameter.) An *alpha complex* comprises those simplices of the Delaunay
+#'   triangulation within a fixed diameter.
+#'
+#'   {**ggtda**} relies on three engines to compute simplicial complexes, which
+#'   can be specified to the `engine` parameter: Vietoris--Rips and Čech
+#'   complexes of dimension at most 2 are implemented in base R (`"base"`),
+#'   which is slow but allows the package to stand alone for small cases.
+#'   [RTriangle::triangulate()] is used to compute the Delaunay triangulation
+#'   for alpha complexes (`"RTriangle"`), without inserting Steiner points (so
+#'   that the vertices of the triangulation are among those of the data).
+#'   Finally, the highly optimized package
+#'   **[simplextree][simplextree::simplextree-package]** can be called
+#'   to compute Vietoris--Rips complexes (`"simplextree"`). As other complexes
+#'   are implemented in {**simplextree**}, they will be made available here.
 #'   
 
-#' A *ball* of radius \eqn{r} around a point \eqn{x} in Euclidean space consists
-#' of all points whose distances from \eqn{x} are less than \eqn{r}.
-#'
-#' A *Vietoris complex* of a point cloud is the simplicial complex consisting of
-#' a simplex for each subset of points within a fixed diameter of each other. A
-#' *Čech complex* contains the simplex for each subset that lies within a circle
-#' of fixed diameter. (This means that the Čech complex depends on the geometry
-#' of the ambient space containing the point cloud, while the Vietoris complex
-#' depends only on the inter-point distances. Moreover, a Vietoris complex
-#' contains the Čech complex of the same diameter.)
-#'
-#' An *alpha complex* comprises those simplices of the Delaunay triangulation
-#' within a fixed diameter. *ggtda* uses [RTriangle::triangulate()] to compute
-#' the Delaunay triangulation, without inserting Steiner points (so that the
-#' vertices of the triangulation are among those of the data).
-#'
-#' The *0-skeleton* of a complex consists of its vertices (0-simplices), the
-#' *1-skeleton* additionally the edges between pairs of vertices (1-simplices),
-#' and the *2-skeleton* additionally faces among triples of vertices
-#' (2-simplices).
-#' 
+#' @eval rd_sec_aesthetics(
+#'   stat_simplicial_complex = StatSimplicialComplex,
+#'   geom_simplicial_complex = GeomSimplicialComplex
+#' )
 
-#' @section Layers:
-#'   
+#' @eval rd_sec_computed_vars(
+#'   stat = "simplicial_complex",
+#'   dim = "dimension of the corresponding simplex.",
+#'   id = "simplex identifiers within each `dim`.",
+#'   face = "encoding of `dim` for high-dimensional simplices (`dim >= 2L`)."
+#' )
 
-#' `geom_face()` is a convenience geom that is equivalent to `geom_polygon()`
-#' except that its default aesthetics are more appropriate for the overlapping
-#' elements produced by the stat layers.
-#'
-#' Given `x` and `y` coordinates, `stat_vietoris1()` encodes the edges of the
-#' Vietoris complex using `x`, `y`, `xend`, and `yend` for `geom_segment()`, and
-#' `stat_vietoris2()` encodes the faces using `x`, `y`, and `group` for
-#' `geom_face()`. The edges of a Čech complex are exactly those of the Vietoris
-#' complex, so `stat_cech1()` is an alias for `stat_vietoris1()`, while
-#' `stat_cech2()` encodes the faces of the Čech complex in the same way as
-#' `stat_vietoris2()` those of the Vietoris complex. Note that these stat layers
-#' encode only the simplices of fixed dimension; to render the 1- or 2-skeleton,
-#' they can be combined with `geom_vietoris0()` or `geom_cech0()`, which are
-#' aliases for [ggplot2::stat_identity()] that default to
-#' [ggplot2::geom_point()].
-#'
-#' `stat_alpha0()` behaves exactly like the other `stat_*0()`. `stat_alpha1()`
-#' and `stat_alpha2()` encode the edges and faces of the Delaunay triangulation
-#' (below the diameter threshold) in the same way as the other `stat_*1()` and
-#' `stat_*2()`.
-#' 
-
-#' @template ref-chazal2017
-#' 
-
-#' @name simplicial-complex
+#' @name simplicial_complex
 #' @import ggplot2
-#' @importFrom RTriangle triangulate pslg
 #' @family plot layers for point clouds
 #' @seealso [ggplot2::layer()] for additional arguments.
-#' @inheritParams ggplot2::layer
-#' @param na.rm Logical; ignored.
-#' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param geom The geometric object to use display the data; defaults to
-#'   `segment` in `stat_vietoris1()` and to `face` in `stat_vietoris2`. Pass a
-#'   string to override the default.
-#' @param radius A positive number; the radius of the disk to render around each
-#'   point or to determine simplices from a point cloud.
-#' @param diameter A positive number; the diameter of the disk to render around
-#'   each point or to determine simplices from a point cloud.
-#' @param segments The number of segments to be used in drawing each disk.
+#' @inheritParams ggplot2::geom_point
+#' @inheritParams ggplot2::stat_identity
+#' @inheritParams disk
+#' @param max_dimension Compute simplexes of dimension up to `max_dimension`
+#'   (only relevant for the Vietoris--Rips complex computed with the
+#'   `simplextree` engine).
+#' @param complex The type of complex to compute, either `"Vietoris"`, `"Rips"`,
+#'   `"Cech"`, or `"alpha"`.
+#' @param engine The computational engine to use (see 'Details'). Reasonable
+#'   defaults are chosen based on `complex`.
+#' @param zero_simplexes Which 0-simplices (vertices) to plot; one of `"none"`,
+#'   `"maximal"`, and `"all"` (default).
+#' @param one_simplexes Which 1-simplices (edges) to plot; one of `"none"`,
+#'   `"maximal"` (default), and `"all"`.
+#' @param outlines Should the outlines of polygons representing high-dimensional
+#'   simplexes be drawn?
+#' @example inst/examples/ex-simplicial-complex-equilateral.R
 #' @example inst/examples/ex-simplicial-complex.R
-
-#' @rdname simplicial-complex
-#' @export
-stat_disk <- function(mapping = NULL,
-                      data = NULL,
-                      geom = "face",
-                      position = "identity",
-                      na.rm = FALSE,
-                      radius = NULL, diameter = NULL,
-                      segments = 60,
-                      show.legend = NA,
-                      inherit.aes = TRUE,
-                      ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatDisk,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      segments = segments,
-      ...
-    )
-  )
-}
+#' @example inst/examples/ex-disk-simplicial-complex.R
+# file.edit("inst/examples/ex-simplicial-complex-equilateral.R")
+# file.edit("inst/examples/ex-simplicial-complex.R")
+# file.edit("inst/examples/ex-disk-simplicial-complex.R")
+NULL
 
 #' @rdname ggtda-ggproto
+#' @format NULL
 #' @usage NULL
 #' @export
-StatDisk <- ggproto(
-  "StatDisk", Stat,
+StatSimplicialComplex <-  ggproto(
+  "StatSimplicialComplex", Stat,
   
   required_aes = c("x", "y"),
   
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL,
-                           segments = 60) {
-    # handle disk dimension
-    if ((is.null(radius) && is.null(diameter)) || segments == 0) {
-      return(data[NULL, , drop = FALSE])
-    }
-    if (! is.null(diameter)) {
-      if (! is.null(radius)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
-                "`radius` value will be used.")
-      } else {
-        radius <- diameter / 2
-      }
-    }
+  # Alternatively, could assign fill = after_stat(dim)
+  default_aes = aes(alpha = after_stat(face)),
+  
+  compute_group = function(
+    data, scales,
+    radius = NULL, diameter = NULL, 
+    zero_simplexes = "all", one_simplexes = "maximal",
+    max_dimension = 10, complex = "Rips", engine = NULL 
+  ) {
     
-    # calculate a polygon that approximates a circle
-    angles <- (0:segments) * 2 * pi / segments
-    disk <- radius * cbind(cos(angles), sin(angles))
-    disk <- as.data.frame(disk)
-    names(disk) <- c("x.offset", "y.offset")
-    
-    # copy the circle at each point
-    disks <- tidyr::expand_grid(data[, c("x", "y")], disk)
-    data$.id <- 1:nrow(data)
-    data <- merge(data, disks, by = c("x", "y"))
-    data <- transform(data,
-                      x = x + x.offset, y = y + y.offset,
-                      group = interaction(group, .id))
-    data$group <- match(data$group, unique(data$group))
-    data <- data[, setdiff(names(data), c("x.offset", "y.offset", ".id"))]
-    
-    # return circles data
-    data
-  }
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_vietoris0 <- function(mapping = NULL,
-                           data = NULL,
-                           geom = "point",
-                           position = "identity",
-                           na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE,
-                           ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatVietoris0,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatVietoris0 <- ggproto(
-  "StatVietoris0", StatIdentity,
-  
-  required_aes = c("x", "y")
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_vietoris1 <- function(mapping = NULL,
-                           data = NULL,
-                           geom = "segment",
-                           position = "identity",
-                           na.rm = FALSE,
-                           radius = NULL, diameter = NULL,
-                           show.legend = NA,
-                           inherit.aes = TRUE,
-                           ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatVietoris1,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatVietoris1 <- ggproto(
-  "StatVietoris1", Stat,
-  
-  required_aes = c("x", "y"),
-  
-  default_aes = aes(alpha = .25),
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL) {
-    # handle disk dimension
+    # TODO:
+    # Add check for validitiy of zero_ and one_simplexes arguments
+    # move to setup params method
+    # handle disk size
     if (is.null(radius) && is.null(diameter)) {
       return(data[NULL, , drop = FALSE])
     }
     if (! is.null(radius)) {
       if (! is.null(diameter)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
+        warning("Pass a value to only one of `radius` and `diameter`; ",
                 "`diameter` value will be used.")
       } else {
         diameter <- radius * 2
       }
     }
     
-    # indices of pairs of data points that are within `diameter` of each other
-    edges <- proximate_pairs(data, diameter)
-    edges <- t(edges)[c("a", "b"), ]
+    # logic to deduce reasonable values of engine
+    # + issue warnings when choices are incompatible
+    complex <- match.arg(complex, c("Vietoris", "Rips", "Cech", "alpha"))
+    engine <- assign_complex_engine(complex, engine, max_dimension)
     
-    # data frame of edges' starting and ending coordinates
-    res <- data.frame(
-      x = data$x[edges["a", , drop = TRUE]],
-      y = data$y[edges["a", , drop = TRUE]],
-      xend = data$x[edges["b", , drop = TRUE]],
-      yend = data$y[edges["b", , drop = TRUE]]
+    res <- switch(
+      engine,
+      "base" = simplicial_complex_base(
+        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+      ),
+      "RTriangle" = simplicial_complex_RTriangle(
+        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+      ),
+      "simplextree" = simplicial_complex_simplextree(
+        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+      )
     )
     
-    # return the edges data
-    res
-  }
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_vietoris2 <- function(mapping = NULL,
-                           data = NULL,
-                           geom = "face",
-                           position = "identity",
-                           na.rm = FALSE,
-                           radius = NULL, diameter = NULL,
-                           show.legend = NA,
-                           inherit.aes = TRUE,
-                           ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatVietoris2,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatVietoris2 <- ggproto(
-  "StatVietoris2", Stat,
-  
-  required_aes = c("x", "y"),
-  
-  default_aes = aes(alpha = .1),
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL) {
-    # handle disk dimension
-    if (is.null(radius) && is.null(diameter)) {
-      return(data[NULL, , drop = FALSE])
+    # TODO:
+    # Take care of zero_ or one_simplexes == "none"
+    # and remove simplexes w/ dim > max_dimension
+    if (max_dimension < 2L) {
+      res <- res[res$dim < 2L, , drop = FALSE]
     }
-    if (! is.null(radius)) {
-      if (! is.null(diameter)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
-                "`diameter` value will be used.")
-      } else {
-        diameter <- radius * 2
-      }
+    if (max_dimension < 1L | one_simplexes == "none") {
+      res <- res[res$dim != 1L, , drop = FALSE]
+    }
+    # QUESTION: Require upstream that `max_dimension >= 0`?
+    if (max_dimension < 0L | zero_simplexes == "none") {
+      res <- res[res$dim != 0L, , drop = FALSE]
     }
     
-    # indices of pairs of data points that are within `diameter` of each other
-    edges <- as.data.frame(proximate_pairs(data, diameter))
-    
-    # indices of triples of data points having diameter less than `diameter`
-    faces <- merge(
-      edges,
-      transform(edges, b = a, c = b, a = NULL),
-      by = "b", all = FALSE,
-      sort = FALSE
-    )
-    faces <- merge(
-      faces,
-      transform(edges, c = b, b = NULL),
-      by = c("a", "c"), all = FALSE,
-      sort = FALSE
-    )
-    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
-    
-    # data frame of faces' perimeter coordinates
-    res <- data.frame(
-      x = data$x[as.vector(faces)],
-      y = data$y[as.vector(faces)],
-      group = rep(seq_len(ncol(faces)), each = 3L)
-    )
-    
-    # return the faces data
-    res
-  }
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_cech0 <- stat_vietoris0
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatCech0 <- ggproto("StatCech0", StatVietoris0)
-
-#' @rdname simplicial-complex
-#' @export
-stat_cech1 <- stat_vietoris1
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatCech1 <- ggproto("StatCech1", StatVietoris1)
-
-#' @rdname simplicial-complex
-#' @export
-stat_cech2 <- function(mapping = NULL,
-                       data = NULL,
-                       geom = "face",
-                       position = "identity",
-                       na.rm = FALSE,
-                       radius = NULL, diameter = NULL,
-                       show.legend = NA,
-                       inherit.aes = TRUE,
-                       ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatCech2,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatCech2 <- ggproto(
-  "StatCech2", StatVietoris2,
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL) {
-    # handle disk dimension
-    if (is.null(radius) && is.null(diameter)) {
-      return(data[NULL, , drop = FALSE])
-    }
-    if (! is.null(radius)) {
-      if (! is.null(diameter)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
-                "`diameter` value will be used.")
-      } else {
-        diameter <- radius * 2
-      }
-    }
-    
-    # indices of triples of data points that are within `diameter` of some point
-    faces <- proximate_triples(data, diameter)
-    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
-    
-    # data frame of faces' perimeter coordinates
-    data <- data.frame(
-      x = data$x[as.vector(faces)],
-      y = data$y[as.vector(faces)],
-      group = rep(seq_len(ncol(faces)), each = 3L)
-    )
-    
-    # return the faces data
-    data
-  }
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_alpha0 <- stat_vietoris0
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatAlpha0 <- ggproto("StatAlpha0", StatVietoris0)
-
-#' @rdname simplicial-complex
-#' @export
-stat_alpha1 <- function(mapping = NULL,
-                        data = NULL,
-                        geom = "segment",
-                        position = "identity",
-                        na.rm = FALSE,
-                        radius = NULL, diameter = NULL,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatAlpha1,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatAlpha1 <- ggproto(
-  "StatAlpha1", Stat,
-  
-  required_aes = c("x", "y"),
-  
-  default_aes = aes(alpha = .25),
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL) {
-    if (is.null(radius) && is.null(diameter)) {
-      return(data[NULL, , drop = FALSE])
-    }
-    if (! is.null(radius)) {
-      if (! is.null(diameter)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
-                "`diameter` value will be used.")
-      } else {
-        diameter <- radius * 2
-      }
-    }
-    
-    # Delaunay triangulation, keeping only indices of edges and of triangles
-    dt <- triangulate(pslg(as.matrix(data[, c("x", "y")])), Y = TRUE)[["E"]]
-    
-    # indices of Delaunay edges within `diameter` of each other
-    edge_dists <- apply(
-      data[dt[, 2L], c("x", "y"), drop = FALSE] -
-        data[dt[, 1L], c("x", "y"), drop = FALSE],
-      1L, norm, "2"
-    )
-    edges <- dt[edge_dists < diameter, , drop = FALSE]
-    edges <- matrix(t(apply(edges, 1L, sort)), ncol = 2L)
-    edges <- as.data.frame(edges)
-    names(edges) <- c("a", "b")
-    edges <- t(edges)[c("a", "b"), ]
-    
-    # data frame of edges' starting and ending coordinates
-    data <- data.frame(
-      x = data$x[edges["a", , drop = TRUE]],
-      y = data$y[edges["a", , drop = TRUE]],
-      xend = data$x[edges["b", , drop = TRUE]],
-      yend = data$y[edges["b", , drop = TRUE]]
-    )
-    
-    # return the edges data
-    data
-  }
-)
-
-#' @rdname simplicial-complex
-#' @export
-stat_alpha2 <- function(mapping = NULL,
-                        data = NULL,
-                        geom = "face",
-                        position = "identity",
-                        na.rm = FALSE,
-                        radius = NULL, diameter = NULL,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        ...) {
-  layer(
-    data = data,
-    mapping = mapping,
-    stat = StatAlpha2,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      radius = radius, diameter = diameter,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-StatAlpha2 <- ggproto(
-  "StatAlpha2", Stat,
-  
-  required_aes = c("x", "y"),
-  
-  default_aes = aes(alpha = .25),
-  
-  # statistical transformation into plot-ready data
-  compute_panel = function(data, scales,
-                           radius = NULL, diameter = NULL) {
-    if (is.null(radius) && is.null(diameter)) {
-      return(data[NULL, , drop = FALSE])
-    }
-    if (! is.null(radius)) {
-      if (! is.null(diameter)) {
-        warning("Pass a value to only one of `radius` or `diameter`; ",
-                "`diameter` value will be used.")
-      } else {
-        diameter <- radius * 2
-      }
-    }
-    
-    # Delaunay triangulation, keeping only indices of edges and of triangles
-    dt <- triangulate(pslg(as.matrix(data[, c("x", "y")])), Y = TRUE)[["T"]]
-    
-    # indices of Delaunay faces within `diameter` of each other
-    face_vertices <- unique(as.vector(dt))
-    if (nrow(dt) * 3L > choose(length(face_vertices), 2L)) {
-      # calculate all distances among face vertices
-      face_vertices <- sort(face_vertices)
-      faces <- proximate_triples(data[face_vertices, , drop = FALSE], diameter)
-      faces[] <- face_vertices[as.matrix(faces)]
-      dt_faces <- matrix(t(apply(dt, 1L, sort)), ncol = 3L)
-      faces <- merge(faces, as.data.frame(dt_faces), by = seq(3L))
+    # make a factor variable for high-dimensional simplices
+    if (max(res$dim >= 2L)) {
+      res$face <- as.character(ifelse(res$dim < 2L, 2L, res$dim))
     } else {
-      # calculate pairwise distances between face edges
-      face_pairs <-
-        rbind(dt[, c(1L, 2L)], dt[, c(1L, 3L)], dt[, c(2L, 3L)])
-      face_dists <- apply(
-        data[face_pairs[, 2L], c("x", "y"), drop = FALSE] -
-          data[face_pairs[, 1L], c("x", "y"), drop = FALSE],
-        1L, norm, "2"
-      )
-      face_dists <- matrix(face_dists, ncol = 3L, byrow = FALSE)
-      # shed too-distant pairs
-      face_wh <- apply(face_dists < diameter, 1L, all)
-      faces <- dt[face_wh, , drop = FALSE]
-      face_dists <- face_dists[face_wh, , drop = FALSE]
-      # semiperimeters
-      face_sp <- .5 * apply(face_dists, 1L, sum)
-      # circumdiameters
-      face_cd <- .5 * apply(face_dists, 1L, prod) / sqrt(
-        face_sp * (face_sp - face_dists[, 1L]) *
-          (face_sp - face_dists[, 2L]) * (face_sp - face_dists[, 3L])
-      )
-      # squares of longest sides
-      face_m <- apply(face_dists, 1L, max)^2
-      # sum of squares of remaining sides
-      face_n <- apply(face_dists^2, 1L, sum) - face_m
-      # when largest angles obtuse, longest side lengths;
-      # otherwise, circumdiameters
-      face_diam <- ifelse(
-        face_m > face_n,
-        apply(face_dists, 1L, max),
-        face_cd
-      )
-      faces <- faces[face_diam < diameter, , drop = FALSE]
-      faces <- as.data.frame(faces)
-      names(faces) <- c("a", "b", "c")
+      res$face <- NA_character_
     }
-    faces <- t(as.matrix(faces))[c("a", "b", "c"), , drop = FALSE]
-    
-    # data frame of faces' perimeter coordinates
-    data <- data.frame(
-      x = data$x[as.vector(faces)],
-      y = data$y[as.vector(faces)],
-      group = rep(seq_len(ncol(faces)), each = 3L)
+    res$face <- factor(
+      res$face,
+      levels = as.character(seq(2L, max(c(2L, res$dim))))
     )
     
-    # return the faces data
-    data
+    res
   }
+  
 )
 
-proximate_pairs <- function(data, diameter) {
-  distances <- as.matrix(stats::dist(data[, c("x", "y")]))
-  pairs <- which(distances < diameter & upper.tri(distances), arr.ind = TRUE)
-  dimnames(pairs) <- list(NULL, c("a", "b"))
-  pairs
-}
-
-proximate_triples <- function(data, diameter) {
-  # distances between pairs
-  dists <- data.frame(
-    a = rep(1:(nrow(data) - 1), rep((nrow(data) - 1):1)),
-    b = unlist(lapply(2:nrow(data), function(k) k:nrow(data))),
-    d = as.vector(stats::dist(data))
-  )
-  # shed too-distant pairs
-  dists <- dists[dists$d < diameter, , drop = FALSE]
-  # distances among triples
-  triples <- merge(
-    dists,
-    transform(dists, c = dists$b, b = dists$a, a = NULL),
-    by = "b", suffixes = c("_ab", "_bc")
-  )
-  triples <- merge(
-    triples,
-    transform(dists, c = dists$b, b = NULL, d_ac = dists$d, d = NULL),
-    by = c("a", "c")
-  )
-  # semiperimeters
-  triples$s <- .5 * (triples$d_ab + triples$d_bc + triples$d_ac)
-  # circumdiameters
-  triples$cd <- .5 * triples$d_ab * triples$d_bc * triples$d_ac / sqrt(
-    triples$s * (triples$s - triples$d_ab) *
-      (triples$s - triples$d_bc) * (triples$s - triples$d_ac)
-  )
-  # squares of longest sides
-  triples$m <- pmax(triples$d_ab, triples$d_bc, triples$d_ac)^2
-  # sum of squares of remaining sides
-  triples$n <- triples$d_ab^2 + triples$d_bc^2 + triples$d_ac^2 - triples$m
-  # when largest angles obtuse, longest side lengths; otherwise, circumdiameters
-  triples$diam <- ifelse(
-    triples$m > triples$n,
-    pmax(triples$d_ab, triples$d_bc, triples$d_ac),
-    triples$cd
-  )
-  triples <- triples[triples$diam < diameter, c("a", "b", "c"), drop = FALSE]
-  rownames(triples) <- NULL
-  triples
-}
-
-#' @rdname simplicial-complex
+#' @rdname simplicial_complex
 #' @export
-geom_face <- function(mapping = NULL,
-                      data = NULL,
-                      stat = "identity",
-                      position = "identity",
-                      na.rm = FALSE,
-                      show.legend = NA,
-                      inherit.aes = TRUE,
-                      ...) {
+stat_simplicial_complex <- function(mapping = NULL,
+                                    data = NULL,
+                                    geom = "SimplicialComplex",
+                                    position = "identity",
+                                    radius = NULL,
+                                    diameter = NULL,
+                                    zero_simplexes = "all",
+                                    one_simplexes = "maximal",
+                                    max_dimension = 10,
+                                    complex = "Rips",
+                                    engine = NULL,
+                                    na.rm = FALSE,
+                                    show.legend = NA,
+                                    inherit.aes = TRUE,
+                                    ...) {
+  layer(
+    stat = StatSimplicialComplex, 
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      radius = radius,
+      diameter = diameter,
+      zero_simplexes = zero_simplexes,
+      one_simplexes = one_simplexes,
+      max_dimension = max_dimension,
+      engine = engine,
+      complex = complex,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomSimplicialComplex <- ggproto(
+  "GeomSimplicialComplex", Geom,
+  
+  # NOTE: might want to use this if legends are otherwise printed without
+  # high-dimenisonal simplices
+  # setup_params = function(data, params) {
+  #   
+  #   # only show legend if high-dimensional simplices exist
+  #   if (all(is.na(data$face))) params$show.legend <- FALSE
+  #   
+  #   params
+  # },
+  
+  draw_group = function(data, panel_params, coord,
+                        outlines = TRUE,
+                        lineend = "butt", linejoin = "round", linemitre = 10) {
+    
+    n <- nrow(data)
+    
+    if (n == 0L) return(zeroGrob())
+    
+    # TODO:
+    # Munching happens at the group level,
+    # need to reconsider how to deal w/ transforms
+    if (FALSE) {
+      
+      munched <- coord_munch(coord, data, panel_params)
+      
+      # Sort by id to make sure that colors, fill, etc. come in same
+      # order
+      munched <- munched[order(munched$id),]
+      
+      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      high_simplex_data <- 
+        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
+      
+    } else {
+      
+      data <- coord$transform(data, panel_params)
+      
+      data <- data[order(data$id), , drop = FALSE]
+      
+      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      high_simplex_data <- 
+        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
+      
+    }
+    
+    # List to hold various grobs (polygons, linesegments, points)
+    grobs <- list()
+    
+    # Drawing the simplexes w/ dim > 1 -----
+    if (nrow(high_simplex_data) > 0L) {
+      
+      # For gpar(), there is one entry per polygon (not one entry per point).
+      # We'll pull the first value from each (id)_group, and assume all
+      # these values are the same within each group.
+      first_idx <- ! duplicated(high_simplex_data$id)
+      first_rows <- high_simplex_data[first_idx, , drop = FALSE]
+      
+      grobs$simplexes <- grid::polygonGrob(
+        high_simplex_data$x, high_simplex_data$y, default.units = "native",
+        id = high_simplex_data$id,
+        gp = grid::gpar(
+          col = if (outlines) first_rows$colour else NA,
+          fill = alpha(first_rows$fill, first_rows$alpha),
+          lwd = first_rows$linewidth * .pt,
+          lty = first_rows$linetype,
+          lineend = lineend,
+          linejoin = linejoin,
+          linemitre = linemitre
+        )
+      )
+      
+    }
+    
+    # Drawing the one_simplexes -----
+    if (nrow(one_simplex_data) > 0L) {
+      
+      # First, need to collapse pairs of rows corresponding
+      # to line segments (edges)
+      one_simplex_data <- split(one_simplex_data, one_simplex_data$id)
+      one_simplex_data <- lapply(one_simplex_data, collapse_one_simplex_pairs)
+      one_simplex_data <- do.call(rbind, one_simplex_data)
+      
+      # Currently, can't adjust alpha of zero- and one-simplexes
+      # If overplotting is an issue, set one_simplexes = "none"
+      # (Similar to geom_density)
+      grobs$one_simplex <- grid::segmentsGrob(
+        one_simplex_data$x, one_simplex_data$y,
+        one_simplex_data$xend, one_simplex_data$yend,
+        default.units = "native",
+        gp = grid::gpar(
+          # col = alpha(one_simplex_data$colour, one_simplex_data$alpha),
+          # fill = alpha(one_simplex_data$fill, one_simplex_data$alpha),
+          col = one_simplex_data$colour,
+          fill = one_simplex_data$fill,
+          lwd = one_simplex_data$linewidth * .pt,
+          lty = one_simplex_data$linetype,
+          lineend = lineend,
+          linejoin = linejoin
+        ),
+        arrow = NULL # not directed
+      )
+      
+    }
+    
+    # Drawing the 0-simplexes -----
+    if (nrow(zero_simplex_data) > 0L) {
+      
+      stroke_size <- zero_simplex_data$stroke
+      stroke_size[is.na(stroke_size)] <- 0
+      
+      # Currently, can't adjust alpha of zero- and one-simplexes
+      # If overplotting is an issue, set zero_simplexes = FALSE
+      # (Similar to geom_density)
+      grobs$zero_simplex_data <- grid::pointsGrob(
+        zero_simplex_data$x, zero_simplex_data$y,
+        pch = zero_simplex_data$shape,
+        gp = grid::gpar(
+          col = zero_simplex_data$colour,
+          fill = zero_simplex_data$fill,
+          # col = alpha(zero_simplex_data$colour, zero_simplex_data$alpha),
+          # fill = alpha(zero_simplex_data$fill, zero_simplex_data$alpha),
+          # Stroke is added around the outside of the point
+          # fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
+          lwd = zero_simplex_data$stroke * .stroke / 2
+        )
+      )
+      
+    }
+    
+    grob <- grid::gTree(children = do.call(grid::gList, grobs))
+    grob$name <- grid::grobName(grob, "geom_simplicial_complex")
+    grob
+  },
+ 
+  default_aes = aes(colour = "black", fill = "grey30", alpha = NA,
+                    linewidth = 0.5, linetype = 1,
+                    shape = 21L, size = 1.5, stroke = .5),
+  
+  required_aes = c("x", "y", "id", "dim"),
+  
+  draw_key = draw_key_simplex,
+  
+  rename_size = TRUE
+)
+
+#' @rdname simplicial_complex
+#' @export
+geom_simplicial_complex <- function(mapping = NULL, data = NULL,
+                                    stat = "SimplicialComplex",
+                                    position = "identity",
+                                    outlines = TRUE,
+                                    na.rm = FALSE,
+                                    show.legend = NA,
+                                    inherit.aes = TRUE,
+                                    ...) {
   layer(
     data = data,
     mapping = mapping,
     stat = stat,
-    geom = GeomFace,
+    geom = GeomSimplicialComplex,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      outlines = outlines,
       na.rm = na.rm,
       ...
     )
   )
 }
 
-#' @rdname ggtda-ggproto
-#' @usage NULL
-#' @export
-GeomFace <- ggproto(
-  "GeomFace", GeomPolygon,
+# Helper functions ---------------------------------------------------------
+
+collapse_one_simplex_pairs <- function(df) {
+  res <- df[1, , drop = FALSE]
+  res$xend <- df[2, "x"]
+  res$yend <- df[2, "y"]
   
-  default_aes = aes(colour = "NA", fill = "grey", alpha = .15,
-                    size = 0.5, linetype = 1)
-)
+  res
+}
+
+# Helper function to find return rows of df
+# representing convex hull of (x, y) coords
+simplex_chull <- function(df) {
+  df[grDevices::chull(df$x, df$y), , drop = FALSE]
+}

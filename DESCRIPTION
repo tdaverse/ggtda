@@ -27,11 +27,13 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 2.10),
+    rlang (>= 1.0.0),
     RTriangle,
+    ripserr (>= 0.1.1),
+    simplextree (>= 0.9.1),
     ggplot2 (>= 3.2.1)
 Suggests:
     tdaunif (>= 0.1.0),
-    ripserr (>= 0.1.1),
     rPref (>= 1.2),
     tidyr,
     covr (>= 3.1.0),
@@ -42,5 +44,5 @@ Suggests:
 URL: https://rrrlw.github.io/ggtda/
 BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)

@@ -1,3 +1,4 @@
+
 # toy extended persistence data, adapted from Carriere & Oudot (2015)
 eph.data <- data.frame(
   dimension = c(0L, 1L, 0L, 1L),

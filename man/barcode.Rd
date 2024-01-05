@@ -17,10 +17,10 @@ geom_barcode(
 )
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}} or
-\code{\link[ggplot2:aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
-default), it is combined with the default mapping at the top level of the
-plot. You must supply \code{mapping} if there is no plot mapping.}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -40,8 +40,10 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 \item{stat}{The The statistical transformation to use on the data.
 Defaults to \code{identity}; pass a string to override the default.}
 
-\item{position}{Position adjustment, either as a string, or the result of
-a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string naming the adjustment
+(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
+position adjustment function. Use the latter if you need to change the
+settings of the adjustment.}
 
 \item{na.rm}{Logical:
 if \code{FALSE}, the default, \code{NA} lodes are not included;
@@ -93,6 +95,21 @@ in persistence diagrams, barcodes often separate segments corresponding to
 features of different dimension, by vertical grouping or by faceting.
 }
 
+\section{Aesthetics}{
+
+\code{geom_barcode()} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{start} \emph{or} \code{xmin}}
+\item \strong{\code{end} \emph{or} \code{xmax}}
+\item \code{alpha}
+\item \code{colour}
+\item \code{group}
+\item \code{linetype}
+\item \code{linewidth}
+}
+Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
+}
+
 \examples{
 #####EXAMPLE 1#####
 
@@ -138,6 +155,7 @@ fundamental and practical aspects for data scientists.
 \code{\link[ggplot2:layer]{ggplot2::layer()}} for additional arguments.
 
 Other plot layers for persistence data: 
+\code{\link{landscape}},
 \code{\link{persistence}}
 }
 \concept{plot layers for persistence data}

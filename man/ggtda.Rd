@@ -6,8 +6,6 @@
 \title{A \emph{ggplot2} Extension for Persistence Data}
 \description{
 \emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing data arising
-from topological data analysis pipelines, in particular persistence data.
-Once persistent homology as been computed, \emph{tidyverse} useRs can efficiently
-visualize the persistence of features within the "layered grammar of
-graphics" framework of \emph{ggplot2}.
+from topological data analysis, including persistence data and topological
+constructions on planar data.
 }
