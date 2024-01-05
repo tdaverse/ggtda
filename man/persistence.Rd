@@ -6,7 +6,6 @@
 \alias{stat_frontier}
 \alias{geom_frontier}
 \alias{geom_fundamental_box}
-\alias{geom_diagonal}
 \title{Persistence diagrams}
 \usage{
 stat_persistence(
@@ -56,17 +55,6 @@ geom_fundamental_box(
   position = "identity",
   diagram = "diagonal",
   t = NULL,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
-geom_diagonal(
-  mapping = NULL,
-  data = NULL,
-  stat = "identity",
-  position = "identity",
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -165,9 +153,7 @@ The original persistence diagrams plotted persistence against birth in what
 we call "flat" diagrams, but most plot death against birth in "diagonal"
 diagrams, often with a diagonal line indicating zero persistence.
 
-The convenience layer \code{geom_diagonal()} is appropriate only for the
-"diagonal" layout and accepts no aesthetics. It pairs well with the
-\code{geom_fundamental_box()} layer that renders fundamental boxes at specified
+The \code{geom_fundamental_box()} layer renders fundamental boxes at specified
 time points (Chung & Lawson, 2020).
 }
 
@@ -200,7 +186,7 @@ ggplot(toy.data,
   coord_equal() +
   stat_persistence(aes(alpha = after_stat(persistence)),
                    diagram = "diagonal", size = 3) +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = "none")
 # diagonal persistence diagram with fundamental boxes
@@ -209,7 +195,7 @@ ggplot(toy.data,
   theme_persist() +
   coord_equal() +
   stat_persistence() +
-  geom_diagonal() +
+  geom_abline(intercept = 0, slope = 1) +
   geom_fundamental_box(t = c(1.5, 5.5),
                        color = "goldenrod", fill = "goldenrod") +
   lims(x = c(0, 6), y = c(0, 6))
