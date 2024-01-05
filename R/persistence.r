@@ -39,6 +39,7 @@
 
 #' @eval rd_sec_computed_vars(
 #'   stat = "persistence",
+#'   id = "feature identifier (across 'group').",
 #'   part =
 #'   "whether features belong to ordinary, relative, or extended homology.",
 #'   persistence =
@@ -56,18 +57,23 @@
 #' @param ... Additional arguments passed to [ggplot2::layer()].
 #' @param geom The geometric object to use display the data; defaults to
 #'   `point`. Pass a string to override the default.
-#' @param diameter_max,radius_max (Document.)
-#' @param p (Document.)
-#' @param dimension_max (Document.)
-#' @param complex (Document.)
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
+#' @param diameter_max,radius_max (Document.)
+#' @param dimension_max (Document.)
+#' @param field_order (Document.)
+#' @param complex The type of filtration from which to compute persistent
+#'   homology; currently only `"Rips"` and `"Vietoris"` (equivalent) are
+#'   accepted.
 #' @example inst/examples/ex-persistence.R
 #' @example inst/examples/ex-persistence-extended.R
+#' @example inst/examples/ex-persistence-dataset.R
+NULL
+
 # file.edit("inst/examples/ex-persistence.R")
 # file.edit("inst/examples/ex-persistence-extended.R")
-NULL
+# file.edit("inst/examples/ex-persistence-dataset.R")
 
 #' @rdname ggtda-ggproto
 #' @format NULL
@@ -90,16 +96,81 @@ StatPersistence <- ggproto(
         data$end <- data$start <- NULL
       }
       
+      # REVIEW: move this to `stat_persistence()`?
+      params$complex <- match.arg(params$complex, c("Vietoris", "Rips"))
+      
       # ensure that engine can handle data
-      ph_classes <- gsub(
-        "vietoris_rips\\.", "",
-        as.character(methods(ripserr::vietoris_rips))
-      )
+      ph_classes <- if (.ripserr_version == "0.1.1") {
+        # https://github.com/cran/ripserr/blob/
+        # 8cadc3a86009149418d6f9a61124af9d6372d34e/R/calculate.R#L68
+        c(
+          "dist", "matrix",
+          gsub("as\\.matrix\\.", "",
+               as.character(methods(base::as.matrix)))
+        )
+      } else if (.ripserr_version >= "0.2.0") {
+        gsub("vietoris_rips\\.", "",
+             as.character(methods(ripserr::vietoris_rips)))
+      }
       ph_classes <- setdiff(ph_classes, "default")
       if (! all(vapply(data$dataset, inherits, FALSE, what = ph_classes))) {
-        stop("`dataset` accepts data of the following classes: ",
+        stop("`dataset` only accepts data of the following classes: ",
              paste(paste("'", ph_classes, "'", sep = ""), collapse = ", "))
       }
+      
+      # as in {ggalluvial}, ensure data is in transformation-ready form here
+      
+      # handle disk size
+      if (is.null(params$radius_max) && is.null(params$diameter_max)) {
+        params$diameter_max <- Inf
+      }
+      if (! is.null(params$radius_max)) {
+        if (! is.null(params$diameter_max)) {
+          warning("Pass a value to only one of ",
+                  "`radius_max` and `diameter_max`; ",
+                  "`diameter_max` value will be used.")
+        } else {
+          params$diameter_max <- params$radius_max * 2
+        }
+      }
+      
+      # separate out dataset list column
+      dataset_list <- data$dataset
+      # introduce identifier
+      data$dataset <- seq(nrow(data))
+      # compute persistent homology from dataset list
+      if (params$diameter_max == Inf) params$diameter_max <- -1L
+      dataset_list <- lapply(
+        dataset_list,
+        ripserr::vietoris_rips,
+        threshold = params$diameter_max,
+        p = params$field_order %||% 2L,
+        # deprecated to `max_dim` in v0.2.0
+        dim = params$dimension_max %||% 1L,
+        # ignored in v0.2.0
+        return_format = "df"
+      )
+      # introduce identifier
+      dataset_list <- mapply(
+        \(d, i) { d <- as.data.frame(d); d$dataset <- i; d },
+        d = dataset_list, i = seq(nrow(data)),
+        SIMPLIFY = FALSE
+      )
+      # bind the list of output data frames
+      ph_data <- do.call(rbind, dataset_list)
+      # rename to required aesthetics
+      names(ph_data)[match(c("birth", "death"), names(ph_data))] <- 
+        c("start", "end")
+      # merge persistent homology data back into original data
+      data <- merge(data, ph_data, by = "dataset")
+      
+      # introduce or interact with 'group' aesthetic
+      if (is.null(data$group)) {
+        data$group <- as.character(data$dataset)
+      } else {
+        data$group <- interaction(data$group, as.character(data$dataset))
+      }
+      data$dataset <- NULL
       
     }
     
@@ -108,92 +179,36 @@ StatPersistence <- ggproto(
   
   setup_params = function(data, params) {
     
-    # need to implement other complexes (Cech, Alpha, ...)
-    if (params$complex != "vietoris" && params$complex != "rips")
-      stop("Only `'vietoris'` / `'rips'` complexes are currently implemented.")
-    
-    # handle disk size
-    if (is.null(params$radius_max) && is.null(params$diameter_max)) {
-      params$diameter_max <- Inf
-    }
-    if (! is.null(params$radius_max)) {
-      if (! is.null(params$diameter_max)) {
-        warning("Pass a value to only one of `radius_max` or `diameter_max`; ",
-                "`diameter_max` value will be used.")
-      } else {
-        params$diameter_max <- params$radius_max
+    # discard unused parameters
+    if (is.null(data$dataset)) {
+      
+      dataset_params <- intersect(
+        names(data),
+        c("diameter_max", "radius_max", "dimension_max", "field_order",
+          "complex")
+      )
+      if (length(dataset_params) > 0L) {
+        params_vec <- paste0("`", dataset_params, "`", collapse = ", ")
+        warning("Parameters ", params_vec,
+                " are only used with the `dataset` aesthetic.")
+        params <- params[setdiff(names(params), params_vec)]
       }
+      
+    } else {
+      
+      # REVIEW: move this to `stat_persistence()`?
+      params$complex <- match.arg(params$complex, c("Vietoris", "Rips"))
+      
     }
     
     params
   },
   
-  # FIXME: `compute_group()` taken from 'persistence' branch
-  compute_group = function(
-    data, scales,
-    radius_max = NULL, diameter_max = Inf,
-    p = 2L, dimension_max = 1L, complex = "rips",
-    diagram = "diagonal"
-  ) {
-    
-    # compute persistence from list column of data objects
-    if (! is.null(data$dataset)) {
-      
-      # compute persistence data from `dataset`
-      if (diameter_max == Inf) diameter_max <- -1L
-      data$dataset <- lapply(
-        data$dataset,
-        ripserr::vietoris_rips,
-        threshold = diameter_max, p = p, dim = dimension_max,
-        return_format = "df"
-      )
-      data <- tidyr::unnest(data, dataset)
-      # rename to required aesthetics
-      names(data)[match(c("birth", "death"), names(data))] <- c("start", "end")
-      
-    }
-
-    # points in cartesian coordinates (un-negated from opposite filtration)
-    data$x <- abs(data$start)
-    data$y <- abs(data$end)
-    # endpoints of frontier segments
-    data$x0 <- data$y0 <- data$x
-    data$xend <- data$yend <- data$y
-    # TODO: Is this overkill? Could just use `x0` and `xend`, though at some
-    # risk of confusion.
-    
-    # compute 'part'
-    data$part <- with(data, {
-      part <- NA_character_
-      part[start >= 0 & end >= 0] <- "ordinary"
-      part[start <  0 & end <  0] <- "relative"
-      part[start >= 0 & end <  0] <- "extended"
-      factor(part, levels = c("ordinary", "relative", "extended"))
-    })
-    
-    # compute 'persistence'
-    data$persistence <- data$end - data$start
-    data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
-    # computed variable: `feature_id` (sort by dimension, birth, death)
-    data$feature_id <- interaction(
-      if (is.null(data$group)) NA_character_ else data$group,
-      data$start, data$end,
-      drop = TRUE, lex.order = TRUE
-    )
-    # re-distinguish duplicates
-    data$feature_id <- order(order(data$feature_id))
-
-    # diagram transformation
-    data <- diagram_transform(data, diagram)
-    
-    # return point data
-    data
-  },
-  
-  # FIXME: `compute_panel()` taken from 'simplify-layers' branch
   compute_panel = function(
     data, scales,
-    diagram = "diagonal"
+    diagram = "diagonal",
+    diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
+    field_order = 2L, complex = "Rips"
   ) {
     
     # points in cartesian coordinates (un-negated from opposite filtration)
@@ -214,6 +229,15 @@ StatPersistence <- ggproto(
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
+    # computed variable: `id` (sort by dimension, birth, death)
+    data$id <- interaction(
+      if (is.null(data$group)) NA_character_ else data$group,
+      data$start, data$end,
+      drop = TRUE, lex.order = TRUE
+    )
+    # re-distinguish duplicates
+    data$id <- order(order(data$id))
+    
     # diagram transformation
     data <- diagram_transform(data, diagram)
     
@@ -227,9 +251,9 @@ stat_persistence <- function(mapping = NULL,
                              geom = "point",
                              position = "identity",
                              diameter_max = Inf, radius_max = NULL,
-                             p = 2L,
                              dimension_max = 1L,
-                             complex = "rips",
+                             field_order = 2L,
+                             complex = "Rips",
                              diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
@@ -245,8 +269,8 @@ stat_persistence <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       diameter_max = diameter_max, radius_max = radius_max,
-      p = p,
       dimension_max = dimension_max,
+      field_order = field_order,
       complex = complex,
       diagram = diagram,
       na.rm = na.rm,
@@ -364,9 +388,7 @@ diagram_transform <- function(data, diagram) {
     match.arg(diagram, c("flat", "diagonal", "landscape")),
     flat = transform(
       data,
-      y = data$y - data$x,
-      y0 = data$y0 - data$x0,
-      yend = data$yend - data$xend
+      y = data$y - data$x
     ),
     diagonal = data,
     landscape = transform(

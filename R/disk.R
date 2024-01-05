@@ -35,9 +35,10 @@
 #'   approximates each disk
 #' @example inst/examples/ex-disk.r
 #' @example inst/examples/ex-disk-simplicial-complex.R
+NULL
+
 # file.edit("inst/examples/ex-disk.r")
 # file.edit("inst/examples/ex-disk-simplicial-complex.R")
-NULL
 
 #' @rdname ggtda-ggproto
 #' @format NULL

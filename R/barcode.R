@@ -44,8 +44,9 @@
 #' @param stat The The statistical transformation to use on the data.
 #'   Defaults to `identity`; pass a string to override the default.
 #' @example inst/examples/ex-barcode.R
-# file.edit("inst/examples/ex-barcode.R")
 NULL
+
+# file.edit("inst/examples/ex-barcode.R")
 
 #' @rdname ggtda-ggproto
 #' @usage NULL

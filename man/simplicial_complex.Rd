@@ -184,7 +184,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(dim)}\cr dimension of the corresponding simplex.
-\item \code{after_stat(id)}\cr simplex identifiers within each \code{dim}.
+\item \code{after_stat(id)}\cr simplex identifier within each \code{dim}.
 \item \code{after_stat(face)}\cr encoding of \code{dim} for high-dimensional simplices (\code{dim >= 2L}).
 }
 }

@@ -44,8 +44,9 @@
 #' @param geom The geometric object to use display the data; defaults to `line`.
 #'   Pass a string to override the default.
 #' @example inst/examples/ex-landscape.R
-# file.edit("inst/examples/ex-landscape.R")
 NULL
+
+# file.edit("inst/examples/ex-landscape.R")
 
 #' @rdname ggtda-ggproto
 #' @format NULL

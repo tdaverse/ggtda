@@ -48,7 +48,7 @@
 #' @eval rd_sec_computed_vars(
 #'   stat = "simplicial_complex",
 #'   dim = "dimension of the corresponding simplex.",
-#'   id = "simplex identifiers within each `dim`.",
+#'   id = "simplex identifier within each `dim`.",
 #'   face = "encoding of `dim` for high-dimensional simplices (`dim >= 2L`)."
 #' )
 
@@ -75,10 +75,11 @@
 #' @example inst/examples/ex-simplicial-complex-equilateral.R
 #' @example inst/examples/ex-simplicial-complex.R
 #' @example inst/examples/ex-disk-simplicial-complex.R
+NULL
+
 # file.edit("inst/examples/ex-simplicial-complex-equilateral.R")
 # file.edit("inst/examples/ex-simplicial-complex.R")
 # file.edit("inst/examples/ex-disk-simplicial-complex.R")
-NULL
 
 #' @rdname ggtda-ggproto
 #' @format NULL

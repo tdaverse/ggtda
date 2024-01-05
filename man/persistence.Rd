@@ -2,27 +2,9 @@
 % Please edit documentation in R/persistence.r
 \name{persistence}
 \alias{persistence}
-\alias{stat_persistence}
 \alias{geom_fundamental_box}
 \title{Persistence diagrams}
 \usage{
-stat_persistence(
-  mapping = NULL,
-  data = NULL,
-  geom = "point",
-  position = "identity",
-  diameter_max = Inf,
-  radius_max = NULL,
-  p = 2L,
-  dimension_max = 1L,
-  complex = "rips",
-  diagram = "diagonal",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
 geom_fundamental_box(
   mapping = NULL,
   data = NULL,
@@ -57,24 +39,20 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use display the data; defaults to
-\code{point}. Pass a string to override the default.}
+\item{stat}{The statistical transformation to use on the data for this
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
-\item{diameter_max, radius_max}{(Document.)}
-
-\item{p}{(Document.)}
-
-\item{dimension_max}{(Document.)}
-
-\item{complex}{(Document.)}
-
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
+
+\item{t}{A numeric vector of time points at which to place fundamental boxes.}
 
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
@@ -93,12 +71,18 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{stat}{The statistical transformation to use on the data for this
-layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
-stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
-\code{"stat_count"})}
+\item{geom}{The geometric object to use display the data; defaults to
+\code{point}. Pass a string to override the default.}
 
-\item{t}{A numeric vector of time points at which to place fundamental boxes.}
+\item{diameter_max, radius_max}{(Document.)}
+
+\item{dimension_max}{(Document.)}
+
+\item{field_order}{(Document.)}
+
+\item{complex}{The type of filtration from which to compute persistent
+homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
+accepted.}
 }
 \description{
 Visualize persistence data in a (flat, diagonal, or landscape)
@@ -140,8 +124,8 @@ time points (Chung & Lawson, 2020).
 
 \code{stat_persistence()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start}}
-\item \strong{\code{end}}
+\item \strong{\code{start} \emph{or} \code{dataset}}
+\item \strong{\code{end} \emph{or} \code{dataset}}
 \item \code{group}
 }
 \code{geom_fundamental_box()} understands the following aesthetics (required aesthetics are in bold):
@@ -160,6 +144,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
+\item \code{after_stat(id)}\cr feature identifier (across 'group').
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
 }
@@ -183,7 +168,6 @@ ggplot(toy.data,
   geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 6), y = c(0, 6)) +
   guides(alpha = "none")
-  lims(x = c(0, 6), y = c(0, 6))
 # diagonal persistence diagram with fundamental boxes
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
@@ -201,6 +185,16 @@ ggplot(toy.data,
   theme_persist() +
   stat_persistence(diagram = "flat", geom = "text") +
   lims(x = c(0, NA), y = c(0, NA))
+# flat persistence diagram, labeling by feature ID
+ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
+  theme_persist() +
+  coord_equal() +
+  stat_persistence(
+    geom = "text",
+    aes(label = after_stat(id), alpha = after_stat(persistence)),
+    diagram = "flat", size = 3
+  ) +
+  guides(alpha = "none")
 
 # toy extended persistence data, adapted from Carriere & Oudot (2015)
 eph.data <- data.frame(
@@ -208,37 +202,6 @@ eph.data <- data.frame(
   birth = c(1, -9, 1, 8),
   death = c(5, -7, -11, -3)
 )
-
-## Experimental examples to test new functionality
-
-ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence(
-    geom = "text",
-    aes(label = after_stat(feature_id), alpha = after_stat(persistence)),
-    diagram = "flat", size = 3
-  ) +
-  guides(alpha = "none")
-
-ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
-  theme_persist() + coord_equal() +
-  stat_persistence(geom = "frontier")
-
-ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
-  theme_persist() + coord_equal() +
-  stat_persistence(geom = "frontier", diagram = "flat")
-
-ggplot(toy.data, aes(start = birth, end = death, color = dim)) +
-  theme_persist() + coord_equal() +
-  stat_persistence(geom = "frontier", diagram = "landscape")
-
-# this is silly but a good test
-raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
-raw_data$class <- vapply(raw_data$obj, class, "")
-ggplot(raw_data, aes(dataset = obj)) +
-  stat_persistence(aes(shape = factor(after_stat(dimension)), color = class))
-
 # extended persistence diagram
 ggplot(eph.data,
        aes(start = birth, end = death, color = factor(dimension))) +
@@ -248,6 +211,12 @@ ggplot(eph.data,
   geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 11), y = c(0, 11)) +
   labs(color = "Dimension", shape = "Homology")
+
+# this is silly but a good test
+raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
+raw_data$class <- vapply(raw_data$obj, class, "")
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
