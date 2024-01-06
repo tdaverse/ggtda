@@ -39,6 +39,8 @@
 
 #' @eval rd_sec_computed_vars(
 #'   stat = "persistence",
+#'   dimension = "feature dimension (with 'dataset' aesthetic only).",
+#'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   id = "feature identifier (across 'group').",
 #'   part =
 #'   "whether features belong to ordinary, relative, or extended homology.",
@@ -84,7 +86,7 @@ StatPersistence <- ggproto(
   
   required_aes = c("start|dataset", "end|dataset"),
   
-  optional_aes = c("dataset"),
+  # optional_aes = c("dataset"),
   
   setup_data = function(data, params) {
     
@@ -140,16 +142,24 @@ StatPersistence <- ggproto(
       data$dataset <- seq(nrow(data))
       # compute persistent homology from dataset list
       if (params$diameter_max == Inf) params$diameter_max <- -1L
-      dataset_list <- lapply(
-        dataset_list,
-        ripserr::vietoris_rips,
-        threshold = params$diameter_max,
-        # deprecated to `max_dim` in v0.2.0
-        dim = params$dimension_max %||% 1L,
-        p = params$field_order %||% 2L,
-        # ignored in v0.2.0
-        return_format = "df"
-      )
+      dataset_list <- if (.ripserr_version == "0.1.1") {
+        lapply(
+          dataset_list,
+          ripserr::vietoris_rips,
+          threshold = params$diameter_max,
+          dim = params$dimension_max %||% 1L,
+          p = params$field_order %||% 2L,
+          return_format = "df"
+        )
+      } else if (.ripserr_version >= "0.2.0") {
+        lapply(
+          dataset_list,
+          ripserr::vietoris_rips,
+          threshold = params$diameter_max,
+          max_dim = params$dimension_max %||% 1L,
+          p = params$field_order %||% 2L
+        )
+      }
       # introduce identifier
       dataset_list <- mapply(
         \(d, i) { d <- as.data.frame(d); d$dataset <- i; d },
@@ -165,10 +175,10 @@ StatPersistence <- ggproto(
       data <- merge(data, ph_data, by = "dataset")
       
       # introduce or interact with 'group' aesthetic
-      if (is.null(data$group)) {
-        data$group <- as.character(data$dataset)
+      data$group <- if (is.null(data$group)) {
+        interaction(as.character(data$dataset), data$dimension)
       } else {
-        data$group <- interaction(data$group, as.character(data$dataset))
+        interaction(data$group, as.character(data$dataset), data$dimension)
       }
       data$dataset <- NULL
       
@@ -207,6 +217,7 @@ StatPersistence <- ggproto(
   compute_panel = function(
     data, scales,
     diagram = "diagonal",
+    # 'dataset' aesthetic
     diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
     field_order = 2L, complex = "Rips"
   ) {

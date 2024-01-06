@@ -144,6 +144,8 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
+\item \code{after_stat(dimension)}\cr feature dimension (with 'dataset' aesthetic only).
+\item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(id)}\cr feature identifier (across 'group').
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
@@ -217,8 +219,12 @@ raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
 raw_data$class <- vapply(raw_data$obj, class, "")
 # exclude time series data if {ripserr} v0.1.1 is installed
 if (.ripserr_version == "0.1.1") raw_data <- raw_data[c(1L, 2L), ]
+# persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +
   stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
+# persistence landscape
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_landscape(aes(color = factor(after_stat(dimension)), linetype = class))
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence

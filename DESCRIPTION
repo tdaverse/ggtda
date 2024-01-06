@@ -45,3 +45,15 @@ BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
+Collate: 
+    'barcode.R'
+    'disk.R'
+    'draw-key-simplex.R'
+    'ggtda.R'
+    'persistence.r'
+    'landscape.R'
+    'simplicial-complex-engines.R'
+    'simplicial-complex.R'
+    'themes.R'
+    'utils.R'
+    'zzz.R'

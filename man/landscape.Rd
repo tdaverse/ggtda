@@ -23,7 +23,7 @@ geom_landscape(
   data = NULL,
   stat = "landscape",
   position = "identity",
-  diagram = "diagonal",
+  diagram = "landscape",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -103,8 +103,8 @@ Persistence landscapes do not currently recognize extended persistence data.
 
 \code{stat_landscape()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start}}
-\item \strong{\code{end}}
+\item \strong{\code{start} \emph{or} \code{dataset}}
+\item \strong{\code{end} \emph{or} \code{dataset}}
 \item \code{group}
 }
 \code{geom_landscape()} understands the following aesthetics (required aesthetics are in bold):
@@ -127,6 +127,8 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \code{stat_landscape} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(x)}, \code{after_stat(y)}\cr coordinates of segment endpoints of each frontier.
+\item \code{after_stat(dimension)}\cr feature dimension (with 'dataset' aesthetic only).
+\item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(level)}\cr position of each frontier, starting from the outermost.
 }
 
@@ -182,6 +184,18 @@ ggplot(annulus.phom, aes(start = birth, end = death,
                          shape = dimension, colour = dimension)) +
   stat_landscape(diagram = "landscape") +
   theme_persist()
+
+# this is silly but a good test
+raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
+raw_data$class <- vapply(raw_data$obj, class, "")
+# exclude time series data if {ripserr} v0.1.1 is installed
+if (.ripserr_version == "0.1.1") raw_data <- raw_data[c(1L, 2L), ]
+# persistence diagram
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
+# persistence landscape
+ggplot(raw_data, aes(dataset = obj)) +
+  stat_landscape(aes(color = factor(after_stat(dimension)), linetype = class))
 }
 \references{
 P Bubenik (2015) Statistical Topological Data Analysis using Persistence

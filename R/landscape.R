@@ -28,6 +28,8 @@
 #' @eval rd_sec_computed_vars(
 #'   stat = "landscape",
 #'   "x,y" = "coordinates of segment endpoints of each frontier.",
+#'   dimension = "feature dimension (with 'dataset' aesthetic only).",
+#'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   "level" = "position of each frontier, starting from the outermost.",
 #'   extra_note = paste0(
 #'     "Note that ",
@@ -36,6 +38,7 @@
 #' )
 
 #' @name landscape
+#' @include persistence.r
 #' @import ggplot2
 #' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -44,6 +47,7 @@
 #' @param geom The geometric object to use display the data; defaults to `line`.
 #'   Pass a string to override the default.
 #' @example inst/examples/ex-landscape.R
+#' @example inst/examples/ex-persistence-dataset.R
 NULL
 
 # file.edit("inst/examples/ex-landscape.R")
@@ -55,12 +59,30 @@ NULL
 StatLandscape <- ggproto(
   "StatLandscape", Stat,
   
-  required_aes = c("start", "end"),
+  # required_aes = c("start", "end"),
+  required_aes = StatPersistence$required_aes,
   
   default_aes = aes(group = interaction(after_stat(level), group)),
   
-  compute_group = function(data, scales,
-                           diagram = "landscape") {
+  setup_data = StatPersistence$setup_data,
+  
+  setup_params = StatPersistence$setup_params,
+  
+  # compute_panel = Stat$compute_panel,
+  
+  compute_group = function(
+    data, scales,
+    diagram = "landscape",
+    # 'dataset' aesthetic
+    diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
+    field_order = 2L, complex = "Rips"
+  ) {
+    
+    # empty case
+    if (nrow(data) == 0L) {
+      names(data)[match(c("start", "end"), names(data))] <- c("x", "y")
+      return(data)
+    }
     
     # first row (for aesthetics)
     first_row <- data[1L, setdiff(names(data), c("start", "end")), drop = FALSE]
@@ -161,7 +183,7 @@ GeomLandscape <- ggproto(
   "GeomLandscape", GeomPath,
   
   draw_panel = function(data, panel_params, coord,
-                        diagram = "diagonal",
+                        diagram = "landscape",
                         lineend = "butt", linejoin = "round", linemitre = 10) {
     
     # # adapted from `ggplot2::GeomPath`
@@ -219,7 +241,7 @@ geom_landscape <- function(mapping = NULL,
                            data = NULL,
                            stat = "landscape",
                            position = "identity",
-                           diagram = "diagonal",
+                           diagram = "landscape",
                            lineend = "butt",
                            linejoin = "round",
                            linemitre = 10,
