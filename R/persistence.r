@@ -144,9 +144,9 @@ StatPersistence <- ggproto(
         dataset_list,
         ripserr::vietoris_rips,
         threshold = params$diameter_max,
-        p = params$field_order %||% 2L,
         # deprecated to `max_dim` in v0.2.0
         dim = params$dimension_max %||% 1L,
+        p = params$field_order %||% 2L,
         # ignored in v0.2.0
         return_format = "df"
       )

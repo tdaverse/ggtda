@@ -1,6 +1,6 @@
-# Implentation of different engines for StatSimplicialComplex
+# Implementation of different engines for `StatSimplicialComplex`
 
-## simplextree
+## {simplextree}
 simplicial_complex_simplextree <- function(
     data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
 ) {
@@ -14,7 +14,7 @@ simplicial_complex_simplextree <- function(
   # (all further computed values derive from st)
   st <- data_to_simplextree(data, diameter, max_dimension, complex)
   
-  # Convert simplextree into a list
+  # Convert simplex tree into a list
   if (.simplextree_version >= "1.0.1") {
     simplexes <- as.list(simplextree::maximal(st))
   } else if (.simplextree_version == "0.9.1") {
