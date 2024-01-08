@@ -18,10 +18,10 @@ ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_landscape(aes(alpha = -after_stat(level))) +
+  stat_landscape(aes(linetype = after_stat(factor(level)))) +
   stat_persistence(diagram = "landscape") +
   lims(x = c(0, 8), y = c(0, NA)) +
-  guides(alpha = "none")
+  labs(linetype = "level")
 
 # load library and generate dataset for comprehensive example
 library("ripserr")

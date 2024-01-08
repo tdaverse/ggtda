@@ -57,8 +57,6 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param geom The geometric object to use display the data; defaults to
-#'   `point`. Pass a string to override the default.
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.

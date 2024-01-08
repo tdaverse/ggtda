@@ -31,6 +31,7 @@
 #'   dimension = "feature dimension (with 'dataset' aesthetic only).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   "level" = "position of each frontier, starting from the outermost.",
+#'   "slope" = "slope of the landscape abscissa.",
 #'   extra_note = paste0(
 #'     "Note that ",
 #'     "`start` and `end` are dropped during the statistical transformation."
@@ -44,8 +45,6 @@
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @inheritParams persistence
-#' @param geom The geometric object to use display the data; defaults to `line`.
-#'   Pass a string to override the default.
 #' @example inst/examples/ex-landscape.R
 #' @example inst/examples/ex-persistence-dataset.R
 NULL
@@ -62,7 +61,7 @@ StatLandscape <- ggproto(
   # required_aes = c("start", "end"),
   required_aes = StatPersistence$required_aes,
   
-  default_aes = aes(group = interaction(after_stat(level), group)),
+  # default_aes = aes(group = interaction(after_stat(level), group)),
   
   setup_data = StatPersistence$setup_data,
   
@@ -121,11 +120,13 @@ StatLandscape <- ggproto(
       # extract frontier
       frontier <- rbind(peaks, cols)
       frontier <- frontier[order(frontier[, 1L], frontier[, 2L]), ]
-      # frontier <- rbind(
-      #   frontier[1L, ] - Inf,
-      #   frontier,
-      #   frontier[nrow(frontier), ] + Inf
-      # )
+      frontier <- rbind(
+        # frontier[1L, ] - Inf,
+        c(-Inf, -Inf),
+        frontier,
+        # frontier[nrow(frontier), ] + Inf
+        c(Inf, Inf)
+      )
       pl[[k]] <- frontier
       
       # reset persistence diagram
@@ -138,10 +139,12 @@ StatLandscape <- ggproto(
     data <- do.call(rbind, pl)
     data <- as.data.frame(data)
     names(data) <- c("x", "y")
-    # diagram transformation
-    data <- diagram_transform(data, diagram)
     # compute level of each frontier
     data$level <- rep(seq(length(pl)), sapply(pl, nrow))
+    
+    # diagram transformation
+    data <- diagram_transform(data, diagram)
+    data$slope <- diagram_slope(diagram)
     
     # return landscape data
     cbind(data, first_row)
@@ -183,7 +186,6 @@ GeomLandscape <- ggproto(
   "GeomLandscape", GeomPath,
   
   draw_panel = function(data, panel_params, coord,
-                        diagram = "landscape",
                         lineend = "butt", linejoin = "round", linemitre = 10) {
     
     # # adapted from `ggplot2::GeomPath`
@@ -197,19 +199,7 @@ GeomLandscape <- ggproto(
     }
     
     # extend each level to the extended range
-    horizon <- diagram_horizon(ranges, diagram)
-    
-    # make room for horizons
-    group_start <- c(TRUE, data$group[-1L] != data$group[-nrow(data)])
-    group_end <- c(data$group[-1L] != data$group[-nrow(data)], TRUE)
-    data <- data[rep(seq(nrow(data)), (group_start | group_end) + 1L), ]
-    # insert horizons
-    group_start <- c(TRUE, data$group[-1L] != data$group[-nrow(data)])
-    group_end <- c(data$group[-1L] != data$group[-nrow(data)], TRUE)
-    data$x[group_start] <- horizon$x[1L]
-    data$y[group_start] <- horizon$y[1L]
-    data$x[group_end] <- horizon$x[2L]
-    data$y[group_end] <- horizon$y[2L]
+    data <- diagram_horizon(data, ranges)
     
     # adapted from `ggplot2::GeomPath`
     munched <- coord_munch(coord, data, panel_params)
@@ -241,7 +231,6 @@ geom_landscape <- function(mapping = NULL,
                            data = NULL,
                            stat = "landscape",
                            position = "identity",
-                           diagram = "landscape",
                            lineend = "butt",
                            linejoin = "round",
                            linemitre = 10,
@@ -258,7 +247,6 @@ geom_landscape <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      diagram = diagram,
       lineend = lineend,
       linejoin = linejoin,
       linemitre = linemitre,
@@ -286,17 +274,38 @@ geom_landscape <- function(mapping = NULL,
 #   rPref::psel.indices(x, rPref::low("start") * rPref::high("end"))
 # }
 
-diagram_horizon <- function(ranges, diagram) {
+diagram_slope <- function(diagram) {
   switch(
     match.arg(diagram, c("flat", "diagonal", "landscape")),
-    flat = list(x = ranges$x, y = c(0, 0)),
-    diagonal = {
-      lim <- c(
-        max(ranges$x[1L], ranges$y[1L]),
-        min(ranges$x[2L], ranges$y[2L])
-      )
-      list(x = lim, y = lim)
-    },
-    landscape = list(x = ranges$x, y = c(0, 0))
+    flat = 0,
+    diagonal = 1,
+    landscape = 0
   )
+}
+
+# WARNING: cannot handle infinite slope
+diagram_horizon <- function(data, ranges) {
+  # rows designating horizons (-1 & 1) versus peaks & cols (0)
+  data$sign <- ifelse(
+    (is.infinite(data$x) | is.infinite(data$y)),
+    (-1) ^ c(data$level[-nrow(data)] == data$level[-1L], FALSE),
+    0
+  )
+  # rows designating horizons
+  ends <- data$sign != 0
+  # minimum x coordinates to leave range
+  rans <- c(
+    min(ranges$x[1L],
+        ifelse(data$slope == 0, ranges$y[1L], ranges$y[1L] / data$slope)),
+    max(ranges$x[2L],
+        ifelse(data$slope == 0, ranges$y[2L], ranges$y[2L] / data$slope))
+  )
+  # row indices of `rans` (only for horizons)
+  inds <- (data$sign[ends] + 3) / 2
+  # finitize horizons
+  data$x[ends] <- rans[inds]
+  data$y[ends] <- rans[inds] * data$slope[ends]
+  # drop extraneous columns
+  data$sign <- NULL
+  data
 }

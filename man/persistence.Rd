@@ -71,9 +71,6 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{geom}{The geometric object to use display the data; defaults to
-\code{point}. Pass a string to override the default.}
-
 \item{diameter_max, radius_max}{(Document.)}
 
 \item{dimension_max}{(Document.)}

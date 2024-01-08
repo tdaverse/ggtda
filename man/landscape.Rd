@@ -23,7 +23,6 @@ geom_landscape(
   data = NULL,
   stat = "landscape",
   position = "identity",
-  diagram = "landscape",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -54,8 +53,9 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use display the data; defaults to \code{line}.
-Pass a string to override the default.}
+\item{geom}{The geometric object to use to display the data, either as a
+\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
+\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
@@ -130,6 +130,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \item \code{after_stat(dimension)}\cr feature dimension (with 'dataset' aesthetic only).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(level)}\cr position of each frontier, starting from the outermost.
+\item \code{after_stat(slope)}\cr slope of the landscape abscissa.
 }
 
 Note that \code{start} and \code{end} are dropped during the statistical transformation.
@@ -156,10 +157,10 @@ ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_landscape(aes(alpha = -after_stat(level))) +
+  stat_landscape(aes(linetype = after_stat(factor(level)))) +
   stat_persistence(diagram = "landscape") +
   lims(x = c(0, 8), y = c(0, NA)) +
-  guides(alpha = "none")
+  labs(linetype = "level")
 
 # load library and generate dataset for comprehensive example
 library("ripserr")
