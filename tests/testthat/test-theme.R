@@ -1,4 +1,3 @@
-context("Themes")
 
 # Tests adapted from ggplot2 theme tests ---------------------------------------
 

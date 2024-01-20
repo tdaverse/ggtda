@@ -1,4 +1,3 @@
-context("Simplicial complexes")
 
 test_that("proximate functions threshold correctly on equilateral triangle", {
   
@@ -45,14 +44,14 @@ test_that("disk layer works as expected", {
   # expect_equal(nrow(layer_data(p, i = 2L)), nrow(d) * (60L + 1L))
   
   # visual regression test
-  vdiffr::expect_doppelganger("stat_disk, annulus", p)
+  vdiffr::expect_doppelganger("geom_disk, annulus", p)
 })
 
 test_that("Cech layers work as expected", {
   
   # Čech 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", max_dimension = 0L)
+    stat_simplicial_complex(complex = "Cech", radius = .1, max_dimension = 0L)
   expect_is(p0, "ggplot")
   expect_is(p0$layer[[1]], "ggproto")
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
@@ -60,35 +59,42 @@ test_that("Cech layers work as expected", {
   
   # Čech 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", diameter = 0.7, max_dimension = 1L)
+    stat_simplicial_complex(complex = "Cech", diameter = .7, max_dimension = 1L)
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p1)), 1090L)
+  layer_p1 <- layer_data(p1)
+  expect_equal(nrow(layer_p1[layer_p1$dim == 0L, ]), nrow(d))
+  # segment data requires two rows per simplex
+  expect_equal(nrow(layer_p1), nrow(d) + 1090L * 2L)
   
   # Čech 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", diameter = 0.7, max_dimension = 2L)
+    stat_simplicial_complex(complex = "Cech", diameter = .7, max_dimension = 2L)
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 17205L)
+  layer_p2 <- layer_data(p2)
+  expect_equal(nrow(layer_p2[layer_p2$dim == 0L, ]), nrow(d))
+  # face data requires three rows per simplex
+  expect_equal(nrow(layer_p2), nrow(d) + 5735L * 3L)
   
   # skip on continuous integration services
   skip_on_travis()
   skip_on_appveyor()
   
   # visual regression tests
-  vdiffr::expect_doppelganger("stat_cech0, annulus", p0)
-  vdiffr::expect_doppelganger("stat_cech1, annulus", p1)
-  vdiffr::expect_doppelganger("stat_cech2, annulus", p2)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, cech, 0", p0)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, cech, 1", p1)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, cech, 2", p2)
 })
 
 test_that("Vietoris layers work as expected", {
   
   # Vietoris 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Vietoris", max_dimension = 0L)
+    stat_simplicial_complex(complex = "Vietoris", radius = .1,
+                            max_dimension = 0L)
   expect_is(p0, "ggplot")
   expect_is(p0$layer[[1]], "ggproto")
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
@@ -96,62 +102,34 @@ test_that("Vietoris layers work as expected", {
   
   # Vietoris 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Vietoris", diameter = 0.7, max_dimension = 1L)
+    stat_simplicial_complex(complex = "Vietoris", diameter = .7,
+                            max_dimension = 1L)
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p1)), 1090L)
+  layer_p1 <- layer_data(p1)
+  expect_equal(nrow(layer_p1[layer_p1$dim == 0L, ]), nrow(d))
+  # segment data requires two rows per simplex
+  expect_equal(nrow(layer_p1), nrow(d) + 1090L * 2L)
   
   # Vietoris 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Vietoris", diameter = 0.7, max_dimension = 2L)
+    stat_simplicial_complex(complex = "Vietoris", diameter = .7,
+                            max_dimension = 2L)
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 17214L)
+  layer_p2 <- layer_data(p2)
+  expect_equal(nrow(layer_p2[layer_p2$dim == 0L, ]), nrow(d))
+  # face data requires three rows per simplex
+  expect_equal(nrow(layer_p2), nrow(d) + 5738L * 3L)
   
   # skip on continuous integration services
   skip_on_travis()
   skip_on_appveyor()
   
   # visual regression tests
-  vdiffr::expect_doppelganger("stat_vietoris0, annulus", p0)
-  vdiffr::expect_doppelganger("stat_vietoris1, annulus", p1)
-  vdiffr::expect_doppelganger("stat_vietoris2, annulus", p2)
-})
-
-test_that("face layer works as expected", {
-  
-  # disks of specified radius and resolution (segments)
-  p1 <- ggplot(d, aes(x = x, y = y)) +
-    geom_face(stat = "disk", radius = 0.35) +
-    geom_point()
-  expect_is(p1, "ggplot")
-  expect_is(p1$layer[[1]], "ggproto")
-  expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
-  
-  # Vietoris-Rips face geom
-  p2 <- ggplot(d, aes(x = x, y = y)) +
-    geom_face(stat = "vietoris2", diameter = 0.7, alpha = .05)
-  expect_is(p2, "ggplot")
-  expect_is(p2$layer[[1]], "ggproto")
-  expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p2)), 17214L)
-  
-  # Čech face geom
-  p3 <- ggplot(d, aes(x = x, y = y)) +
-    geom_face(stat = "cech2", diameter = 0.7, alpha = .05)
-  expect_is(p3, "ggplot")
-  expect_is(p3$layer[[1]], "ggproto")
-  expect_equal(c(p3$labels$x, p3$labels$y), c("x", "y"))
-  expect_equal(nrow(layer_data(p3)), 17205L)
-  
-  # skip on continuous integration services
-  skip_on_travis()
-  skip_on_appveyor()
-  
-  # visual regression test
-  vdiffr::expect_doppelganger("geom_face, stat_disk, annulus", p1)
-  vdiffr::expect_doppelganger("geom_face, stat_vietoris, annulus", p2)
-  vdiffr::expect_doppelganger("geom_face, stat_cech, annulus", p3)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, vietoris, 0", p0)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, vietoris, 1", p1)
+  vdiffr::expect_doppelganger("stat_simplicial_complex, vietoris, 2", p2)
 })

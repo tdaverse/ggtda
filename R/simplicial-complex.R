@@ -59,19 +59,19 @@
 #' @inheritParams ggplot2::geom_point
 #' @inheritParams ggplot2::stat_identity
 #' @inheritParams disk
-#' @param max_dimension Compute simplexes of dimension up to `max_dimension`
+#' @param max_dimension Compute simplices of dimension up to `max_dimension`
 #'   (only relevant for the Vietoris--Rips complex computed with the
 #'   `simplextree` engine).
 #' @param complex The type of complex to compute, either `"Vietoris"`, `"Rips"`,
 #'   `"Cech"`, or `"alpha"`.
 #' @param engine The computational engine to use (see 'Details'). Reasonable
 #'   defaults are chosen based on `complex`.
-#' @param zero_simplexes Which 0-simplices (vertices) to plot; one of `"none"`,
+#' @param zero_simplices Which 0-simplices (vertices) to plot; one of `"none"`,
 #'   `"maximal"`, and `"all"` (default).
-#' @param one_simplexes Which 1-simplices (edges) to plot; one of `"none"`,
+#' @param one_simplices Which 1-simplices (edges) to plot; one of `"none"`,
 #'   `"maximal"` (default), and `"all"`.
 #' @param outlines Should the outlines of polygons representing high-dimensional
-#'   simplexes be drawn?
+#'   simplices be drawn?
 #' @example inst/examples/ex-simplicial-complex-equilateral.R
 #' @example inst/examples/ex-simplicial-complex.R
 #' @example inst/examples/ex-disk-simplicial-complex.R
@@ -96,15 +96,16 @@ StatSimplicialComplex <-  ggproto(
   compute_group = function(
     data, scales,
     radius = NULL, diameter = NULL, 
-    zero_simplexes = "all", one_simplexes = "maximal",
-    max_dimension = 10, complex = "Rips", engine = NULL 
+    zero_simplices = "all", one_simplices = "maximal",
+    max_dimension = 2L, complex = "Rips", engine = NULL 
   ) {
     
     # TODO:
-    # Add check for validitiy of zero_ and one_simplexes arguments
+    # Add check for validitiy of zero_ and one_simplices arguments
     # move to setup params method
     # handle disk size
     if (is.null(radius) && is.null(diameter)) {
+      warning("`stat_simplicial_complex()` requires a `radius` or `diameter`.")
       return(data[NULL, , drop = FALSE])
     }
     if (! is.null(radius)) {
@@ -124,27 +125,27 @@ StatSimplicialComplex <-  ggproto(
     res <- switch(
       engine,
       "base" = simplicial_complex_base(
-        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices
       ),
       "RTriangle" = simplicial_complex_RTriangle(
-        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices
       ),
       "simplextree" = simplicial_complex_simplextree(
-        data, diameter, max_dimension, complex, zero_simplexes, one_simplexes
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices
       )
     )
     
     # TODO:
-    # Take care of zero_ or one_simplexes == "none"
-    # and remove simplexes w/ dim > max_dimension
+    # Take care of zero_ or one_simplices == "none"
+    # and remove simplices w/ dim > max_dimension
     if (max_dimension < 2L) {
       res <- res[res$dim < 2L, , drop = FALSE]
     }
-    if (max_dimension < 1L | one_simplexes == "none") {
+    if (max_dimension < 1L | one_simplices == "none") {
       res <- res[res$dim != 1L, , drop = FALSE]
     }
     # QUESTION: Require upstream that `max_dimension >= 0`?
-    if (max_dimension < 0L | zero_simplexes == "none") {
+    if (max_dimension < 0L | zero_simplices == "none") {
       res <- res[res$dim != 0L, , drop = FALSE]
     }
     
@@ -172,9 +173,9 @@ stat_simplicial_complex <- function(mapping = NULL,
                                     position = "identity",
                                     radius = NULL,
                                     diameter = NULL,
-                                    zero_simplexes = "all",
-                                    one_simplexes = "maximal",
-                                    max_dimension = 10,
+                                    zero_simplices = "all",
+                                    one_simplices = "maximal",
+                                    max_dimension = 2L,
                                     complex = "Rips",
                                     engine = NULL,
                                     na.rm = FALSE,
@@ -192,8 +193,8 @@ stat_simplicial_complex <- function(mapping = NULL,
     params = list(
       radius = radius,
       diameter = diameter,
-      zero_simplexes = zero_simplexes,
-      one_simplexes = one_simplexes,
+      zero_simplices = zero_simplices,
+      one_simplices = one_simplices,
       max_dimension = max_dimension,
       engine = engine,
       complex = complex,
@@ -260,7 +261,7 @@ GeomSimplicialComplex <- ggproto(
     # List to hold various grobs (polygons, linesegments, points)
     grobs <- list()
     
-    # Drawing the simplexes w/ dim > 1 -----
+    # Drawing the simplices w/ dim > 1 -----
     if (nrow(high_simplex_data) > 0L) {
       
       # For gpar(), there is one entry per polygon (not one entry per point).
@@ -269,7 +270,7 @@ GeomSimplicialComplex <- ggproto(
       first_idx <- ! duplicated(high_simplex_data$id)
       first_rows <- high_simplex_data[first_idx, , drop = FALSE]
       
-      grobs$simplexes <- grid::polygonGrob(
+      grobs$simplices <- grid::polygonGrob(
         high_simplex_data$x, high_simplex_data$y, default.units = "native",
         id = high_simplex_data$id,
         gp = grid::gpar(
@@ -285,7 +286,7 @@ GeomSimplicialComplex <- ggproto(
       
     }
     
-    # Drawing the one_simplexes -----
+    # Drawing the one_simplices -----
     if (nrow(one_simplex_data) > 0L) {
       
       # First, need to collapse pairs of rows corresponding
@@ -294,8 +295,8 @@ GeomSimplicialComplex <- ggproto(
       one_simplex_data <- lapply(one_simplex_data, collapse_one_simplex_pairs)
       one_simplex_data <- do.call(rbind, one_simplex_data)
       
-      # Currently, can't adjust alpha of zero- and one-simplexes
-      # If overplotting is an issue, set one_simplexes = "none"
+      # Currently, can't adjust alpha of zero- and one-simplices
+      # If overplotting is an issue, set one_simplices = "none"
       # (Similar to geom_density)
       grobs$one_simplex <- grid::segmentsGrob(
         one_simplex_data$x, one_simplex_data$y,
@@ -316,25 +317,25 @@ GeomSimplicialComplex <- ggproto(
       
     }
     
-    # Drawing the 0-simplexes -----
+    # Drawing the 0-simplices -----
     if (nrow(zero_simplex_data) > 0L) {
       
       stroke_size <- zero_simplex_data$stroke
       stroke_size[is.na(stroke_size)] <- 0
       
-      # Currently, can't adjust alpha of zero- and one-simplexes
-      # If overplotting is an issue, set zero_simplexes = FALSE
+      # Currently, can't adjust alpha of zero- and one-simplices
+      # If overplotting is an issue, set zero_simplices = FALSE
       # (Similar to geom_density)
       grobs$zero_simplex_data <- grid::pointsGrob(
         zero_simplex_data$x, zero_simplex_data$y,
         pch = zero_simplex_data$shape,
         gp = grid::gpar(
-          col = zero_simplex_data$colour,
-          fill = zero_simplex_data$fill,
           # col = alpha(zero_simplex_data$colour, zero_simplex_data$alpha),
           # fill = alpha(zero_simplex_data$fill, zero_simplex_data$alpha),
+          col = zero_simplex_data$colour,
+          fill = zero_simplex_data$fill,
           # Stroke is added around the outside of the point
-          # fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
+          fontsize = zero_simplex_data$size * .pt + stroke_size * .stroke / 2,
           lwd = zero_simplex_data$stroke * .stroke / 2
         )
       )

@@ -44,6 +44,7 @@
 #' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_path
 #' @inheritParams persistence
 #' @example inst/examples/ex-landscape.R
 #' @example inst/examples/ex-persistence-dataset.R

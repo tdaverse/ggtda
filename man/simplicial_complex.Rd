@@ -13,9 +13,9 @@ stat_simplicial_complex(
   position = "identity",
   radius = NULL,
   diameter = NULL,
-  zero_simplexes = "all",
-  one_simplexes = "maximal",
-  max_dimension = 10,
+  zero_simplices = "all",
+  one_simplices = "maximal",
+  max_dimension = 2L,
   complex = "Rips",
   engine = NULL,
   na.rm = FALSE,
@@ -70,13 +70,13 @@ settings of the adjustment.}
 construction. Provide only one of these; if neither is provided, they
 default to zero.}
 
-\item{zero_simplexes}{Which 0-simplices (vertices) to plot; one of \code{"none"},
+\item{zero_simplices}{Which 0-simplices (vertices) to plot; one of \code{"none"},
 \code{"maximal"}, and \code{"all"} (default).}
 
-\item{one_simplexes}{Which 1-simplices (edges) to plot; one of \code{"none"},
+\item{one_simplices}{Which 1-simplices (edges) to plot; one of \code{"none"},
 \code{"maximal"} (default), and \code{"all"}.}
 
-\item{max_dimension}{Compute simplexes of dimension up to \code{max_dimension}
+\item{max_dimension}{Compute simplices of dimension up to \code{max_dimension}
 (only relevant for the Vietoris--Rips complex computed with the
 \code{simplextree} engine).}
 
@@ -111,7 +111,7 @@ stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
 \code{"stat_count"})}
 
 \item{outlines}{Should the outlines of polygons representing high-dimensional
-simplexes be drawn?}
+simplices be drawn?}
 }
 \description{
 Construct and plot simplicial complexes that equal or
@@ -192,31 +192,32 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \examples{
 
 # equilateral triangle
-et <- data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
+equilateral_triangle <- 
+  data.frame(x = cos(2*pi*c(0,1/3,2/3)), y = sin(2*pi*c(0,1/3,2/3)))
 # small perturbations from key values
 eps <- .00000001
 
 # Vietoris-Rips
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(diameter = sqrt(3) - eps)
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(diameter = sqrt(3) + eps)
 
 # Čech
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(complex = "Cech", diameter = sqrt(3) - eps)
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(complex = "Cech", diameter = sqrt(3) + eps)
 
 # alpha
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(complex = "alpha", diameter = sqrt(3) - eps)
-ggplot(et, aes(x, y)) +
+ggplot(equilateral_triangle, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(complex = "alpha", diameter = sqrt(3) + eps)
 

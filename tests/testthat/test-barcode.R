@@ -1,4 +1,3 @@
-context("Barcode plots")
 
 # ggplot object tests ----------------------------------------------------------
 
@@ -39,7 +38,7 @@ test_that("barcode layers work correctly", {
     geom_barcode()
   expect_is(b_x_xend, "ggplot")
   expect_is(b_x_xend$layer[[1L]], "ggproto")
-  expect_error(ggplot_build(b_x_xend), "start and end")
+  expect_error(ggplot_build(b_x_xend), "start.*end")
   
   # skip on continuous integration services
   skip_on_travis()

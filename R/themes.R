@@ -1,10 +1,15 @@
-#' Theme for Persistence Diagrams
-#' 
-#' A simple theme to clearly display persistent homology in
-#' the form of flat persistence diagrams or diagonal persistence diagrams.
-#' 
+#' @title Themes for persistence data visualizations
+#'
+#' @description A simple theme to clearly display persistent homology in the
+#'   form of persistence barcodes or diagrams.
+#'
+#' @name themes
+#' @param vertical Logical; whether to plot a vertical axis. Defaults to
+#'   `FALSE`; if `TRUE`, allows users to more easily count the number of
+#'   features plotted in barcode; equivalent to `theme_persist()`.
 #' @import ggplot2
-#' @family TDA themes
+
+#' @rdname themes
 #' @export
 theme_persist <- function() {
   theme(axis.line = element_line(colour = "black"),
@@ -14,17 +19,7 @@ theme_persist <- function() {
         panel.background = element_blank())
 }
 
-#' Theme for Persistence Barcodes
-#' 
-#' A simple theme to clearly display persistent homology in
-#' the form of persistence barcodes (aka topological barcodes).
-#' 
-#' @import ggplot2
-#' @param vertical  defaults to `FALSE` (no vertical axis); if `TRUE`, allows
-#'   users to more easily count the number of features plotted in barcode
-#'   (if `vertical` equals `TRUE`, this function is equivalent to
-#'   `theme_persist`)
-#' @family TDA themes
+#' @rdname themes
 #' @export
 theme_barcode <- function(vertical = FALSE) {
   # allows users to count how many features are there in barcode

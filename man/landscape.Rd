@@ -65,9 +65,8 @@ settings of the adjustment.}
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
 
-\item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
-if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
-(regardless of the color scheme).}
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -80,12 +79,21 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
+often aesthetics, used to set an aesthetic to a fixed value, like
+\code{colour = "red"} or \code{size = 3}. They may also be parameters
+to the paired geom/stat.}
 
 \item{stat}{The statistical transformation to use on the data for this
 layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
 stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
 \code{"stat_count"})}
+
+\item{lineend}{Line end style (round, butt, square).}
+
+\item{linejoin}{Line join style (round, mitre, bevel).}
+
+\item{linemitre}{Line mitre limit (number greater than 1).}
 }
 \description{
 Visualize persistence data as a persistence landscape.
@@ -190,13 +198,17 @@ ggplot(annulus.phom, aes(start = birth, end = death,
 raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
 raw_data$class <- vapply(raw_data$obj, class, "")
 # exclude time series data if {ripserr} v0.1.1 is installed
-if (.ripserr_version == "0.1.1") raw_data <- raw_data[c(1L, 2L), ]
+if ("ripserr" \%in\% rownames(utils::installed.packages()) &&
+    utils::packageVersion("ripserr") == "0.1.1")
+  raw_data[c(1L, 2L), ]
 # persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +
   stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
 # persistence landscape
 ggplot(raw_data, aes(dataset = obj)) +
-  stat_landscape(aes(color = factor(after_stat(dimension)), linetype = class))
+  facet_wrap(facets = vars(class), scales = "free") +
+  stat_landscape(aes(color = factor(after_stat(dimension)))) +
+  theme(legend.position = "bottom")
 }
 \references{
 P Bubenik (2015) Statistical Topological Data Analysis using Persistence

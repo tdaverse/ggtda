@@ -1,4 +1,4 @@
-#' Base `ggproto` classes for *ggtda*
+#' @title Base `ggproto` classes for *ggtda*
 #' 
 #' @name ggtda-ggproto
 #' @seealso [`ggplot2::ggplot2-ggproto`]
@@ -15,3 +15,20 @@ NULL
 #' @name ggtda
 #' @docType package
 NULL
+
+# installed versions of {simplextree} and {ripserr}, or `NULL` if not installed
+.onLoad <- function(...) {
+  rlang::run_on_load()
+}
+rlang::on_load(
+  .simplextree_version <-
+    if ("simplextree" %in% rownames(utils::installed.packages())) {
+      utils::packageVersion("simplextree")
+    }
+)
+rlang::on_load(
+  .ripserr_version <-
+    if ("ripserr" %in% rownames(utils::installed.packages())) {
+      utils::packageVersion("ripserr")
+    }
+)

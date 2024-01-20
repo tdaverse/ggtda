@@ -255,6 +255,8 @@ StatPersistence <- ggproto(
   }
 )
 
+#' @rdname persistence
+#' @export
 stat_persistence <- function(mapping = NULL,
                              data = NULL,
                              geom = "point",

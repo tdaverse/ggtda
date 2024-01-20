@@ -2,9 +2,27 @@
 % Please edit documentation in R/persistence.r
 \name{persistence}
 \alias{persistence}
+\alias{stat_persistence}
 \alias{geom_fundamental_box}
 \title{Persistence diagrams}
 \usage{
+stat_persistence(
+  mapping = NULL,
+  data = NULL,
+  geom = "point",
+  position = "identity",
+  diameter_max = Inf,
+  radius_max = NULL,
+  dimension_max = 1L,
+  field_order = 2L,
+  complex = "Rips",
+  diagram = "diagonal",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
 geom_fundamental_box(
   mapping = NULL,
   data = NULL,
@@ -39,20 +57,27 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{stat}{The statistical transformation to use on the data for this
-layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
-stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
-\code{"stat_count"})}
+\item{geom}{The geometric object to use to display the data, either as a
+\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
+\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
+\item{diameter_max, radius_max}{(Document.)}
+
+\item{dimension_max}{(Document.)}
+
+\item{field_order}{(Document.)}
+
+\item{complex}{The type of filtration from which to compute persistent
+homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
+accepted.}
+
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
-
-\item{t}{A numeric vector of time points at which to place fundamental boxes.}
 
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
@@ -71,15 +96,12 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{diameter_max, radius_max}{(Document.)}
+\item{stat}{The statistical transformation to use on the data for this
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
 
-\item{dimension_max}{(Document.)}
-
-\item{field_order}{(Document.)}
-
-\item{complex}{The type of filtration from which to compute persistent
-homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
-accepted.}
+\item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
 \description{
 Visualize persistence data in a (flat, diagonal, or landscape)
@@ -215,13 +237,17 @@ ggplot(eph.data,
 raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
 raw_data$class <- vapply(raw_data$obj, class, "")
 # exclude time series data if {ripserr} v0.1.1 is installed
-if (.ripserr_version == "0.1.1") raw_data <- raw_data[c(1L, 2L), ]
+if ("ripserr" \%in\% rownames(utils::installed.packages()) &&
+    utils::packageVersion("ripserr") == "0.1.1")
+  raw_data[c(1L, 2L), ]
 # persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +
   stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
 # persistence landscape
 ggplot(raw_data, aes(dataset = obj)) +
-  stat_landscape(aes(color = factor(after_stat(dimension)), linetype = class))
+  facet_wrap(facets = vars(class), scales = "free") +
+  stat_landscape(aes(color = factor(after_stat(dimension)))) +
+  theme(legend.position = "bottom")
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence
