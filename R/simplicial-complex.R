@@ -77,6 +77,7 @@
 #' @example inst/examples/ex-disk-simplicial-complex.R
 NULL
 
+# file.edit("tests/testthat/test-simplicial-complex.R")
 # file.edit("inst/examples/ex-simplicial-complex-equilateral.R")
 # file.edit("inst/examples/ex-simplicial-complex.R")
 # file.edit("inst/examples/ex-disk-simplicial-complex.R")

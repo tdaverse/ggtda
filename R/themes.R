@@ -9,6 +9,8 @@
 #'   features plotted in barcode; equivalent to `theme_persist()`.
 #' @import ggplot2
 
+# file.edit("tests/testthat/test-theme.R")
+
 #' @rdname themes
 #' @export
 theme_persist <- function() {

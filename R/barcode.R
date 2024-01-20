@@ -46,6 +46,7 @@
 #' @example inst/examples/ex-barcode.R
 NULL
 
+# file.edit("tests/testthat/test-barcode.R")
 # file.edit("inst/examples/ex-barcode.R")
 
 #' @rdname ggtda-ggproto

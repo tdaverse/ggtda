@@ -65,4 +65,3 @@ Collate:
     'simplicial-complex.R'
     'themes.R'
     'utils.R'
-    'zzz.R'

@@ -71,6 +71,7 @@
 #' @example inst/examples/ex-persistence-dataset.R
 NULL
 
+# file.edit("tests/testthat/test-persistence.R")
 # file.edit("inst/examples/ex-persistence.R")
 # file.edit("inst/examples/ex-persistence-extended.R")
 # file.edit("inst/examples/ex-persistence-dataset.R")
