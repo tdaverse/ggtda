@@ -1,146 +1,7 @@
 # Implementation of different engines for `StatSimplicialComplex`
 
-## {simplextree}
-simplicial_complex_simplextree <- function(
-    data, diameter, max_dimension, complex, zero_simplices, one_simplices
-) {
-  
-  # The entire set of 0-simplices needs to come from data, not simplextree
-  df_zero_simplices <- data
-  df_zero_simplices$id <- seq(nrow(data))
-  df_zero_simplices$dim <- 0L
-  
-  # Compute simplicial complex up to max_dimension, encoded as a simplextree
-  # (all further computed values derive from st)
-  st <- data_to_simplextree(data, diameter, max_dimension, complex)
-  
-  # Convert simplex tree into a list
-  if (.simplextree_version >= "1.0.1") {
-    simplices <- as.list(simplextree::maximal(st))
-  } else if (.simplextree_version == "0.9.1") {
-    simplices <- st$serialize()
-  } else {
-    stop("No method available for {simplextree} v", .simplextree_version)
-  }
-  
-  # If there are no edges, just return zero_simplices
-  # Otherwise, go on to find one_simplices + high_simplices
-  if (length(simplices) == 0) return(df_zero_simplices)
-  
-  # Convert simplices into dataframe -----
-  
-  # no of points in each simplex
-  sizes <- vapply(simplices, length, numeric(1))
-  
-  # unique identifier for each simplex
-  ids <- rep(1:length(simplices), times = sizes)
-  
-  # dimension of each simplex as ordered factor
-  dims <- rep(sizes, times = sizes) - 1L
-  # dims <- ordered(dims, levels = seq(min(dims), max(dims)))
-  
-  # combine ordered pairs for each simplex into dataframe
-  indices <- unlist(simplices)
-  df_simplices <- data[indices,]
-  
-  # fix row names
-  rownames(df_simplices) <- NULL
-  
-  # include relevant computed values
-  df_simplices$id <- ids
-  df_simplices$dim <- dims
-  
-  # reorder rows so that higher dim simplices are plotted last
-  # note: order among simplices of equal dim doesn't matter
-  #       b/c we split() on id
-  df_simplices <- df_simplices[order(df_simplices$dim), , drop = FALSE]
-  
-  # take convex hull of each simplex for polygon grob:
-  # (df_simplices is brielfly a list of data.frames, each corresponding to a
-  # k-simplex)
-  df_simplices <- split(df_simplices, df_simplices$id)
-  df_simplices <- lapply(df_simplices, simplex_chull)
-  df_simplices <- do.call(rbind, df_simplices)
-  
-  # Store 1- and >1-dim simplices seperately
-  # (1-dim need to be drawn as line segments)
-  df_one_simplices <- df_simplices[df_simplices$dim == 1L, , drop = FALSE]
-  df_high_simplices <- df_simplices[df_simplices$dim > 1L, , drop = FALSE]
-  
-  # Overwrite df_one_simplices to include non-maximal edges
-  # if user wants all one-simplices or if higher-dim simplices aren't plotted,
-  if (one_simplices == "all" | max_dimension == 1L) {
-    
-    # convert matrix of edges into a list
-    edges <- apply(st$edges, 1L, identity, simplify = FALSE)
-    
-    # unique identifier for each edge
-    edge_id <- rep(seq(length(edges)), each = 2L)
-    
-    # get indices of edge coords
-    edges <- unlist(edges)
-    
-    # combine ordered pairs for each edge into dataframe
-    df_one_simplices <- data[edges, , drop = FALSE]
-    df_one_simplices$id <- edge_id
-    df_one_simplices$dim <- 1L
-    
-  }
-  
-  # Similar operation for zero_simplices argument:
-  if (zero_simplices == "maximal") {
-    
-    maximal_vertices <- setdiff(seq(nrow(data)), st$vertices)
-    
-    df_zero_simplices <- data[maximal_vertices, , drop = FALSE]
-    df_zero_simplices$dim <- 0L
-    df_zero_simplices$id <- seq(nrow(data))
-    
-  } 
-  
-  rbind(df_high_simplices, df_one_simplices, df_zero_simplices)
-  
-}
-
-# Helper function, returns simplextree to be manipulated into data.frame
-# f: data -> simplextree encoding simplicial complex for given `complex`
-data_to_simplextree <- function(df, diameter, max_dimension, complex) {
-  
-  if (complex %in% c("Rips", "Vietoris")) {
-    # For the Vietoris-Rips complex, just return the flag complex:
-    # w/ simplices with dim up to max_dimension
-    
-    # Find edges given diameter:
-    edges <- t(proximate_pairs(df, diameter))
-    edges <- as.data.frame(edges)
-    edges <- as.list(edges)
-    
-    # Construct the flag complex as a simplex tree
-    if (.simplextree_version >= "1.0.1") {
-      st <- simplextree::simplex_tree(edges)
-      st <- simplextree::expand(st, k = max_dimension)
-    } else if (.simplextree_version == "0.9.1") {
-      st <- simplextree::simplex_tree()
-      st$insert(edges)
-      # strange behavior in this archived version must be worked around
-      if (! is.null(st$dimension)) st$expand(k = max_dimension)
-    } else {
-      stop("No method available for {simplextree} v", .simplextree_version)
-    }
-    
-    # Return flag complex
-    st
-    
-  } else {
-    
-    # Error out if engine is used incorrectly
-    stop("Only Vietoris-Rips complexes are implemented in {simplextree}.")
-    
-  }
-  
-}
-
 ## base 
+
 # These should probably be factored out more cleanly
 # Currently, an if statement for each complex
 simplicial_complex_base <- function(
@@ -217,6 +78,7 @@ simplicial_complex_base <- function(
 } 
 
 ## RTriangle
+
 simplicial_complex_RTriangle <- function(
     data, diameter, max_dimension, complex, zero_simplices, one_simplices
 ) {
@@ -401,7 +263,7 @@ is_maximal <- function(edge, faces) {
 # indices
 get_maximal_zero_simplices <- function(edges, df_zero_simplices) {
   
-  edges_unique <- as.numeric(edges)
+  edges_unique <- as.matrix(edges)
   edges_unique <- unique(edges_unique)
   
   are_maximal <- setdiff(seq(nrow(df_zero_simplices)), edges_unique)
@@ -474,6 +336,205 @@ proximate_triples <- function(data, diameter) {
   
 }
 
+## {simplextree}
+
+simplicial_complex_simplextree <- function(
+    data, diameter, max_dimension, complex, zero_simplices, one_simplices
+) {
+  
+  # The entire set of 0-simplices needs to come from data
+  df_zero_simplices <- data
+  df_zero_simplices$id <- seq(nrow(data))
+  df_zero_simplices$dim <- 0L
+  
+  # Compute simplicial complex up to `max_dimension`, encoded as a 'simplextree'
+  # (all further computed values derive from st)
+  st <- data_to_simplextree(data, diameter, max_dimension, complex)
+  
+  # Convert simplex tree into a list
+  if (.simplextree_version >= "1.0.1") {
+    simplices <- as.list(simplextree::maximal(st))
+  } else if (.simplextree_version == "0.9.1") {
+    simplices <- st$serialize()
+  } else {
+    stop("No method available for {simplextree} v", .simplextree_version)
+  }
+  
+  # If there are no edges, just return zero_simplices
+  # Otherwise, go on to find one_simplices + high_simplices
+  if (length(simplices) == 0) return(df_zero_simplices)
+  
+  # Convert simplices into dataframe -----
+  
+  # no of points in each simplex
+  sizes <- vapply(simplices, length, numeric(1))
+  
+  # unique identifier for each simplex
+  ids <- rep(1:length(simplices), times = sizes)
+  
+  # dimension of each simplex as ordered factor
+  dims <- rep(sizes, times = sizes) - 1L
+  # dims <- ordered(dims, levels = seq(min(dims), max(dims)))
+  
+  # combine ordered pairs for each simplex into dataframe
+  indices <- unlist(simplices)
+  df_simplices <- data[indices,]
+  
+  # fix row names
+  rownames(df_simplices) <- NULL
+  
+  # include relevant computed values
+  df_simplices$id <- ids
+  df_simplices$dim <- dims
+  
+  # reorder rows so that higher dim simplices are plotted last
+  # note: order among simplices of equal dim doesn't matter
+  #       b/c we split() on id
+  df_simplices <- df_simplices[order(df_simplices$dim), , drop = FALSE]
+  
+  # take convex hull of each simplex for polygon grob:
+  # (df_simplices is brielfly a list of data.frames, each corresponding to a
+  # k-simplex)
+  df_simplices <- split(df_simplices, df_simplices$id)
+  df_simplices <- lapply(df_simplices, simplex_chull)
+  df_simplices <- do.call(rbind, df_simplices)
+  
+  # Store 1- and >1-dim simplices seperately
+  # (1-dim need to be drawn as line segments)
+  df_one_simplices <- df_simplices[df_simplices$dim == 1L, , drop = FALSE]
+  df_high_simplices <- df_simplices[df_simplices$dim > 1L, , drop = FALSE]
+  
+  # Overwrite df_one_simplices to include non-maximal edges
+  # if user wants all one-simplices or if higher-dim simplices aren't plotted,
+  if (one_simplices == "all" | max_dimension == 1L) {
+    
+    # convert matrix of edges into a list
+    edges <- apply(st$edges, 1L, identity, simplify = FALSE)
+    
+    # unique identifier for each edge
+    edge_id <- rep(seq(length(edges)), each = 2L)
+    
+    # get indices of edge coords
+    edges <- unlist(edges)
+    
+    # combine ordered pairs for each edge into dataframe
+    df_one_simplices <- data[edges, , drop = FALSE]
+    df_one_simplices$id <- edge_id
+    df_one_simplices$dim <- 1L
+    
+  }
+  
+  # Similar operation for zero_simplices argument:
+  if (zero_simplices == "maximal") {
+    
+    maximal_vertices <- setdiff(seq(nrow(data)), st$vertices)
+    
+    df_zero_simplices <- data[maximal_vertices, , drop = FALSE]
+    df_zero_simplices$dim <- 0L
+    df_zero_simplices$id <- seq(nrow(data))
+    
+  } 
+  
+  rbind(df_high_simplices, df_one_simplices, df_zero_simplices)
+  
+}
+
+# Helper function, returns simplextree to be manipulated into data.frame
+# f: data -> simplextree encoding simplicial complex for given `complex`
+data_to_simplextree <- function(df, diameter, max_dimension, complex) {
+  
+  if (complex %in% c("Rips", "Vietoris")) {
+    # For the Vietoris-Rips complex, just return the flag complex:
+    # w/ simplices with dim up to max_dimension
+    
+    # Find edges given diameter:
+    edges <- t(proximate_pairs(df, diameter))
+    edges <- as.data.frame(edges)
+    edges <- as.list(edges)
+    
+    # Construct the flag complex as a simplex tree
+    if (.simplextree_version >= "1.0.1") {
+      st <- simplextree::simplex_tree(edges)
+      st <- simplextree::expand(st, k = max_dimension)
+    } else if (.simplextree_version == "0.9.1") {
+      st <- simplextree::simplex_tree()
+      st$insert(edges)
+      # strange behavior in this archived version must be worked around
+      if (! is.null(st$dimension)) st$expand(k = max_dimension)
+    } else {
+      stop("No method available for {simplextree} v", .simplextree_version)
+    }
+    
+    # Return flag complex
+    st
+    
+  } else {
+    
+    # Error out if engine is used incorrectly
+    stop("Only Vietoris-Rips complexes are implemented in {simplextree}.")
+    
+  }
+  
+}
+
+## {TDA}
+
+simplicial_complex_TDA <- function(
+    data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+    library
+) {
+  
+  # The entire set of 0-simplices needs to come from data
+  df_zero_simplices <- data
+  df_zero_simplices$id <- seq(nrow(data))
+  df_zero_simplices$dim <- 0L
+  
+  # Compute simplicial complex up to `max_dimension`, encoded as a 'Diagram'
+  # (all further computed values derive from `pd`)
+  pd <- data_to_Filtration(data[, c("x", "y")],
+                           diameter, max_dimension,
+                           complex, library)
+  
+  # data frame of coordinates with linking index
+  df_coords <- as.data.frame(pd$coordinates)
+  df_coords$row <- seq(nrow(df_coords))
+  
+  # data frame of combinatorics with linking index
+  pd_dim <- vapply(pd$cmplx, length, 0L) - 1L
+  df_combin <- data.frame(
+    row = unlist(pd$cmplx),
+    id = rep(seq_along(pd_dim), pd_dim + 1L),
+    dim = rep(pd_dim, pd_dim + 1L)
+  )
+  df_combin <-
+    df_combin[order(df_combin$dim, df_combin$id), , drop = FALSE]
+  
+  # merge coordinates with combinatorics & return
+  df_simplices <- merge(df_coords, df_combin, by = "row")
+  df_simplices$row <- NULL
+  df_simplices
+}
+
+# Helper function, returns 'Diag' to be manipulated into 'data.frame'
+# f: data -> simplextree encoding simplicial complex for given `complex`
+data_to_Filtration <- function(df, diameter, max_dimension, complex, library) {
+  
+  if (complex %in% c("Rips", "Vietoris")) {
+    
+    pd <- TDA::ripsFiltration(X = df, maxdimension = max_dimension,
+                              maxscale = diameter, library = library)
+    
+  } else if (complex == "alpha") {
+    
+    pd <- TDA::alphaComplexFiltration(X = df, library = library)
+    
+  }
+  
+  pd
+}
+
+## assignment rules
+
 # Logic for matching params w/ optimal engine
 assign_complex_engine <- function(complex, engine, max_dimension) {
   
@@ -491,21 +552,28 @@ assign_complex_engine <- function(complex, engine, max_dimension) {
     # Default to "base" engine if not plotting high dim simplices
     # if (max_dimension < 3L & is.null(engine)) return("base")
     
-    return(
-      complex_engine_rules("Vietoris-Rips", engine, c("simplextree", "base"))
-    )
+    return(complex_engine_rules(
+      "Vietoris-Rips", engine,
+      c("simplextree", "TDA", "GUDHI", "Dionysus", "base")
+    ))
     
   }
   
   if (complex == "Cech") {
     
-    return(complex_engine_rules("Cech", engine, "base"))
+    return(complex_engine_rules(
+      "Cech", engine,
+      "base"
+    ))
     
   }
   
   if (complex == "alpha") {
     
-    return(complex_engine_rules("alpha", engine, "RTriangle"))
+    return(complex_engine_rules(
+      "alpha", engine,
+      c("TDA", "GUDHI", "RTriangle")
+    ))
     
   }
   

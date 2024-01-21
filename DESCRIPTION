@@ -40,6 +40,7 @@ Depends:
     ggplot2 (>= 3.2.1)
 Suggests:
     RTriangle,
+    TDA,
     ripserr (>= 0.1.1),
     simplextree (>= 0.9.1),
     tdaunif (>= 0.1.0),

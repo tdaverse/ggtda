@@ -138,14 +138,16 @@ Moreover, a Vietoris complex contains the Čech complex of the same
 diameter.) An \emph{alpha complex} comprises those simplices of the Delaunay
 triangulation within a fixed diameter.
 
-{\strong{ggtda}} relies on three engines to compute simplicial complexes, which
+{\strong{ggtda}} relies on four engines to compute simplicial complexes, which
 can be specified to the \code{engine} parameter: Vietoris--Rips and Čech
 complexes of dimension at most 2 are implemented in base R (\code{"base"}),
 which is slow but allows the package to stand alone for small cases.
 \code{\link[RTriangle:triangulate]{RTriangle::triangulate()}} is used to compute the Delaunay triangulation
 for alpha complexes (\code{"RTriangle"}), without inserting Steiner points (so
-that the vertices of the triangulation are among those of the data).
-Finally, the highly optimized package
+that the vertices of the triangulation are among those of the data). The
+package \strong{TDA} can compute \link[TDA:ripsFiltration]{Vietoris--Rips filtrations} and \link[TDA:alphaComplexFiltration]{alpha filtrations} (\code{"TDA"} for default engines,
+or specify the \code{"GUDHI"} or \code{"Dionysus"} engine). Finally, the highly
+optimized package
 \strong{\link[simplextree:simplextree-package]{simplextree}} can be called
 to compute Vietoris--Rips complexes (\code{"simplextree"}). As other complexes
 are implemented in {\strong{simplextree}}, they will be made available here.

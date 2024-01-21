@@ -27,14 +27,18 @@
 #'   diameter.) An *alpha complex* comprises those simplices of the Delaunay
 #'   triangulation within a fixed diameter.
 #'
-#'   {**ggtda**} relies on three engines to compute simplicial complexes, which
+#'   {**ggtda**} relies on four engines to compute simplicial complexes, which
 #'   can be specified to the `engine` parameter: Vietoris--Rips and Čech
 #'   complexes of dimension at most 2 are implemented in base R (`"base"`),
 #'   which is slow but allows the package to stand alone for small cases.
 #'   [RTriangle::triangulate()] is used to compute the Delaunay triangulation
 #'   for alpha complexes (`"RTriangle"`), without inserting Steiner points (so
-#'   that the vertices of the triangulation are among those of the data).
-#'   Finally, the highly optimized package
+#'   that the vertices of the triangulation are among those of the data). The
+#'   package **TDA** can compute [Vietoris--Rips
+#'   filtrations][TDA::ripsFiltration()] and [alpha
+#'   filtrations][TDA::alphaComplexFiltration()] (`"TDA"` for default engines,
+#'   or specify the `"GUDHI"` or `"Dionysus"` engine). Finally, the highly
+#'   optimized package
 #'   **[simplextree][simplextree::simplextree-package]** can be called
 #'   to compute Vietoris--Rips complexes (`"simplextree"`). As other complexes
 #'   are implemented in {**simplextree**}, they will be made available here.
@@ -130,6 +134,18 @@ StatSimplicialComplex <-  ggproto(
       ),
       "RTriangle" = simplicial_complex_RTriangle(
         data, diameter, max_dimension, complex, zero_simplices, one_simplices
+      ),
+      "TDA" = simplicial_complex_TDA(
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        library = "GUDHI"
+      ),
+      "GUDHI" = simplicial_complex_TDA(
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        library = "GUDHI"
+      ),
+      "Dionysus" = simplicial_complex_TDA(
+        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        library = "Dionysus"
       ),
       "simplextree" = simplicial_complex_simplextree(
         data, diameter, max_dimension, complex, zero_simplices, one_simplices
