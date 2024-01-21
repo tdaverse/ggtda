@@ -6,7 +6,9 @@ persistence <- function(
   
   # ensure that engine can handle data
   engine_classes <- list(
-    ripserr = if (.ripserr_version == "0.1.1") {
+    ripserr = if (is.na(.ripserr_version)) {
+      stop("Package {ripserr} is required but could not be found.")
+    } else if (.ripserr_version == "0.1.1") {
       # https://github.com/cran/ripserr/blob/
       # 8cadc3a86009149418d6f9a61124af9d6372d34e/R/calculate.R#L68
       c(

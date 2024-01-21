@@ -1,10 +1,10 @@
 ---
-title: "Visualizing persistent homology data with ggtda"
+title: "Visualizing persistent homology data"
 author: "Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Visualizing persistent homology with ggtda}
+  %\VignetteIndexEntry{Visualizing persistent homology data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: ggtda.bib

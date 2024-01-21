@@ -352,7 +352,9 @@ simplicial_complex_simplextree <- function(
   st <- data_to_simplextree(data, diameter, max_dimension, complex)
   
   # Convert simplex tree into a list
-  if (.simplextree_version >= "1.0.1") {
+  if (is.na(.simplextree_version)) {
+    stop("Package {simplextree} is required but could not be found.")
+  } else if (.simplextree_version >= "1.0.1") {
     simplices <- as.list(simplextree::maximal(st))
   } else if (.simplextree_version == "0.9.1") {
     simplices <- st$serialize()
@@ -453,7 +455,9 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
     edges <- as.list(edges)
     
     # Construct the flag complex as a simplex tree
-    if (.simplextree_version >= "1.0.1") {
+    if (is.na(.simplextree_version)) {
+      stop("Package {simplextree} is required but could not be found.")
+    } else if (.simplextree_version >= "1.0.1") {
       st <- simplextree::simplex_tree(edges)
       st <- simplextree::expand(st, k = max_dimension)
     } else if (.simplextree_version == "0.9.1") {
@@ -552,28 +556,29 @@ assign_complex_engine <- function(complex, engine, max_dimension) {
     # Default to "base" engine if not plotting high dim simplices
     # if (max_dimension < 3L & is.null(engine)) return("base")
     
-    return(complex_engine_rules(
-      "Vietoris-Rips", engine,
-      c("simplextree", "TDA", "GUDHI", "Dionysus", "base")
-    ))
+    return(complex_engine_rules("Vietoris-Rips", engine, c(
+      if (! is.na(.simplextree_version)) "simplextree",
+      if ("TDA" %in% rownames(utils::installed.packages()))
+        c("TDA", "GUDHI", "Dionysus"),
+      "base"
+    )))
     
   }
   
   if (complex == "Cech") {
     
-    return(complex_engine_rules(
-      "Cech", engine,
+    return(complex_engine_rules("Cech", engine, c(
       "base"
-    ))
+    )))
     
   }
   
   if (complex == "alpha") {
     
-    return(complex_engine_rules(
-      "alpha", engine,
-      c("TDA", "GUDHI", "RTriangle")
-    ))
+    return(complex_engine_rules("alpha", engine, c(
+      if ("TDA" %in% rownames(utils::installed.packages())) c("TDA", "GUDHI"),
+      if ("RTriangle" %in% rownames(utils::installed.packages())) "RTriangle"
+    )))
     
   }
   
@@ -585,6 +590,9 @@ complex_engine_rules <- function(
   
   if (is.null(engine)) {
     
+    if (is.null(engine_default)) {
+      stop("No engine is available to construct ", complex_name, " complexes.")
+    }
     engine <- engine_default
     
   } else if (! engine %in% engine_options) {
