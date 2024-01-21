@@ -16,3 +16,5 @@ Meta
 # ignore
 ignore
 
+/doc/
+/Meta/
