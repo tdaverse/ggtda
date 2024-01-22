@@ -45,6 +45,7 @@ Suggests:
     simplextree (>= 0.9.1),
     tdaunif (>= 0.1.0),
     rPref (>= 1.2),
+    dplyr, tidyr,
     covr (>= 3.1.0),
     testthat (>= 2.0.0),
     vdiffr (>= 0.3.0),

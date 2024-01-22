@@ -10,7 +10,7 @@ vignette: >
 bibliography: ggtda.bib
 ---
 
-```{r setup-orig, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"

@@ -39,6 +39,8 @@
 
 #' @eval rd_sec_computed_vars(
 #'   stat = "persistence",
+#'   start = "birth value of each feature (with 'dataset' aesthetic only).",
+#'   end = "death value of each feature (with 'dataset' aesthetic only).",
 #'   dimension = "feature dimension (with 'dataset' aesthetic only).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   id = "feature identifier (across 'group').",
@@ -60,6 +62,9 @@
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
+# @param point_cloud Optional; a single data set for which methods exist to
+#   compute persistent homology. Alternatively, a list column of data sets can
+#   be passed to the `dataset` aesthetic.
 #' @param diameter_max,radius_max (Document.)
 #' @param dimension_max (Document.)
 #' @param field_order (Document.)
@@ -88,6 +93,29 @@ StatPersistence <- ggproto(
   # optional_aes = c("dataset"),
   
   setup_data = function(data, params) {
+    
+    # # check if data was provided via 'point_cloud' argument
+    # if (! is.null(params$point_cloud)) {
+    #   
+    #   if (is.null(data$dataset)) {
+    #     
+    #     if (nrow(data) > 1) {
+    #       # TODO: fix this message
+    #       stop("The 'point_cloud' argument requires at most 1 row of `data`.")
+    #     }
+    #     data$dataset <- I(list(point_cloud))
+    #     
+    #   } else {
+    #     
+    #     warning(
+    #       "An argument was passed to the 'dataset' aesthetic,",
+    #       " so the 'point_cloud' argument will be ignored."
+    #     )
+    #     params$point_cloud <- NULL
+    #     
+    #   }
+    #   
+    # }
     
     if (! is.null(data$dataset)) {
       
@@ -121,7 +149,7 @@ StatPersistence <- ggproto(
              paste(paste("'", ph_classes, "'", sep = ""), collapse = ", "))
       }
       
-      # as in {ggalluvial}, ensure data is in transformation-ready form here
+      # ensure data is in transformation-ready form here
       
       # handle disk size
       if (is.null(params$radius_max) && is.null(params$diameter_max)) {
@@ -220,6 +248,8 @@ StatPersistence <- ggproto(
   compute_panel = function(
     data, scales,
     diagram = "diagonal",
+    # # 'point_cloud' parameter
+    # point_cloud = NULL,
     # 'dataset' aesthetic
     diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
     field_order = 2L, complex = "Rips"
@@ -266,6 +296,7 @@ stat_persistence <- function(mapping = NULL,
                              data = NULL,
                              geom = "point",
                              position = "identity",
+                             # point_cloud = NULL,
                              diameter_max = Inf, radius_max = NULL,
                              dimension_max = 1L,
                              field_order = 2L,
@@ -284,6 +315,7 @@ stat_persistence <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      # point_cloud = point_cloud,
       diameter_max = diameter_max, radius_max = radius_max,
       dimension_max = dimension_max,
       field_order = field_order,

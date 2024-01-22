@@ -163,6 +163,8 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
+\item \code{after_stat(start)}\cr birth value of each feature (with 'dataset' aesthetic only).
+\item \code{after_stat(end)}\cr death value of each feature (with 'dataset' aesthetic only).
 \item \code{after_stat(dimension)}\cr feature dimension (with 'dataset' aesthetic only).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(id)}\cr feature identifier (across 'group').
@@ -234,13 +236,20 @@ ggplot(eph.data,
   labs(color = "Dimension", shape = "Homology")
 
 if ("ripserr" \%in\% rownames(utils::installed.packages())) {
-# this is silly but a good test
+
+# list-column of data sets to 'dataset' aesthetic
 raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
 raw_data$class <- vapply(raw_data$obj, class, "")
 # exclude time series data if {ripserr} v0.1.1 is installed
 if ("ripserr" \%in\% rownames(utils::installed.packages()) &&
     utils::packageVersion("ripserr") == "0.1.1")
   raw_data <- raw_data[c(1L, 2L), ]
+# barcodes
+# FIXME: Should barcodes stack within each facet?
+ggplot(raw_data, aes(dataset = obj)) +
+  geom_barcode(stat = "persistence",
+               aes(color = factor(after_stat(dimension)), shape = class)) +
+  facet_wrap(facets = vars(class))
 # persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +
   stat_persistence(aes(color = factor(after_stat(dimension)), shape = class))
@@ -249,6 +258,7 @@ ggplot(raw_data, aes(dataset = obj)) +
   facet_wrap(facets = vars(class), scales = "free") +
   stat_landscape(aes(color = factor(after_stat(dimension)))) +
   theme(legend.position = "bottom")
+
 }
 }
 \references{
