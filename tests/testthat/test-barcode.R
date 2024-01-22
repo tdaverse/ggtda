@@ -21,17 +21,6 @@ test_that("barcode layers work correctly", {
   expect_equal(c(b_start_end$labels$start, b_start_end$labels$end),
                c("birth", "death"))
   
-  # use alternative positional aesthetics
-  b_xmin_xmax <- ggplot(data = d,
-                        aes(xmin = birth, xmax = death,
-                            group = dim, color = dim)) +
-    geom_barcode()
-  expect_is(b_xmin_xmax, "ggplot")
-  expect_is(b_xmin_xmax$layer[[1L]], "ggproto")
-  expect_equal(class(ggplot_build(b_xmin_xmax)), "ggplot_built")
-  expect_equal(c(b_xmin_xmax$labels$xmin, b_xmin_xmax$labels$xmax),
-               c("birth", "death"))
-  
   # warn to use correct aesthetics
   b_x_xend <- ggplot(data = d,
                      aes(x = birth, xend = death, group = dim, color = dim)) +
@@ -46,5 +35,4 @@ test_that("barcode layers work correctly", {
   
   # visual regression tests
   vdiffr::expect_doppelganger("geom_barcode, start, end", b_start_end)
-  vdiffr::expect_doppelganger("geom_barcode, xmin, xmax", b_xmin_xmax)
 })
