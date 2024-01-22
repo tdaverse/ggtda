@@ -163,9 +163,9 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \code{stat_persistence} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
-\item \code{after_stat(start)}\cr birth value of each feature (with 'dataset' aesthetic only).
-\item \code{after_stat(end)}\cr death value of each feature (with 'dataset' aesthetic only).
-\item \code{after_stat(dimension)}\cr feature dimension (with 'dataset' aesthetic only).
+\item \code{after_stat(start)}\cr birth value of each feature (from 'dataset' aesthetic).
+\item \code{after_stat(end)}\cr death value of each feature (from 'dataset' aesthetic).
+\item \code{after_stat(dimension)}\cr feature dimension (from 'dataset' aesthetic).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(id)}\cr feature identifier (across 'group').
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
@@ -234,6 +234,12 @@ ggplot(eph.data,
   geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 11), y = c(0, 11)) +
   labs(color = "Dimension", shape = "Homology")
+# extended barcode
+ggplot(eph.data,
+       aes(start = birth, end = death, color = factor(dimension))) +
+  theme_barcode() +
+  geom_barcode(stat = "persistence",
+               aes(linetype = after_stat(part)))
 
 if ("ripserr" \%in\% rownames(utils::installed.packages())) {
 
@@ -245,10 +251,9 @@ if ("ripserr" \%in\% rownames(utils::installed.packages()) &&
     utils::packageVersion("ripserr") == "0.1.1")
   raw_data <- raw_data[c(1L, 2L), ]
 # barcodes
-# FIXME: Should barcodes stack within each facet?
 ggplot(raw_data, aes(dataset = obj)) +
   geom_barcode(stat = "persistence",
-               aes(color = factor(after_stat(dimension)), shape = class)) +
+               aes(color = factor(after_stat(dimension)))) +
   facet_wrap(facets = vars(class))
 # persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +

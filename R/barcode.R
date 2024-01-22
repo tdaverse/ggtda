@@ -55,37 +55,23 @@ NULL
 GeomBarcode <- ggproto(
   "GeomBarcode", GeomSegment,
   
-  required_aes = c("start|xmin", "end|xmax"),
+  required_aes = c("start", "end"),
   
   # pre-process of the data set
   setup_data = function(data, params) {
-    
-    # reconcile conflicts: prompt for `xmin,xmax` but use `start,end` internally
-    if (is.null(data$start)) {
-      data$start <- data$xmin
-    } else if (! is.null(data$xmin)) {
-      warning("Aesthetic `xmin` was provided, so `start` will be ignored.")
-    }
-    if (is.null(data$end)) {
-      data$end <- data$xmax
-    } else if (! is.null(data$xmax)) {
-      warning("Aesthetic `xmax` was provided, so `end` will be ignored.")
-    }
     
     # introduce numerical x-values in order to allow coordinate transforms
     data$x <- data$start
     data$xend <- data$end
     
-    # introduce categorical -> integer y-values
-    # in order of `group`, `x`, and `xend`
-    # (assumes that `group` is a refinement of dimension)
-    grp <- if (is.null(data$group)) NA_character_ else data$group
-    data$y <- interaction(
-      grp, data$start, data$end,
+    # introduce `id` if absent (see `StatPersistence$compute_*()`)
+    if (is.null(data$id)) data$id <- interaction(
+      if (is.null(data$dimension)) NA_character_ else data$dimension,
+      data$start, data$end,
       drop = TRUE, lex.order = TRUE
     )
     # re-distinguish duplicates
-    data$y <- order(order(data$y))
+    data$y <- order(order(data$id))
     
     # return the pre-processed data set
     data

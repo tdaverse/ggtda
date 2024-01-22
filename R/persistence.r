@@ -39,9 +39,9 @@
 
 #' @eval rd_sec_computed_vars(
 #'   stat = "persistence",
-#'   start = "birth value of each feature (with 'dataset' aesthetic only).",
-#'   end = "death value of each feature (with 'dataset' aesthetic only).",
-#'   dimension = "feature dimension (with 'dataset' aesthetic only).",
+#'   start = "birth value of each feature (from 'dataset' aesthetic).",
+#'   end = "death value of each feature (from 'dataset' aesthetic).",
+#'   dimension = "feature dimension (from 'dataset' aesthetic).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   id = "feature identifier (across 'group').",
 #'   part =
@@ -275,7 +275,7 @@ StatPersistence <- ggproto(
     
     # computed variable: `id` (sort by dimension, birth, death)
     data$id <- interaction(
-      if (is.null(data$group)) NA_character_ else data$group,
+      if (is.null(data$dimension)) NA_character_ else data$dimension,
       data$start, data$end,
       drop = TRUE, lex.order = TRUE
     )

@@ -1,4 +1,3 @@
-#####EXAMPLE 1#####
 
 # toy example
 toy.data <- data.frame(
@@ -11,8 +10,12 @@ ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
   theme_barcode()
+# couple with persistence stat (no effect when `data` is persistence data)
+ggplot(toy.data,
+       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
+  geom_barcode(stat = "persistence") +
+  theme_barcode()
 
-#####EXAMPLE 2#####
 # load library and dataset for comprehensive example
 library("ripserr")
 angles <- runif(100, 0, 2 * pi)

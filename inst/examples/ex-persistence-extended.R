@@ -14,3 +14,9 @@ ggplot(eph.data,
   geom_abline(intercept = 0, slope = 1) +
   lims(x = c(0, 11), y = c(0, 11)) +
   labs(color = "Dimension", shape = "Homology")
+# extended barcode
+ggplot(eph.data,
+       aes(start = birth, end = death, color = factor(dimension))) +
+  theme_barcode() +
+  geom_barcode(stat = "persistence",
+               aes(linetype = after_stat(part)))

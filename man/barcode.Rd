@@ -99,8 +99,8 @@ features of different dimension, by vertical grouping or by faceting.
 
 \code{geom_barcode()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start} \emph{or} \code{xmin}}
-\item \strong{\code{end} \emph{or} \code{xmax}}
+\item \strong{\code{start}}
+\item \strong{\code{end}}
 \item \code{alpha}
 \item \code{colour}
 \item \code{group}
@@ -111,7 +111,6 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
-#####EXAMPLE 1#####
 
 # toy example
 toy.data <- data.frame(
@@ -124,8 +123,12 @@ ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
   theme_barcode()
+# couple with persistence stat (no effect when `data` is persistence data)
+ggplot(toy.data,
+       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
+  geom_barcode(stat = "persistence") +
+  theme_barcode()
 
-#####EXAMPLE 2#####
 # load library and dataset for comprehensive example
 library("ripserr")
 angles <- runif(100, 0, 2 * pi)
