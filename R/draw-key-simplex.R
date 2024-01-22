@@ -1,5 +1,13 @@
-# Custom draw_key fun -----------------------------------------------------
-## (similar to draw_key_polygon, w/o border)
+#' @title Key glyphs for topological visualizations
+#'
+#' @description The `simplex` key is equivalent to the `polygon` key except that
+#'   it renders triangles rather than squares. This evokes the triangularity
+#'   of simplices and distinguishes plots from plots of arbitrary polygons.
+#'
+#' @name draw_key
+#' @import ggplot2
+#' @inheritParams ggplot2::draw_key
+
 draw_key_simplex <- function(data, params, size) {
   
   if (is.null(data$linewidth)) {

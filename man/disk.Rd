@@ -3,7 +3,7 @@
 \name{disk}
 \alias{disk}
 \alias{geom_disk}
-\title{Disks around points}
+\title{Disk covers of 2-D point clouds}
 \usage{
 geom_disk(
   mapping = NULL,
@@ -73,7 +73,7 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 }
 \description{
-Center disks at points in a scatterplot
+Center disks at points in a scatterplot.
 }
 \details{
 A \emph{ball} of radius \eqn{r} around a point \eqn{x} in Euclidean space consists

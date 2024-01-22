@@ -1,6 +1,6 @@
-#' @title Disks around points
+#' @title Disk covers of 2-D point clouds
 #'
-#' @description Center disks at points in a scatterplot
+#' @description Center disks at points in a scatterplot.
 #'
 #' @details
 #'

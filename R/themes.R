@@ -4,10 +4,10 @@
 #'   form of persistence barcodes or diagrams.
 #'
 #' @name themes
+#' @import ggplot2
 #' @param vertical Logical; whether to plot a vertical axis. Defaults to
 #'   `FALSE`; if `TRUE`, allows users to more easily count the number of
 #'   features plotted in barcode; equivalent to `theme_persist()`.
-#' @import ggplot2
 
 # file.edit("tests/testthat/test-theme.R")
 
