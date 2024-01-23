@@ -59,12 +59,20 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
+#' @param order_by A character vector of properties (`"start"`, `"end"`, and/or
+#'   `"persistence"`) by which the features should be ordered (within `group`);
+#'   defaults to `c("persistence", "start")`. This will most notably impact the
+#'   appearance of [barcode]s.
+#' @param decreasing Logical; whether to sort features by decreasing values of
+#'   `order_by` (again, within `group`).
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
+
 # @param point_cloud Optional; a single data set for which methods exist to
 #   compute persistent homology. Alternatively, a list column of data sets can
 #   be passed to the `dataset` aesthetic.
+
 #' @param diameter_max,radius_max (Document.)
 #' @param dimension_max (Document.)
 #' @param field_order (Document.)
@@ -247,6 +255,8 @@ StatPersistence <- ggproto(
   
   compute_panel = function(
     data, scales,
+    order_by = c("persistence", "start"),
+    decreasing = FALSE,
     diagram = "diagonal",
     # # 'point_cloud' parameter
     # point_cloud = NULL,
@@ -273,12 +283,17 @@ StatPersistence <- ggproto(
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
-    # computed variable: `id` (sort by dimension, birth, death)
-    data$id <- interaction(
-      if (is.null(data$dimension)) NA_character_ else data$dimension,
-      data$start, data$end,
-      drop = TRUE, lex.order = TRUE
+    # computed variable: `id` (sort by `group`, then `order_by`)
+    print(head(data))
+    interaction_args <- c(
+      # always sort first by `group`
+      if (! is.null(data$group)) list(data$group),
+      # sort by specified properties in order
+      lapply(order_by, \(f) if (decreasing) -xtfrm(data[[f]]) else data[[f]]),
+      # drop unused levels and use lexicographic order
+      list(drop = TRUE, lex.order = TRUE)
     )
+    data$id <- do.call(interaction, args = interaction_args)
     # re-distinguish duplicates
     data$id <- order(order(data$id))
     
@@ -301,6 +316,8 @@ stat_persistence <- function(mapping = NULL,
                              dimension_max = 1L,
                              field_order = 2L,
                              complex = "Rips",
+                             order_by = c("persistence", "start"),
+                             decreasing = FALSE,
                              diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
@@ -320,6 +337,8 @@ stat_persistence <- function(mapping = NULL,
       dimension_max = dimension_max,
       field_order = field_order,
       complex = complex,
+      order_by = order_by,
+      decreasing = decreasing,
       diagram = diagram,
       na.rm = na.rm,
       ...
@@ -351,6 +370,8 @@ GeomFundamentalBox <- ggproto(
   },
   
   draw_panel = function(data, panel_params, coord,
+                        order_by = c("persistence", "start"),
+                        decreasing = FALSE,
                         diagram = "diagonal", t = NULL) {
     
     # expand ranges if appropriate

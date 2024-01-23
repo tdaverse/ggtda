@@ -16,6 +16,8 @@ stat_persistence(
   dimension_max = 1L,
   field_order = 2L,
   complex = "Rips",
+  order_by = c("persistence", "start"),
+  decreasing = FALSE,
   diagram = "diagonal",
   na.rm = FALSE,
   show.legend = NA,
@@ -75,6 +77,14 @@ settings of the adjustment.}
 \item{complex}{The type of filtration from which to compute persistent
 homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
 accepted.}
+
+\item{order_by}{A character vector of properties (\code{"start"}, \code{"end"}, and/or
+\code{"persistence"}) by which the features should be ordered (within \code{group});
+defaults to \code{c("persistence", "start")}. This will most notably impact the
+appearance of \link{barcode}s.}
+
+\item{decreasing}{Logical; whether to sort features by decreasing values of
+\code{order_by} (again, within \code{group}).}
 
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
