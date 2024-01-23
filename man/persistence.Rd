@@ -78,10 +78,9 @@ settings of the adjustment.}
 homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
 accepted.}
 
-\item{order_by}{A character vector of properties (\code{"start"}, \code{"end"}, and/or
-\code{"persistence"}) by which the features should be ordered (within \code{group});
-defaults to \code{c("persistence", "start")}. This will most notably impact the
-appearance of \link{barcode}s.}
+\item{order_by}{A character vector of required or computed variables
+(\code{"start"}, \code{"end"}, \code{"part"}, and/or \code{"persistence"}) by which the
+features should be ordered (within \code{group}); defaults to \code{c("persistence", "start")}. This will most notably impact the appearance of \link{barcode}s.}
 
 \item{decreasing}{Logical; whether to sort features by decreasing values of
 \code{order_by} (again, within \code{group}).}

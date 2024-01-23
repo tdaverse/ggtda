@@ -59,10 +59,10 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param order_by A character vector of properties (`"start"`, `"end"`, and/or
-#'   `"persistence"`) by which the features should be ordered (within `group`);
-#'   defaults to `c("persistence", "start")`. This will most notably impact the
-#'   appearance of [barcode]s.
+#' @param order_by A character vector of required or computed variables
+#'   (`"start"`, `"end"`, `"part"`, and/or `"persistence"`) by which the
+#'   features should be ordered (within `group`); defaults to `c("persistence",
+#'   "start")`. This will most notably impact the appearance of [barcode]s.
 #' @param decreasing Logical; whether to sort features by decreasing values of
 #'   `order_by` (again, within `group`).
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
@@ -248,6 +248,19 @@ StatPersistence <- ggproto(
       # REVIEW: move this to `stat_persistence()`?
       params$complex <- match.arg(params$complex, c("Vietoris", "Rips"))
       
+    }
+    
+    # discard unrecognized feature properties with a warning
+    if (! all(params$order_by %in% order_by_options)) {
+      ignore_by <- setdiff(params$order_by, order_by_options)
+      warning(
+        "`order_by` recognizes only: `",
+        paste0(order_by_options, collapse = "`, `"),
+        "`; `",
+        paste0(ignore_by, collapse = "`, `"),
+        "` will be ignored."
+      )
+      params$order_by <- intersect(params$order_by, order_by_options)
     }
     
     params
@@ -451,6 +464,8 @@ geom_fundamental_box <- function(mapping = NULL,
 }
 
 # Helper functions ---------------------------------------------------------
+
+order_by_options <- c("start", "end", "part", "persistence")
 
 diagram_transform <- function(data, diagram) {
   switch(
