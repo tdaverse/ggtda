@@ -10,11 +10,6 @@ ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
   theme_barcode()
-# couple with persistence stat (no effect when `data` is persistence data)
-ggplot(toy.data,
-       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
-  geom_barcode(stat = "persistence", decreasing = TRUE) +
-  theme_barcode()
 
 # load library and dataset for comprehensive example
 library("ripserr")

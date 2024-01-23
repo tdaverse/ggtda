@@ -72,7 +72,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">geom_barcode</span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  stat <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  stat <span class="op">=</span> <span class="st">"persistence"</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -220,12 +220,6 @@ fundamental and practical aspects for data scientists.
 <span class="r-in"><span>  <span class="fu">geom_barcode</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="themes.html">theme_barcode</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="barcode-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="co"># couple with persistence stat (no effect when `data` is persistence data)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">toy.data</span>,</span></span>
-<span class="r-in"><span>       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">appear</span>, end <span class="op">=</span> <span class="va">disappear</span>, colour <span class="op">=</span> <span class="va">dim</span>, shape <span class="op">=</span> <span class="va">dim</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_barcode</span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"persistence"</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="themes.html">theme_barcode</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="barcode-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># load library and dataset for comprehensive example</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://rrrlw.github.io/ripserr/" class="external-link">"ripserr"</a></span><span class="op">)</span></span></span>
@@ -239,7 +233,7 @@ fundamental and practical aspects for data scientists.
 <span class="r-in"><span>                      colour <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_barcode</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="themes.html">theme_barcode</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="barcode-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="barcode-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>

@@ -205,8 +205,7 @@ if ("ripserr" \%in\% rownames(utils::installed.packages()) &&
   raw_data <- raw_data[c(1L, 2L), ]
 # barcodes
 ggplot(raw_data, aes(dataset = obj)) +
-  geom_barcode(stat = "persistence",
-               aes(color = factor(after_stat(dimension)))) +
+  geom_barcode(aes(color = factor(after_stat(dimension)))) +
   facet_wrap(facets = vars(class))
 # persistence diagram
 ggplot(raw_data, aes(dataset = obj)) +

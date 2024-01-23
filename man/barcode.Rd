@@ -8,7 +8,7 @@
 geom_barcode(
   mapping = NULL,
   data = NULL,
-  stat = "identity",
+  stat = "persistence",
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -122,11 +122,6 @@ toy.data <- data.frame(
 ggplot(toy.data,
        aes(start = appear, end = disappear, colour = dim, shape = dim)) +
   geom_barcode() +
-  theme_barcode()
-# couple with persistence stat (no effect when `data` is persistence data)
-ggplot(toy.data,
-       aes(start = appear, end = disappear, colour = dim, shape = dim)) +
-  geom_barcode(stat = "persistence", decreasing = TRUE) +
   theme_barcode()
 
 # load library and dataset for comprehensive example

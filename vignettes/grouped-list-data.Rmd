@@ -32,7 +32,7 @@ library("ggtda")
 Let's get started with a simple data set:
 
 ```{r, include = FALSE, cache = TRUE}
-set.seed(0)
+set.seed(1)
 
 # nested circles
 p1 <- tdaunif::sample_circle(n = 50L, sd = .05)
@@ -64,7 +64,7 @@ In **TDAvis**, `geom_simplicial_complex()` plots the Rips complex for a 2-dimens
 
 ```{r}
 ggplot(df, aes(x, y)) +
-  geom_simplicial_complex(radius = .3) +
+  geom_simplicial_complex(radius = .25) +
   coord_fixed()
 ```
 
@@ -76,13 +76,14 @@ after we discuss persistent homology in the next section.
 By default, the dimension of each simplex is communicated via opacity (the `alpha` aesthetic).
 In the next example, we'll see how this is useful when plotting data with multiple groups.
 However, when we're just interested in one complex,
-it can be helpful to instead map the computed variable `dim` to the `fill` aesthetic, setting `alpha` $<1$:
+it can be helpful to instead map the computed variable `face` to the `fill` aesthetic, setting `alpha` $<1$:
 
 ```{r}
 ggplot(df, aes(x, y)) +
   geom_simplicial_complex(
-    mapping = aes(fill = after_stat(factor(dim))),
-    alpha = .5, radius = .4
+    mapping = aes(fill = after_stat(factor(face))),
+    max_dimension = 4L,
+    alpha = .25, radius = .25
   ) +
   coord_fixed()
 ```
@@ -109,16 +110,18 @@ ggplot(df, aes(x, y, fill = lab)) +
 ```
 
 It is also possible to use the `fill` aesthetic to visualize the simplex dimensions.
+This may become important as higher-dimensional simplices are computed.
 Typically, faceting the resulting plot is a good idea:
 
-```{r, fig.height=7}
+```{r, fig.height=4}
 ggplot(df, aes(x, y)) +
   geom_simplicial_complex(
-    mapping = aes(fill = after_stat(dim)),
+    mapping = aes(fill = after_stat(face)),
+    max_dimension = 6L,
     alpha = .5, radius = .3
   ) +
   facet_wrap(vars(lab), ncol = 2) +
-  scale_fill_viridis_c() +
+  scale_fill_viridis_d() +
   coord_fixed()
 ```
 
@@ -197,11 +200,11 @@ df_nested
 This approach allows for easy faceting.
 See below how we plot barcode charts for each group in `df`:
 
-```{r, fig.height=7}
+```{r}
 ggplot(df_nested) +
   geom_barcode(stat = "persistence",
                aes(dataset = data, color = factor(after_stat(dimension)))) +
-  facet_wrap(vars(lab), ncol = 1) +
+  facet_wrap(vars(lab), ncol = 2) +
   scale_color_viridis_d(end = .7)
 ```
 
@@ -211,7 +214,7 @@ Similarly, we can plot multiple persistence diagrams:
 ggplot(df_nested) +
   stat_persistence(aes(dataset = data, color = factor(after_stat(dimension)))) +
   geom_abline() +
-  facet_wrap(vars(lab)) +
+  facet_wrap(vars(lab), ncol = 2) +
   scale_color_viridis_d(end = .7)
 ```
 

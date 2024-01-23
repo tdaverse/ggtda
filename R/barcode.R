@@ -64,14 +64,23 @@ GeomBarcode <- ggproto(
     data$x <- data$start
     data$xend <- data$end
     
-    # introduce `id` if absent (see `StatPersistence$compute_*()`)
-    if (is.null(data$id)) data$id <- interaction(
-      if (is.null(data$dimension)) NA_character_ else data$dimension,
-      data$start, data$end,
-      drop = TRUE, lex.order = TRUE
-    )
-    # re-distinguish duplicates
-    data$y <- order(order(data$id))
+    # compute vertical position if absent (see `StatPersistence$compute_*()`)
+    if (is.null(data$id)) {
+      interaction_args <- c(
+        # always sort first by `group`
+        if (! is.null(data$group)) list(data$group),
+        # sort by available properties
+        list(data$start, data$end),
+        # drop unused levels and use lexicographic order
+        list(drop = TRUE, lex.order = TRUE)
+      )
+      data$y <- do.call(interaction, args = interaction_args)
+      # re-distinguish duplicates
+      data$y <- order(order(data$y))
+    } else {
+      # use `id` for vertical position
+      data$y <- data$id
+    }
     
     # return the pre-processed data set
     data
@@ -94,7 +103,7 @@ GeomBarcode <- ggproto(
 #' @export
 geom_barcode <- function(mapping = NULL,
                          data = NULL,
-                         stat = "identity",
+                         stat = "persistence",
                          position = "identity",
                          na.rm = FALSE,
                          show.legend = NA,

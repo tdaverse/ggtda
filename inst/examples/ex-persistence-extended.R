@@ -18,5 +18,4 @@ ggplot(eph.data,
 ggplot(eph.data,
        aes(start = birth, end = death, color = factor(dimension))) +
   theme_barcode() +
-  geom_barcode(stat = "persistence",
-               aes(linetype = after_stat(part)))
+  geom_barcode(aes(linetype = after_stat(part)))

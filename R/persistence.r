@@ -297,7 +297,6 @@ StatPersistence <- ggproto(
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
     # computed variable: `id` (sort by `group`, then `order_by`)
-    print(head(data))
     interaction_args <- c(
       # always sort first by `group`
       if (! is.null(data$group)) list(data$group),
