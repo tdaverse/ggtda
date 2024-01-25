@@ -62,6 +62,8 @@ d <- data.frame(
 )
 # compute the persistent homology
 ph <- as.data.frame(ripserr::vietoris_rips(as.matrix(d), dim = 1))
+#> Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has
+#> been deprecated; use `max_dim` instead.
 print(head(ph, n = 12))
 #>    dimension birth      death
 #> 1          0     0 0.02903148
@@ -99,24 +101,25 @@ pair of which are within `prox` of each other.
 ``` r
 # attach *ggtda*
 library(ggtda)
+#> Loading required package: rlang
 #> Loading required package: ggplot2
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
   coord_fixed() +
-  stat_disk(radius = prox/2, fill = "aquamarine3") +
-  geom_point()
+  geom_disk(radius = prox/2, fill = "aquamarine3") +
+  geom_point() +
+  theme_bw()
 p_sc <- ggplot(d, aes(x = x, y = y)) +
-  theme_bw() +
   coord_fixed() +
-  stat_vietoris2(diameter = prox, fill = "darkgoldenrod") +
-  stat_vietoris1(diameter = prox, alpha = .25) +
-  stat_vietoris0()
+  stat_simplicial_complex(diameter = prox, fill = "darkgoldenrod") +
+  theme_bw() +
+  theme(legend.position = "none")
 # combine the plots
 gridExtra::grid.arrange(
   p_d, p_sc,
   layout_matrix = matrix(c(1, 2), nrow = 1)
 )
+#> Warning: Using alpha for a discrete variable is not advised.
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
@@ -131,21 +134,21 @@ are detectable at this cutoff.
 # visualize the persistence data, indicating cutoffs at this proximity
 p_bc <- ggplot(ph,
                aes(start = birth, end = death, colour = dim)) +
-  theme_barcode() +
-  geom_barcode(size = 1) +
+  geom_barcode(linewidth = 1) +
   labs(x = "Diameter", y = "Homological features") +
-  geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed")
+  geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dashed") +
+  theme_barcode()
 max_prox <- max(ph$death)
 p_pd <- ggplot(ph) +
-  theme_persist() +
   coord_fixed() +
   stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
-  geom_diagonal() +
+  geom_abline(slope = 1) +
   labs(x = "Birth", y = "Death") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
   geom_fundamental_box(t = prox,
                        color = "darkgoldenrod", fill = "darkgoldenrod",
-                       linetype = "dashed")
+                       linetype = "dashed") +
+  theme_persist()
 # combine the plots
 gridExtra::grid.arrange(
   p_bc, p_pd,
