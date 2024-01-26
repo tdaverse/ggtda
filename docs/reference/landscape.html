@@ -74,7 +74,13 @@
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="st">"landscape"</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  diameter_max <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  radius_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dimension_max <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  field_order <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  complex <span class="op">=</span> <span class="st">"Rips"</span>,</span>
 <span>  diagram <span class="op">=</span> <span class="st">"landscape"</span>,</span>
+<span>  n_levels <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -132,9 +138,32 @@ position adjustment function. Use the latter if you need to change the
 settings of the adjustment.</p></dd>
 
 
+<dt>diameter_max, radius_max</dt>
+<dd><p>(Document.)</p></dd>
+
+
+<dt>dimension_max</dt>
+<dd><p>(Document.)</p></dd>
+
+
+<dt>field_order</dt>
+<dd><p>(Document.)</p></dd>
+
+
+<dt>complex</dt>
+<dd><p>The type of filtration from which to compute persistent
+homology; currently only <code>"Rips"</code> and <code>"Vietoris"</code> (equivalent) are
+accepted.</p></dd>
+
+
 <dt>diagram</dt>
 <dd><p>One of <code>"flat"</code>, <code>"diagonal"</code>, or <code>"landscape"</code>; the
 orientation for the diagram should take.</p></dd>
+
+
+<dt>n_levels</dt>
+<dd><p>The number of levels to compute and plot. If <code>Inf</code> (the
+default), determined to be all levels.</p></dd>
 
 
 <dt>na.rm</dt>

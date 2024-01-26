@@ -87,7 +87,7 @@
       <h1 data-toc-skip>Topological analysis of grouped data and list-columns</h1>
                         <h4 data-toc-skip class="author">James Otto, Jason Cory Brunson</h4>
             
-            <h4 data-toc-skip class="date">2024-01-23</h4>
+            <h4 data-toc-skip class="date">2024-01-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/vignettes/grouped-list-data.Rmd" class="external-link"><code>vignettes/grouped-list-data.Rmd</code></a></small>
       <div class="hidden name"><code>grouped-list-data.Rmd</code></div>
@@ -107,9 +107,37 @@
 <h2 id="simplicial-complexes">Simplicial complexes<a class="anchor" aria-label="anchor" href="#simplicial-complexes"></a>
 </h2>
 <p>Let’s get started with a simple data set:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># nested circles</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">tdaunif</span><span class="fu">::</span><span class="fu"><a href="https://tdaverse.github.io/tdaunif/reference/circles.html" class="external-link">sample_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50L</span>, sd <span class="op">=</span> <span class="fl">.05</span><span class="op">)</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">tdaunif</span><span class="fu">::</span><span class="fu"><a href="https://tdaverse.github.io/tdaunif/reference/circles.html" class="external-link">sample_circle</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">25L</span>, sd <span class="op">=</span> <span class="fl">.025</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span><span class="va">p2</span><span class="op">[</span>, <span class="st">"x"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">p2</span><span class="op">[</span>, <span class="st">"x"</span><span class="op">]</span> <span class="op">+</span> <span class="fl">.5</span></span>
+<span></span>
+<span><span class="co"># grouped data set</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span>, lab <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span>, lab <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            x          y lab</span></span>
+<span><span class="co">#&gt; 1 -0.1000961  1.0098284   a</span></span>
+<span><span class="co">#&gt; 2 -0.7020036  0.6976042   a</span></span>
+<span><span class="co">#&gt; 3 -0.9705862 -0.4418767   a</span></span>
+<span><span class="co">#&gt; 4  0.8143332 -0.5415834   a</span></span>
+<span><span class="co">#&gt; 5  0.3198463  0.9247930   a</span></span>
+<span><span class="co">#&gt; 6  0.8709625 -0.6243740   a</span></span>
+<span></span>
+<span><span class="co"># plot data</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="grouped-list-data_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>In TDA, it is very common to create a <a href="https://en.wikipedia.org/wiki/Abstract_simplicial_complex" class="external-link">simplicial complex</a> based on point cloud data. These complexes have well-defined <a href="https://en.wikipedia.org/wiki/Betti_number" class="external-link">topological features</a> which may relate back to the probability structure governing the sample of points. Informally, the topological features of interest correspond to holes of various dimensions (or, more accurately, to “cycles”).</p>
 <p>Typically, the <a href="https://en.wikipedia.org/wiki/Vietoris%E2%80%93Rips_complex" class="external-link">Rips complex</a> is used as it is relatively simple to compute. Loosely, the Rips complex identifies groups of <span class="math inline">\(n\)</span> points that are all within a pairwise distance of each other as <span class="math inline">\((n-1)\)</span>-dimensional simplexes. In <strong>TDAvis</strong>, <code><a href="../reference/simplicial_complex.html">geom_simplicial_complex()</a></code> plots the Rips complex for a 2-dimensional data set given a value of <code>radius</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">.25</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -117,7 +145,7 @@
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>Notice, the object in the plot above clearly has two “holes”. This kind of insight is one of the main motivators of TDA. We’ll see more formal ways of identifying relevant features like this after we discuss persistent homology in the next section.</p>
 <p>By default, the dimension of each simplex is communicated via opacity (the <code>alpha</code> aesthetic). In the next example, we’ll see how this is useful when plotting data with multiple groups. However, when we’re just interested in one complex, it can be helpful to instead map the computed variable <code>face</code> to the <code>fill</code> aesthetic, setting <code>alpha</code> <span class="math inline">\(&lt;1\)</span>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">face</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -131,7 +159,7 @@
 <h3 id="plotting-multiple-groups">Plotting multiple groups<a class="anchor" aria-label="anchor" href="#plotting-multiple-groups"></a>
 </h3>
 <p>Now, we’ll look at the grouped structure of the data, encoded by the group labels <code>a</code> and <code>b</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            x          y lab</span></span>
 <span><span class="co">#&gt; 1 -0.1000961  1.0098284   a</span></span>
@@ -154,14 +182,14 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <p>It is simple to plot the Rips complexes for multiple groups by mapping to the <code>fill</code> aesthetic:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fill <span class="op">=</span> <span class="va">lab</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>It is also possible to use the <code>fill</code> aesthetic to visualize the simplex dimensions. This may become important as higher-dimensional simplices are computed. Typically, faceting the resulting plot is a good idea:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">face</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -185,7 +213,7 @@
 <p>In the above animation, we see the structure of the Rips complexes change as the radii increase. For example, in the top right plot we see two disconnected components that last a couple of seconds. In the bottom right plot, the central hole is present for almost the entire animation. In the first plot, we see quite a few short-lived holes, but overall there are no features that persist for more than a few frames.</p>
 <p>Intuitively, when the difference in “time” between a topological feature’s birth and death is larger, that is an indication that the feature might be important. A way to visualize the persistence of topological features are barcode charts. Each feature is plotted as a horizontal line, marking its birth and death in terms of the value of the Rips complex’s diameter parameter.</p>
 <p>Below, we have computed the persistent homology of <code>df</code> using <strong>ripserr</strong> and plotted its barcode chart using <code><a href="../reference/barcode.html">geom_barcode()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ripserr</span><span class="fu">::</span><span class="fu"><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html" class="external-link">vietoris_rips</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -193,7 +221,7 @@
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p>Notice the two long-lived features, the one dimensional holes. These correspond to the features we observed previously, with <code><a href="../reference/simplicial_complex.html">geom_simplicial_complex()</a></code>!</p>
 <p>Another way to plot persistent homology is persistence diagrams, in which topological features are plotted as points with <span class="math inline">\((x, y)\)</span> values corresponding to their birth and death values:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ripserr</span><span class="fu">::</span><span class="fu"><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html" class="external-link">vietoris_rips</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -214,7 +242,7 @@ However, there is another way to supply data via aesthetic mappings: the `point_
 </h3>
 <p><code><a href="../reference/persistence.html">stat_persistence()</a></code>, which couples by default to the point geom but can also be coupled with <code><a href="../reference/barcode.html">geom_barcode()</a></code>, accepts the optional <code>dataset</code> aesthetic. This aesthetic is different from typical <strong>ggplot2</strong> aesthetics—it must point to a list column whose elements are data sets from which persistent homology can be calculated, e.g. data frames.</p>
 <p>For example, we can nest thet points in <code>df</code> by <code>lab</code></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_nested</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -228,7 +256,7 @@ However, there is another way to supply data via aesthetic mappings: the `point_
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> a     <span style="color: #949494;">&lt;tibble [50 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> b     <span style="color: #949494;">&lt;tibble [25 × 2]&gt;</span></span></span></code></pre></div>
 <p>This approach allows for easy faceting. See below how we plot barcode charts for each group in <code>df</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_nested</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/barcode.html">geom_barcode</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"persistence"</span>,</span>
 <span>               <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="va">data</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -236,7 +264,7 @@ However, there is another way to supply data via aesthetic mappings: the `point_
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span>end <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>Similarly, we can plot multiple persistence diagrams:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_nested</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/persistence.html">stat_persistence</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="va">data</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>

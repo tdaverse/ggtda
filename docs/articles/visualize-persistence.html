@@ -87,7 +87,7 @@
       <h1 data-toc-skip>Visualizing persistent homology data</h1>
                         <h4 data-toc-skip class="author">Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
             
-            <h4 data-toc-skip class="date">2024-01-23</h4>
+            <h4 data-toc-skip class="date">2024-01-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/vignettes/visualize-persistence.Rmd" class="external-link"><code>vignettes/visualize-persistence.Rmd</code></a></small>
       <div class="hidden name"><code>visualize-persistence.Rmd</code></div>
@@ -114,7 +114,7 @@
 <p>We can build some limited intuition about the space by plotting 2-coordinate projections from the point cloud:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">rpp</span>, pch <span class="op">=</span> <span class="fl">16L</span>, cex <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="visualize-persistence_files/figure-html/manifold%20sample%20pairs-1.png" width="384"></p>
+<p><img src="visualize-persistence_files/figure-html/manifold%20sample%20pairs-1.png" width="480"></p>
 <p>The real projective plane has known homology groups, given here over coefficients in <span class="math inline">\(\mathbb{F}_2\)</span>, the field of two elements:</p>
 <p><span class="math display">\[
 \tilde{H}_k(\mathbb{P}^2(\mathbb{R});\mathbb{F}_2)=\begin{cases}
@@ -204,7 +204,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Feature appearance"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Feature disappearance"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="visualize-persistence_files/figure-html/diagonal%20diagram-1.png" width="432"></p>
+<p><img src="visualize-persistence_files/figure-html/diagonal%20diagram-1.png" width="480"></p>
 <p>The reference line <span class="math inline">\(y=x\)</span> often aids the interpretation of diagonal persistence diagrams, so we add one with <code><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline()</a></code>. (This may become a default annotation in a future version.) Aesthetically, it is also generally pleasing to have the vertical and horizontal axes on a fixed coordinate system with both plotting the same range, achieved with <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal()</a></code>. The <code>shape</code> and <code>colour</code> aesthetics together discriminate between features of different dimensions. This is particularly useful when one of the aesthetics (e.g. color) is rendered ineffective (e.g. for color-blind viewers).</p>
 <p>Flat persistence diagrams can also be generated with <code><a href="../reference/persistence.html">stat_persistence()</a></code>, by setting the <code>diagram</code> parameter to <code>"flat"</code> <span class="citation">(Wadhwa et al. 2019)</span>. In this layout, the horizontal coordinate is equal to the radius at which each feature appears (column <code>"birth"</code>) and the vertical coordinate is equal to the <em>persistence</em> of the feature (the difference between <code>"death"</code> and <code>"birth"</code>). While these dimensions can be understood to lie on the same scale, the usefulness of the plot lies in recognizing the most persistent features by height and their relative appearences by birth, so it is less essential to fix the aspect ratio.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -215,17 +215,17 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Feature appearance"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Feature persistence"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="visualize-persistence_files/figure-html/flat%20diagram-1.png" width="432"></p>
+<p><img src="visualize-persistence_files/figure-html/flat%20diagram-1.png" width="480"></p>
 </div>
 <div class="section level2">
 <h2 id="persistence-landscapes">Persistence landscapes<a class="anchor" aria-label="anchor" href="#persistence-landscapes"></a>
 </h2>
-<p>Persistence landscapes vectorize persistence diagrams as real-valued functions over the parameter range. The convenient statistical properties of landscapes are outside the scope of this package, but the <code><a href="../reference/landscape.html">stat_landscape()</a></code> layer provides elegant visualizations of landscapes derived from single diagrams. Whereas persistente diagrams default to the diagonal layout, landscapes default to the “landscape” layout:</p>
+<p>Persistence landscapes vectorize persistence diagrams as real-valued functions over the parameter range. The convenient statistical properties of landscapes are outside the scope of this package, but the <code><a href="../reference/landscape.html">stat_landscape()</a></code> layer provides elegant visualizations of landscapes derived from single diagrams. Below, we only plot the first 24 levels of each landscape. Whereas persistente diagrams default to the diagonal layout, landscapes default to the “landscape” layout:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot a persistent landscape for each dimension</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">rpp_phom</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>,</span>
 <span>                     alpha <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">level</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/landscape.html">stat_landscape</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/landscape.html">stat_landscape</a></span><span class="op">(</span>n_levels <span class="op">=</span> <span class="fl">24</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span>rows <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_alpha.html" class="external-link">scale_alpha_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"reverse"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -248,7 +248,7 @@
 <span><span class="co">#&gt;   the data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
 <span><span class="co">#&gt;   variable into a factor?</span></span></code></pre></div>
-<p><img src="visualize-persistence_files/figure-html/persistence%20landscape-1.png" width="432"></p>
+<p><img src="visualize-persistence_files/figure-html/persistence%20landscape-1.png" width="480"></p>
 <p>Because landscapes take up more space than diagrams, those for different dimensions are rarely if ever overlaid. Instead, above they are faceted into three panels for ease of comparison.</p>
 </div>
 <div class="section level2">
