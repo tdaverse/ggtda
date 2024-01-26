@@ -54,7 +54,7 @@ library(ggtda)
 
 **ggtda** visualizes persistence data but also includes stat layers for common TDA constructions. This example illustrates them using an artificial point cloud $X$ and its persistent homology (PH) computed with [**ripserr**](https://cran.r-project.org/package=ripserr):
 
-```{r, fig.height=3.5}
+```{r, fig.height=3}
 # generate a noisy circle
 n <- 36
 set.seed(0)
@@ -86,7 +86,7 @@ The figure below compares the ball cover (left) with the _Vietoris_ (or _Rips_) 
 The complex comprises a simplex at each subset of points having diameter at most `prox`---that is, each pair of which are within `prox` of each other.
 A key result in TDA is that the homology of the ball union is "very close" to that of the complex.
 
-```{r, fig.height=3.5}
+```{r, fig.height=3}
 # visualize disks of fixed radii and the Vietoris complex for this proximity
 p_d <- ggplot(d, aes(x = x, y = y)) +
   coord_fixed() +
@@ -113,7 +113,7 @@ Persistent homology encodes the homology group ranks across the full range $0 \l
 We can visualize the persistence data using a barcode (left) and a persistence diagram (right).
 In the barcode plot, the dashed line indicates the cutoff at the proximity `prox`; in the persistence diagram plot, the fundamental box contains the features that are detectable at this cutoff.
 
-```{r, fig.height=3.5}
+```{r, fig.height=3}
 # visualize the persistence data, indicating cutoffs at this proximity
 p_bc <- ggplot(ph, aes(start = birth, end = death)) +
   geom_barcode(linewidth = 1, aes(color = dim, linetype = dim)) +
@@ -165,9 +165,9 @@ dl <- lapply(ns, function(n) d[seq(n), ])
 ```
 
 First we construct a nested data frame containing these subsets and plot their Vietoris complexes.
-(We specify the 'ripserr' engine to reduce runtime.)
+(We specify the [**simplextree**](https://github.com/peekxc/simplextree) engine to reduce runtime.)
 
-```{r, fig.height=5.5}
+```{r, fig.height=5}
 # formatted as grouped data
 dg <- do.call(rbind, dl)
 dg$n <- rep(ns, vapply(dl, nrow, 0L))
@@ -177,7 +177,7 @@ ggplot(dg, aes(x, y)) +
   facet_wrap(facets = vars(n), labeller = label_both) +
   stat_simplicial_complex(
     diameter = prox, fill = "darkgoldenrod",
-    engine = "ripserr"
+    engine = "simplextree"
   ) +
   theme_bw() +
   theme(legend.position = "none")
@@ -188,7 +188,7 @@ Notice that, while a cycle exists at $n = 36$, the "true" cycle is only detected
 
 We can also conveniently plot the persistence diagrams from all four cumulative subsets, this time using a list-column of data sets passed to the `dataset` aesthetic:
 
-```{r, fig.height=5.5}
+```{r, fig.height=5}
 # nested data frame of samples of different cumulative sizes
 ds <- data.frame(n = ns, d = I(dl))
 print(ds)

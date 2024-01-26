@@ -211,8 +211,9 @@ dl <- lapply(ns, function(n) d[seq(n), ])
 ```
 
 First we construct a nested data frame containing these subsets and plot
-their Vietoris complexes. (We specify the ‘ripserr’ engine to reduce
-runtime.)
+their Vietoris complexes. (We specify the
+[**simplextree**](https://github.com/peekxc/simplextree) engine to
+reduce runtime.)
 
 ``` r
 # formatted as grouped data
@@ -224,21 +225,10 @@ ggplot(dg, aes(x, y)) +
   facet_wrap(facets = vars(n), labeller = label_both) +
   stat_simplicial_complex(
     diameter = prox, fill = "darkgoldenrod",
-    engine = "ripserr"
+    engine = "simplextree"
   ) +
   theme_bw() +
   theme(legend.position = "none")
-#> Warning: The ripserr engine cannot construct Vietoris-Rips complexes;
-#> switching to `engine = "simplextree"`.
-
-#> Warning: The ripserr engine cannot construct Vietoris-Rips complexes;
-#> switching to `engine = "simplextree"`.
-
-#> Warning: The ripserr engine cannot construct Vietoris-Rips complexes;
-#> switching to `engine = "simplextree"`.
-
-#> Warning: The ripserr engine cannot construct Vietoris-Rips complexes;
-#> switching to `engine = "simplextree"`.
 #> Warning: Using alpha for a discrete variable is not advised.
 ```
 
