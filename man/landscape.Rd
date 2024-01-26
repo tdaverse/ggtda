@@ -11,7 +11,13 @@ stat_landscape(
   data = NULL,
   geom = "landscape",
   position = "identity",
+  diameter_max = Inf,
+  radius_max = NULL,
+  dimension_max = 1L,
+  field_order = 2L,
+  complex = "Rips",
   diagram = "landscape",
+  n_levels = Inf,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -62,8 +68,21 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
+\item{diameter_max, radius_max}{(Document.)}
+
+\item{dimension_max}{(Document.)}
+
+\item{field_order}{(Document.)}
+
+\item{complex}{The type of filtration from which to compute persistent
+homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
+accepted.}
+
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
+
+\item{n_levels}{The number of levels to compute and plot. If \code{Inf} (the
+default), determined to be all levels.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}

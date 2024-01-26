@@ -46,6 +46,8 @@
 #' @inheritParams ggplot2::layer
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams persistence
+#' @param n_levels The number of levels to compute and plot. If `Inf` (the
+#'   default), determined to be all levels.
 #' @example inst/examples/ex-landscape.R
 #' @example inst/examples/ex-persistence-dataset.R
 NULL
@@ -75,7 +77,8 @@ StatLandscape <- ggproto(
     diagram = "landscape",
     # 'dataset' aesthetic
     diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
-    field_order = 2L, complex = "Rips"
+    field_order = 2L, complex = "Rips",
+    n_levels = Inf
   ) {
     
     # empty case
@@ -93,7 +96,7 @@ StatLandscape <- ggproto(
     pd <- as.matrix(data[, c("start", "end"), drop = FALSE])
     pl <- list()
     k <- 0L
-    while (nrow(pd) > 0L) {
+    while (k < n_levels && nrow(pd) > 0L) {
       k <- k + 1L
       
       # identify frontier points
@@ -158,7 +161,12 @@ stat_landscape <- function(mapping = NULL,
                           data = NULL,
                           geom = "landscape",
                           position = "identity",
+                          diameter_max = Inf, radius_max = NULL,
+                          dimension_max = 1L,
+                          field_order = 2L,
+                          complex = "Rips",
                           diagram = "landscape",
+                          n_levels = Inf,
                           na.rm = FALSE,
                           show.legend = NA,
                           inherit.aes = TRUE,
@@ -172,7 +180,12 @@ stat_landscape <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      diameter_max = diameter_max, radius_max = radius_max,
+      dimension_max = dimension_max,
+      field_order = field_order,
+      complex = complex,
       diagram = diagram,
+      n_levels = n_levels,
       na.rm = na.rm,
       ...
     )

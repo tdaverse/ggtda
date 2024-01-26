@@ -42,7 +42,7 @@ rpp <- tdaunif::sample_projective_plane(n = 240L, sd = 0.01)
 
 We can build some limited intuition about the space by plotting 2-coordinate projections from the point cloud:
 
-```{r manifold sample pairs, fig.height = 4, fig.width = 4}
+```{r manifold sample pairs, fig.height = 5, fig.width = 5}
 pairs(rpp, pch = 16L, cex = .5)
 ```
 
@@ -133,7 +133,7 @@ They are generated using `stat_persistence()` as below, using the same persisten
 This is indeed a stat layer, in that the coordinates are calculated differently from the data depending on the layout.
 By default, persistence diagrams take the conventional "diagonal" layout: A feature born at $b$ and dead at $d$ is located at coordinates $(b,d)$.
 
-```{r diagonal diagram, fig.height=3.5, fig.width = 4.5}
+```{r diagonal diagram, fig.height=4.5, fig.width = 5}
 # create persistence diagram with appropriate theme
 ggplot(rpp_phom, aes(start = birth, end = death,
                      shape = dimension, colour = dimension)) +
@@ -154,7 +154,7 @@ Flat persistence diagrams can also be generated with `stat_persistence()`, by se
 In this layout, the horizontal coordinate is equal to the radius at which each feature appears (column `"birth"`) and the vertical coordinate is equal to the _persistence_ of the feature (the difference between `"death"` and `"birth"`).
 While these dimensions can be understood to lie on the same scale, the usefulness of the plot lies in recognizing the most persistent features by height and their relative appearences by birth, so it is less essential to fix the aspect ratio.
 
-```{r flat diagram, fig.height = 3.5, fig.width = 4.5}
+```{r flat diagram, fig.height = 4.5, fig.width = 5}
 # create flat persistence diagrams with adjustments
 ggplot(rpp_phom, aes(start = birth, end = death,
                      shape = dimension, colour = dimension)) +
@@ -167,13 +167,14 @@ ggplot(rpp_phom, aes(start = birth, end = death,
 ## Persistence landscapes
 
 Persistence landscapes vectorize persistence diagrams as real-valued functions over the parameter range. The convenient statistical properties of landscapes are outside the scope of this package, but the `stat_landscape()` layer provides elegant visualizations of landscapes derived from single diagrams.
+Below, we only plot the first 24 levels of each landscape.
 Whereas persistente diagrams default to the diagonal layout, landscapes default to the "landscape" layout:
 
-```{r persistence landscape, fig.height = 6.5, fig.width = 4.5}
+```{r persistence landscape, fig.height = 6, fig.width = 5}
 # plot a persistent landscape for each dimension
 ggplot(rpp_phom, aes(start = birth, end = death,
                      alpha = after_stat(level))) +
-  stat_landscape() +
+  stat_landscape(n_levels = 24) +
   facet_grid(rows = vars(dimension)) +
   coord_equal() +
   scale_alpha_continuous(trans = "reverse") +
