@@ -108,7 +108,7 @@ gridExtra::grid.arrange(
 This cover and simplex clearly contain a non-trivial 1-cycle (loop), which makes $H_1(B_r(X)) = H_1({VR}_r(X)) = 1$.
 Persistent homology encodes the homology group ranks across the full range $0 \leq r < \infty$, corresponding to the full filtration of simplicial complexes constructed on the point cloud.
 
-### Persistence data
+### Persistence plots
 
 We can visualize the persistence data using a barcode (left) and a persistence diagram (right).
 In the barcode plot, the dashed line indicates the cutoff at the proximity `prox`; in the persistence diagram plot, the fundamental box contains the features that are detectable at this cutoff.
@@ -145,7 +145,7 @@ These groups of lines do not overlap, which means that the loop exists only in t
 
 The persistence diagram shows that the loop persists for longer than any of the gaps. This is consistent with the gaps being artifacts of the sampling procedure but the loop being an intrinsic property of the underlying space.
 
-### Composite plots
+### Multiple data sets
 
 TDA almost always involves comparisons of topological data between spaces.
 To illustrate such a comparison, we construct a larger sample but then examine the persistence of its cumulative subsets:

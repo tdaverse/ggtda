@@ -140,7 +140,7 @@ encodes the homology group ranks across the full range
 $0 \leq r < \infty$, corresponding to the full filtration of simplicial
 complexes constructed on the point cloud.
 
-### Persistence data
+### Persistence plots
 
 We can visualize the persistence data using a barcode (left) and a
 persistence diagram (right). In the barcode plot, the dashed line
@@ -190,7 +190,7 @@ of the gaps. This is consistent with the gaps being artifacts of the
 sampling procedure but the loop being an intrinsic property of the
 underlying space.
 
-### Composite plots
+### Multiple data sets
 
 TDA almost always involves comparisons of topological data between
 spaces. To illustrate such a comparison, we construct a larger sample

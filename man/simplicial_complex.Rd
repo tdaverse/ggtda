@@ -11,12 +11,12 @@ stat_simplicial_complex(
   data = NULL,
   geom = "SimplicialComplex",
   position = "identity",
-  radius = NULL,
+  complex = "Rips",
   diameter = NULL,
+  radius = NULL,
+  dimension_max = 2L,
   zero_simplices = "all",
   one_simplices = "maximal",
-  max_dimension = 2L,
-  complex = "Rips",
   engine = NULL,
   na.rm = FALSE,
   show.legend = NA,
@@ -66,22 +66,22 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
+\item{complex}{The type of complex to compute, either \code{"Vietoris"}, \code{"Rips"},
+\code{"Cech"}, or \code{"alpha"}.}
+
 \item{radius, diameter}{The (positive) radius or diameter used in the
 construction. Provide only one of these; if neither is provided, they
 default to zero.}
+
+\item{dimension_max}{Compute simplices of dimension up to \code{dimension_max}
+(only relevant for the Vietoris--Rips complex computed with the
+\code{simplextree} engine).}
 
 \item{zero_simplices}{Which 0-simplices (vertices) to plot; one of \code{"none"},
 \code{"maximal"}, and \code{"all"} (default).}
 
 \item{one_simplices}{Which 1-simplices (edges) to plot; one of \code{"none"},
 \code{"maximal"} (default), and \code{"all"}.}
-
-\item{max_dimension}{Compute simplices of dimension up to \code{max_dimension}
-(only relevant for the Vietoris--Rips complex computed with the
-\code{simplextree} engine).}
-
-\item{complex}{The type of complex to compute, either \code{"Vietoris"}, \code{"Rips"},
-\code{"Cech"}, or \code{"alpha"}.}
 
 \item{engine}{The computational engine to use (see 'Details'). Reasonable
 defaults are chosen based on \code{complex}.}

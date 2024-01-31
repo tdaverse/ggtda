@@ -186,7 +186,7 @@
 <p>This cover and simplex clearly contain a non-trivial 1-cycle (loop), which makes <span class="math inline"><em>H</em><sub>1</sub>(<em>B</em><sub><em>r</em></sub>(<em>X</em>)) = <em>H</em><sub>1</sub>(<em>V</em><em>R</em><sub><em>r</em></sub>(<em>X</em>)) = 1</span>. Persistent homology encodes the homology group ranks across the full range <span class="math inline">0 ≤ <em>r</em> &lt; ∞</span>, corresponding to the full filtration of simplicial complexes constructed on the point cloud.</p>
 </div>
 <div class="section level3">
-<h3 id="persistence-data">Persistence data<a class="anchor" aria-label="anchor" href="#persistence-data"></a>
+<h3 id="persistence-plots">Persistence plots<a class="anchor" aria-label="anchor" href="#persistence-plots"></a>
 </h3>
 <p>We can visualize the persistence data using a barcode (left) and a persistence diagram (right). In the barcode plot, the dashed line indicates the cutoff at the proximity <code>prox</code>; in the persistence diagram plot, the fundamental box contains the features that are detectable at this cutoff.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -219,7 +219,7 @@
 <p>The persistence diagram shows that the loop persists for longer than any of the gaps. This is consistent with the gaps being artifacts of the sampling procedure but the loop being an intrinsic property of the underlying space.</p>
 </div>
 <div class="section level3">
-<h3 id="composite-plots">Composite plots<a class="anchor" aria-label="anchor" href="#composite-plots"></a>
+<h3 id="multiple-data-sets">Multiple data sets<a class="anchor" aria-label="anchor" href="#multiple-data-sets"></a>
 </h3>
 <p>TDA almost always involves comparisons of topological data between spaces. To illustrate such a comparison, we construct a larger sample but then examine the persistence of its cumulative subsets:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">

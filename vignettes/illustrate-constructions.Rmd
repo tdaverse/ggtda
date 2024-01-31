@@ -78,13 +78,13 @@ ggplot(unif_df, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
-To visualize the 0- and 1-simplices, we use `stat_simplicial_complex()` with `max_dimension = 1L` and `one_simplices = "all".
+To visualize the 0- and 1-simplices, we use `stat_simplicial_complex()` with `dimension_max = 1L` and `one_simplices = "all".
 
 ```{r 1skeleton}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(radius = rad_val,
-                          one_simplices = "all", max_dimension = 1L) +
+                          one_simplices = "all", dimension_max = 1L) +
   theme_minimal()
 ```
 
@@ -99,18 +99,18 @@ ggplot(unif_df, aes(x = x, y = y)) +
   geom_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   geom_point() +
   stat_simplicial_complex(diameter = rad_val * 2,
-                          one_simplices = "all", max_dimension = 1L) +
+                          one_simplices = "all", dimension_max = 1L) +
   theme_minimal()
 ```
 
-Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), we set `max_dimension = 2L` to add the faces of the Vietoris--Rips complex. This produces the 2-skeleton.
+Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), we set `dimension_max = 2L` to add the faces of the Vietoris--Rips complex. This produces the 2-skeleton.
 Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.
 
 ```{r 2skeleton, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = rad_val * 2,
-                          one_simplices = "all", max_dimension = 2L) +
+                          one_simplices = "all", dimension_max = 2L) +
   theme_minimal()
 ```
 
@@ -120,7 +120,7 @@ While using `stat_simplicial_complex()` in combination with `geom_disk()` can cr
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = rad_val * 2,
-                          one_simplices = "all", max_dimension = 2L) +
+                          one_simplices = "all", dimension_max = 2L) +
   geom_disk(radius = rad_val, fill = "blue", alpha = 0.1) +
   theme_minimal()
 ```
@@ -243,7 +243,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 # stat_simplicial_complex
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_simplicial_complex(diameter = diam[1], max_dimension = 2L,
+  stat_simplicial_complex(diameter = diam[1], dimension_max = 2L,
                           fill = "darkgoldenrod") +
   theme_minimal()
 ```
@@ -306,7 +306,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 # stat_vietoris*
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_simplicial_complex(diameter = diam[2], max_dimension = 2L,
+  stat_simplicial_complex(diameter = diam[2], dimension_max = 2L,
                           fill = "darkgoldenrod") +
   theme_minimal()
 ```
@@ -370,7 +370,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 # stat_vietoris*
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
-  stat_simplicial_complex(diameter = diam[3], max_dimension = 2L,
+  stat_simplicial_complex(diameter = diam[3], dimension_max = 2L,
                           fill = "darkgoldenrod") +
   theme_minimal()
 ```

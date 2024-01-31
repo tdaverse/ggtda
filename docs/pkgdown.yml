@@ -1,9 +1,9 @@
-pandoc: 3.1.1
+pandoc: 2.16.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   grouped-list-data: grouped-list-data.html
   illustrate-constructions: illustrate-constructions.html
   visualize-persistence: visualize-persistence.html
-last_built: 2024-01-26T14:37Z
+last_built: 2024-01-31T16:11Z
 

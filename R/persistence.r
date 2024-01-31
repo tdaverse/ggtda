@@ -69,16 +69,22 @@
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
 
+# REVIEW: Single data set param?
 # @param point_cloud Optional; a single data set for which methods exist to
 #   compute persistent homology. Alternatively, a list column of data sets can
 #   be passed to the `dataset` aesthetic.
 
-#' @param diameter_max,radius_max (Document.)
-#' @param dimension_max (Document.)
-#' @param field_order (Document.)
-#' @param complex The type of filtration from which to compute persistent
+#' @param filtration The type of filtration from which to compute persistent
 #'   homology; currently only `"Rips"` and `"Vietoris"` (equivalent) are
 #'   accepted.
+#' @param diameter_max,radius_max Maximum diameter or radius for the simplicial
+#'   filtration. Both default to `NULL`, in which case the complete filtration
+#'   is constructed.
+#' @param dimension_max Maximum dimension of the simplicial filtration.
+#' @param field_order (Prime) order of the field over which to compute
+#'   persistent homology.
+#' @param engine The computational engine to use (see 'Details'). Reasonable
+#'   defaults are chosen based on `filtration`.
 #' @example inst/examples/ex-persistence.R
 #' @example inst/examples/ex-persistence-extended.R
 #' @example inst/examples/ex-persistence-dataset.R
@@ -100,8 +106,70 @@ StatPersistence <- ggproto(
   
   # optional_aes = c("dataset"),
   
+  # only explicitly passed params
+  setup_params = function(data, params) {
+    
+    if (is.null(data$dataset)) {
+      # discard unused parameters
+      
+      dataset_params <- intersect(
+        names(data),
+        c("filtration", "diameter_max", "radius_max", "dimension_max",
+          "field_order")
+      )
+      if (length(dataset_params) > 0L) {
+        params_vec <- paste0("`", dataset_params, "`", collapse = ", ")
+        warning("Parameters ", params_vec,
+                " are only used with the `dataset` aesthetic.")
+        params <- params[setdiff(names(params), params_vec)]
+      }
+      
+    } else {
+      # pre-process filtration parameters
+      
+      # logic to deduce reasonable values of engine
+      # + issue warnings when choices are incompatible
+      params$filtration <-
+        match.arg(params$filtration, c("Vietoris", "Rips", "alpha"))
+      params$engine <- 
+        match.arg(params$engine, c("TDA", "GUDHI", "Dionysus", "ripserr"))
+      params$engine <-
+        assign_filtration_engine(params$filtration, params$engine)
+      
+    }
+    
+    # reconcile thresholds
+    if (is.null(params$radius_max) && is.null(params$diameter_max)) {
+      params$diameter_max <- Inf
+    }
+    if (! is.null(params$radius_max)) {
+      if (! is.null(params$diameter_max)) {
+        warning("Both `radius_max` and `diameter_max` were passed; ",
+                "only `diameter_max` value will be used.")
+      } else {
+        params$diameter_max <- params$radius_max * 2
+      }
+    }
+    
+    # discard unrecognized feature properties with a warning
+    if (! all(params$order_by %in% order_by_options)) {
+      ignore_by <- setdiff(params$order_by, order_by_options)
+      warning(
+        "`order_by` recognizes only: `",
+        paste0(order_by_options, collapse = "`, `"),
+        "`; `",
+        paste0(ignore_by, collapse = "`, `"),
+        "` will be ignored."
+      )
+      params$order_by <- intersect(params$order_by, order_by_options)
+    }
+    
+    params
+  },
+  
   setup_data = function(data, params) {
     
+    # REVIEW: Single data set param?
     # # check if data was provided via 'point_cloud' argument
     # if (! is.null(params$point_cloud)) {
     #   
@@ -133,83 +201,36 @@ StatPersistence <- ggproto(
         data$end <- data$start <- NULL
       }
       
-      # REVIEW: move this to `stat_persistence()`?
-      params$complex <- match.arg(params$complex, c("Vietoris", "Rips"))
-      
-      # ensure that engine can handle data
-      ph_classes <- if (is.na(.ripserr_version)) {
-        stop("Package {ripserr} is required but could not be found.")
-      } else if (.ripserr_version == "0.1.1") {
-        # https://github.com/cran/ripserr/blob/
-        # 8cadc3a86009149418d6f9a61124af9d6372d34e/R/calculate.R#L68
-        c(
-          "dist", "matrix",
-          gsub("as\\.matrix\\.", "",
-               as.character(methods(base::as.matrix)))
+      # compute PH listwise
+      ph_list <- switch(
+        params$engine,
+        "TDA" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$dimension_max, params$field_order,
+          library = "GUDHI"
+        ),
+        "GUDHI" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$dimension_max, params$field_order,
+          library = "GUDHI"
+        ),
+        "Dionysus" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$dimension_max, params$field_order,
+          library = "Dionysus"
+        ),
+        "ripserr" = simplicial_filtration_ripserr(
+          data$dataset,
+          params$diameter_max, params$dimension_max, params$field_order
         )
-      } else if (.ripserr_version >= "0.2.0") {
-        gsub("vietoris_rips\\.", "",
-             as.character(methods(ripserr::vietoris_rips)))
-      }
-      ph_classes <- setdiff(ph_classes, "default")
-      if (! all(vapply(data$dataset, inherits, FALSE, what = ph_classes))) {
-        stop("`dataset` only accepts data of the following classes: ",
-             paste(paste("'", ph_classes, "'", sep = ""), collapse = ", "))
-      }
-      
-      # ensure data is in transformation-ready form here
-      
-      # handle disk size
-      if (is.null(params$radius_max) && is.null(params$diameter_max)) {
-        params$diameter_max <- Inf
-      }
-      if (! is.null(params$radius_max)) {
-        if (! is.null(params$diameter_max)) {
-          warning("Pass a value to only one of ",
-                  "`radius_max` and `diameter_max`; ",
-                  "`diameter_max` value will be used.")
-        } else {
-          params$diameter_max <- params$radius_max * 2
-        }
-      }
-      
-      # separate out dataset list column
-      dataset_list <- data$dataset
-      # introduce identifier
-      data$dataset <- seq(nrow(data))
-      # compute persistent homology from dataset list
-      if (params$diameter_max == Inf) params$diameter_max <- -1L
-      dataset_list <- if (is.na(.ripserr_version)) {
-        stop("Package {ripserr} is required but could not be found.")
-      } else if (.ripserr_version == "0.1.1") {
-        lapply(
-          dataset_list,
-          ripserr::vietoris_rips,
-          threshold = params$diameter_max,
-          dim = params$dimension_max %||% 1L,
-          p = params$field_order %||% 2L,
-          return_format = "df"
-        )
-      } else if (.ripserr_version >= "0.2.0") {
-        lapply(
-          dataset_list,
-          ripserr::vietoris_rips,
-          threshold = params$diameter_max,
-          max_dim = params$dimension_max %||% 1L,
-          p = params$field_order %||% 2L
-        )
-      }
-      # introduce identifier
-      dataset_list <- mapply(
-        \(d, i) { d <- as.data.frame(d); d$dataset <- i; d },
-        d = dataset_list, i = seq(nrow(data)),
-        SIMPLIFY = FALSE
       )
+      
+      # introduce identifier (and overwrite `dataset` column)
+      data$dataset <- seq(nrow(data))
+      for (i in seq_along(ph_list)) ph_list[[i]]$dataset <- i
       # bind the list of output data frames
-      ph_data <- do.call(rbind, dataset_list)
-      # rename to required aesthetics
-      names(ph_data)[match(c("birth", "death"), names(ph_data))] <- 
-        c("start", "end")
+      ph_data <- do.call(rbind, ph_list)
+      
       # merge persistent homology data back into original data
       data <- merge(data, ph_data, by = "dataset")
       
@@ -226,56 +247,18 @@ StatPersistence <- ggproto(
     data
   },
   
-  setup_params = function(data, params) {
-    
-    # discard unused parameters
-    if (is.null(data$dataset)) {
-      
-      dataset_params <- intersect(
-        names(data),
-        c("diameter_max", "radius_max", "dimension_max", "field_order",
-          "complex")
-      )
-      if (length(dataset_params) > 0L) {
-        params_vec <- paste0("`", dataset_params, "`", collapse = ", ")
-        warning("Parameters ", params_vec,
-                " are only used with the `dataset` aesthetic.")
-        params <- params[setdiff(names(params), params_vec)]
-      }
-      
-    } else {
-      
-      # REVIEW: move this to `stat_persistence()`?
-      params$complex <- match.arg(params$complex, c("Vietoris", "Rips"))
-      
-    }
-    
-    # discard unrecognized feature properties with a warning
-    if (! all(params$order_by %in% order_by_options)) {
-      ignore_by <- setdiff(params$order_by, order_by_options)
-      warning(
-        "`order_by` recognizes only: `",
-        paste0(order_by_options, collapse = "`, `"),
-        "`; `",
-        paste0(ignore_by, collapse = "`, `"),
-        "` will be ignored."
-      )
-      params$order_by <- intersect(params$order_by, order_by_options)
-    }
-    
-    params
-  },
-  
   compute_panel = function(
     data, scales,
     order_by = c("persistence", "start"),
     decreasing = FALSE,
     diagram = "diagonal",
-    # # 'point_cloud' parameter
+    # REVIEW: Single data set param?
     # point_cloud = NULL,
     # 'dataset' aesthetic
-    diameter_max = Inf, radius_max = NULL, dimension_max = 1L,
-    field_order = 2L, complex = "Rips"
+    filtration = "Rips",
+    diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
+    field_order = 2L,
+    engine = NULL
   ) {
     
     # points in cartesian coordinates (un-negated from opposite filtration)
@@ -323,11 +306,13 @@ stat_persistence <- function(mapping = NULL,
                              data = NULL,
                              geom = "point",
                              position = "identity",
+                             # REVIEW: Single data set param?
                              # point_cloud = NULL,
-                             diameter_max = Inf, radius_max = NULL,
+                             filtration = "Rips",
+                             diameter_max = NULL, radius_max = NULL,
                              dimension_max = 1L,
                              field_order = 2L,
-                             complex = "Rips",
+                             engine = NULL,
                              order_by = c("persistence", "start"),
                              decreasing = FALSE,
                              diagram = "diagonal",
@@ -344,11 +329,13 @@ stat_persistence <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      # REVIEW: Single data set param?
       # point_cloud = point_cloud,
+      filtration = filtration,
       diameter_max = diameter_max, radius_max = radius_max,
       dimension_max = dimension_max,
       field_order = field_order,
-      complex = complex,
+      engine = engine,
       order_by = order_by,
       decreasing = decreasing,
       diagram = diagram,

@@ -1,11 +1,11 @@
 # Implementation of different engines for `StatSimplicialComplex`
 
-## base 
+## {base}
 
 # These should probably be factored out more cleanly
 # Currently, an if statement for each complex
 simplicial_complex_base <- function(
-    data, diameter, max_dimension, complex, zero_simplices, one_simplices
+    data, complex, diameter, dimension_max, zero_simplices, one_simplices
 ) {
   
   # df_zero_simplices <- indices_to_data(data)
@@ -63,12 +63,12 @@ simplicial_complex_base <- function(
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher-dim simplices
   # being plotted
-  if (one_simplices == "maximal" & max_dimension > 1L) {
+  if (one_simplices == "maximal" & dimension_max > 1L) {
     df_one_simplices <- 
       get_maximal_one_simplices(edges, faces, df_one_simplices)
   }
   
-  if (zero_simplices == "maximal" & max_dimension > 0L) {
+  if (zero_simplices == "maximal" & dimension_max > 0L) {
     df_zero_simplices <- 
       get_maximal_zero_simplices(edges, df_zero_simplices)
   } 
@@ -77,10 +77,10 @@ simplicial_complex_base <- function(
   
 } 
 
-## RTriangle
+## {RTriangle}
 
 simplicial_complex_RTriangle <- function(
-    data, diameter, max_dimension, complex, zero_simplices, one_simplices
+    data, complex, diameter, dimension_max, zero_simplices, one_simplices
 ) {
   
   # 0-simplices always just the point cloud
@@ -177,12 +177,12 @@ simplicial_complex_RTriangle <- function(
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher-dim simplices
   # being plotted
-  if (one_simplices == "maximal" & max_dimension > 1L) {
+  if (one_simplices == "maximal" & dimension_max > 1L) {
     df_one_simplices <- 
       get_maximal_one_simplices(edges, faces, df_one_simplices)
   }
   
-  if (zero_simplices == "maximal" & max_dimension > 0L) {
+  if (zero_simplices == "maximal" & dimension_max > 0L) {
     df_zero_simplices <- 
       get_maximal_zero_simplices(edges, df_zero_simplices)
   } 
@@ -339,7 +339,7 @@ proximate_triples <- function(data, diameter) {
 ## {simplextree}
 
 simplicial_complex_simplextree <- function(
-    data, diameter, max_dimension, complex, zero_simplices, one_simplices
+    data, complex, diameter, dimension_max, zero_simplices, one_simplices
 ) {
   
   # The entire set of 0-simplices needs to come from data
@@ -347,9 +347,9 @@ simplicial_complex_simplextree <- function(
   df_zero_simplices$id <- seq(nrow(data))
   df_zero_simplices$dim <- 0L
   
-  # Compute simplicial complex up to `max_dimension`, encoded as a 'simplextree'
+  # Compute simplicial complex up to `dimension_max`, encoded as a 'simplextree'
   # (all further computed values derive from st)
-  st <- data_to_simplextree(data, diameter, max_dimension, complex)
+  st <- data_to_simplextree(data, diameter, dimension_max, complex)
   
   # Convert simplex tree into a list
   if (is.na(.simplextree_version)) {
@@ -408,7 +408,7 @@ simplicial_complex_simplextree <- function(
   
   # Overwrite df_one_simplices to include non-maximal edges
   # if user wants all one-simplices or if higher-dim simplices aren't plotted,
-  if (one_simplices == "all" | max_dimension == 1L) {
+  if (one_simplices == "all" | dimension_max == 1L) {
     
     # convert matrix of edges into a list
     edges <- apply(st$edges, 1L, identity, simplify = FALSE)
@@ -443,11 +443,11 @@ simplicial_complex_simplextree <- function(
 
 # Helper function, returns simplextree to be manipulated into data.frame
 # f: data -> simplextree encoding simplicial complex for given `complex`
-data_to_simplextree <- function(df, diameter, max_dimension, complex) {
+data_to_simplextree <- function(df, diameter, dimension_max, complex) {
   
   if (complex %in% c("Rips", "Vietoris")) {
     # For the Vietoris-Rips complex, just return the flag complex:
-    # w/ simplices with dim up to max_dimension
+    # w/ simplices with dim up to dimension_max
     
     # Find edges given diameter:
     edges <- t(proximate_pairs(df, diameter))
@@ -459,12 +459,12 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
       stop("Package {simplextree} is required but could not be found.")
     } else if (.simplextree_version >= "1.0.1") {
       st <- simplextree::simplex_tree(edges)
-      st <- simplextree::expand(st, k = max_dimension)
+      st <- simplextree::expand(st, k = dimension_max)
     } else if (.simplextree_version == "0.9.1") {
       st <- simplextree::simplex_tree()
       st$insert(edges)
       # strange behavior in this archived version must be worked around
-      if (! is.null(st$dimension)) st$expand(k = max_dimension)
+      if (! is.null(st$dimension)) st$expand(k = dimension_max)
     } else {
       stop("No method available for {simplextree} v", .simplextree_version)
     }
@@ -484,7 +484,7 @@ data_to_simplextree <- function(df, diameter, max_dimension, complex) {
 ## {TDA}
 
 simplicial_complex_TDA <- function(
-    data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+    data, complex, diameter, dimension_max, zero_simplices, one_simplices,
     library
 ) {
   
@@ -493,10 +493,10 @@ simplicial_complex_TDA <- function(
   df_zero_simplices$id <- seq(nrow(data))
   df_zero_simplices$dim <- 0L
   
-  # Compute simplicial complex up to `max_dimension`, encoded as a 'Diagram'
+  # Compute simplicial complex up to `dimension_max`, encoded as a 'Diagram'
   # (all further computed values derive from `pd`)
   pd <- data_to_Filtration(data[, c("x", "y")],
-                           diameter, max_dimension,
+                           diameter, dimension_max,
                            complex, library)
   
   # data frame of coordinates with linking index
@@ -521,11 +521,11 @@ simplicial_complex_TDA <- function(
 
 # Helper function, returns 'Diag' to be manipulated into 'data.frame'
 # f: data -> simplextree encoding simplicial complex for given `complex`
-data_to_Filtration <- function(df, diameter, max_dimension, complex, library) {
+data_to_Filtration <- function(df, diameter, dimension_max, complex, library) {
   
   if (complex %in% c("Rips", "Vietoris")) {
     
-    pd <- TDA::ripsFiltration(X = df, maxdimension = max_dimension,
+    pd <- TDA::ripsFiltration(X = df, maxdimension = dimension_max,
                               maxscale = diameter, library = library)
     
   } else if (complex == "alpha") {
@@ -540,12 +540,12 @@ data_to_Filtration <- function(df, diameter, max_dimension, complex, library) {
 ## assignment rules
 
 # Logic for matching params w/ optimal engine
-assign_complex_engine <- function(complex, engine, max_dimension) {
+assign_complex_engine <- function(complex, engine, dimension_max) {
   
-  if (! is.null(engine) && engine == "base" && max_dimension > 2L) {
+  if (! is.null(engine) && engine == "base" && dimension_max > 2L) {
     
     warning(
-      "The base engine cannot construct complexes of `max_dimension` > 2.",
+      "The base engine cannot construct complexes of `dimension_max` > 2.",
       call. = FALSE
     )
     
@@ -554,7 +554,7 @@ assign_complex_engine <- function(complex, engine, max_dimension) {
   if (complex %in% c("Rips", "Vietoris")) {
     
     # Default to "base" engine if not plotting high dim simplices
-    # if (max_dimension < 3L & is.null(engine)) return("base")
+    # if (dimension_max < 3L & is.null(engine)) return("base")
     
     return(complex_engine_rules("Vietoris-Rips", engine, c(
       if (! is.na(.simplextree_version)) "simplextree",
@@ -591,15 +591,15 @@ complex_engine_rules <- function(
   if (is.null(engine)) {
     
     if (is.null(engine_default)) {
-      stop("No engine is available to construct ", complex_name, " complexes.")
+      stop("No available engine can construct ", complex_name, " complexes.")
     }
     engine <- engine_default
     
   } else if (! engine %in% engine_options) {
     
     msg <- paste0(
-      'The ', engine, ' engine cannot construct ', complex_name, ' complexes;',
-      '\n', 'switching to `engine = "', engine_default, '"`.'
+      "The ", engine, " engine cannot construct ", complex_name, " complexes;",
+      "\n", "switching to `engine = '", engine_default, "'`."
     )
     warning(msg, call. = FALSE)
     

@@ -51,7 +51,7 @@ test_that("Cech layers work as expected", {
   
   # Čech 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", radius = .1, max_dimension = 0L)
+    stat_simplicial_complex(complex = "Cech", radius = .1, dimension_max = 0L)
   expect_is(p0, "ggplot")
   expect_is(p0$layer[[1]], "ggproto")
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
@@ -59,7 +59,7 @@ test_that("Cech layers work as expected", {
   
   # Čech 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", diameter = .7, max_dimension = 1L)
+    stat_simplicial_complex(complex = "Cech", diameter = .7, dimension_max = 1L)
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
@@ -70,7 +70,7 @@ test_that("Cech layers work as expected", {
   
   # Čech 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
-    stat_simplicial_complex(complex = "Cech", diameter = .7, max_dimension = 2L)
+    stat_simplicial_complex(complex = "Cech", diameter = .7, dimension_max = 2L)
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
@@ -94,7 +94,7 @@ test_that("Vietoris layers work as expected", {
   # Vietoris 0-simplices stat
   p0 <- ggplot(d, aes(x = x, y = y)) +
     stat_simplicial_complex(complex = "Vietoris", radius = .1,
-                            max_dimension = 0L)
+                            dimension_max = 0L)
   expect_is(p0, "ggplot")
   expect_is(p0$layer[[1]], "ggproto")
   expect_equal(c(p0$labels$x, p0$labels$y), c("x", "y"))
@@ -103,7 +103,7 @@ test_that("Vietoris layers work as expected", {
   # Vietoris 1-simplices stat
   p1 <- ggplot(d, aes(x = x, y = y)) +
     stat_simplicial_complex(complex = "Vietoris", diameter = .7,
-                            max_dimension = 1L)
+                            dimension_max = 1L)
   expect_is(p1, "ggplot")
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
@@ -115,7 +115,7 @@ test_that("Vietoris layers work as expected", {
   # Vietoris 2-simplices stat
   p2 <- ggplot(d, aes(x = x, y = y)) +
     stat_simplicial_complex(complex = "Vietoris", diameter = .7,
-                            max_dimension = 2L)
+                            dimension_max = 2L)
   expect_is(p2, "ggplot")
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))

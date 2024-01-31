@@ -63,6 +63,7 @@ Collate:
     'ggtda.R'
     'persistence.r'
     'landscape.R'
+    'persistence-engines.R'
     'simplicial-complex-engines.R'
     'simplicial-complex.R'
     'themes.R'

@@ -63,17 +63,17 @@
 #' @inheritParams ggplot2::geom_point
 #' @inheritParams ggplot2::stat_identity
 #' @inheritParams disk
-#' @param max_dimension Compute simplices of dimension up to `max_dimension`
-#'   (only relevant for the Vietoris--Rips complex computed with the
-#'   `simplextree` engine).
 #' @param complex The type of complex to compute, either `"Vietoris"`, `"Rips"`,
 #'   `"Cech"`, or `"alpha"`.
-#' @param engine The computational engine to use (see 'Details'). Reasonable
-#'   defaults are chosen based on `complex`.
+#' @param dimension_max Compute simplices of dimension up to `dimension_max`
+#'   (only relevant for the Vietoris--Rips complex computed with the
+#'   `simplextree` engine).
 #' @param zero_simplices Which 0-simplices (vertices) to plot; one of `"none"`,
 #'   `"maximal"`, and `"all"` (default).
 #' @param one_simplices Which 1-simplices (edges) to plot; one of `"none"`,
 #'   `"maximal"` (default), and `"all"`.
+#' @param engine The computational engine to use (see 'Details'). Reasonable
+#'   defaults are chosen based on `complex`.
 #' @param outlines Should the outlines of polygons representing high-dimensional
 #'   simplices be drawn?
 #' @example inst/examples/ex-simplicial-complex-equilateral.R
@@ -100,9 +100,10 @@ StatSimplicialComplex <-  ggproto(
   
   compute_group = function(
     data, scales,
-    radius = NULL, diameter = NULL, 
+    complex = "Rips",
+    diameter = NULL, radius = NULL, dimension_max = 2L,
     zero_simplices = "all", one_simplices = "maximal",
-    max_dimension = 2L, complex = "Rips", engine = NULL 
+    engine = NULL 
   ) {
     
     # TODO:
@@ -125,44 +126,48 @@ StatSimplicialComplex <-  ggproto(
     # logic to deduce reasonable values of engine
     # + issue warnings when choices are incompatible
     complex <- match.arg(complex, c("Vietoris", "Rips", "Cech", "alpha"))
-    engine <- assign_complex_engine(complex, engine, max_dimension)
+    engine <- match.arg(
+      engine, 
+      c("base", "RTriangle", "TDA", "GUDHI", "Dionysus", "simplextree")
+    )
+    engine <- assign_complex_engine(complex, engine, dimension_max)
     
     res <- switch(
       engine,
       "base" = simplicial_complex_base(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices
       ),
       "RTriangle" = simplicial_complex_RTriangle(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices
       ),
       "TDA" = simplicial_complex_TDA(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices,
         library = "GUDHI"
       ),
       "GUDHI" = simplicial_complex_TDA(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices,
         library = "GUDHI"
       ),
       "Dionysus" = simplicial_complex_TDA(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices,
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices,
         library = "Dionysus"
       ),
       "simplextree" = simplicial_complex_simplextree(
-        data, diameter, max_dimension, complex, zero_simplices, one_simplices
+        data, complex, diameter, dimension_max, zero_simplices, one_simplices
       )
     )
     
     # TODO:
     # Take care of zero_ or one_simplices == "none"
-    # and remove simplices w/ dim > max_dimension
-    if (max_dimension < 2L) {
+    # and remove simplices w/ dim > dimension_max
+    if (dimension_max < 2L) {
       res <- res[res$dim < 2L, , drop = FALSE]
     }
-    if (max_dimension < 1L | one_simplices == "none") {
+    if (dimension_max < 1L | one_simplices == "none") {
       res <- res[res$dim != 1L, , drop = FALSE]
     }
-    # QUESTION: Require upstream that `max_dimension >= 0`?
-    if (max_dimension < 0L | zero_simplices == "none") {
+    # QUESTION: Require upstream that `dimension_max >= 0`?
+    if (dimension_max < 0L | zero_simplices == "none") {
       res <- res[res$dim != 0L, , drop = FALSE]
     }
     
@@ -188,12 +193,12 @@ stat_simplicial_complex <- function(mapping = NULL,
                                     data = NULL,
                                     geom = "SimplicialComplex",
                                     position = "identity",
-                                    radius = NULL,
+                                    complex = "Rips",
                                     diameter = NULL,
+                                    radius = NULL,
+                                    dimension_max = 2L,
                                     zero_simplices = "all",
                                     one_simplices = "maximal",
-                                    max_dimension = 2L,
-                                    complex = "Rips",
                                     engine = NULL,
                                     na.rm = FALSE,
                                     show.legend = NA,
@@ -208,13 +213,13 @@ stat_simplicial_complex <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      radius = radius,
+      complex = complex,
       diameter = diameter,
+      radius = radius,
+      dimension_max = dimension_max,
       zero_simplices = zero_simplices,
       one_simplices = one_simplices,
-      max_dimension = max_dimension,
       engine = engine,
-      complex = complex,
       na.rm = na.rm,
       ...
     )
