@@ -1,0 +1,7 @@
+articles:
+- title: Vignettes
+  navbar: ~
+  contents:
+    - visualize-persistence
+    - illustrate-constructions
+    - grouped-list-data

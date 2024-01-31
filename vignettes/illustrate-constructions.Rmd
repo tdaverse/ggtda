@@ -267,7 +267,7 @@ Interpretation at diameter ```r diam[1]```:
 
 Each of the four panels complement one another by providing overlapping and consistent pieces of information with varying levels of clarity.
 Together, we get a good sense of what's going on in `annulus_df` at a diameter of ```r diam[1]```.
-Next, we look at diameter ```r diam[2]```.
+Next, we look at diameter ```r diam[2]```, using the `'TDA'` engine to reduce runtime.
 
 ```{r during, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
 # topological barcode
@@ -307,7 +307,8 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam[2], dimension_max = 2L,
-                          fill = "darkgoldenrod") +
+                          fill = "darkgoldenrod",
+                          engine = "TDA") +
   theme_minimal()
 ```
 
@@ -371,6 +372,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam[3], dimension_max = 2L,
-                          fill = "darkgoldenrod") +
+                          fill = "darkgoldenrod",
+                          engine = "TDA") +
   theme_minimal()
 ```
