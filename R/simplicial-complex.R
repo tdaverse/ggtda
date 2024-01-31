@@ -63,8 +63,8 @@
 #' @inheritParams ggplot2::geom_point
 #' @inheritParams ggplot2::stat_identity
 #' @inheritParams disk
-#' @param complex The type of complex to compute, either `"Vietoris"`, `"Rips"`,
-#'   `"Cech"`, or `"alpha"`.
+#' @param complex The type of complex to compute, one of `"Vietoris"`, `"Rips"`
+#'   (equivalent), `"Cech"`, or `"alpha"`.
 #' @param dimension_max Compute simplices of dimension up to `dimension_max`
 #'   (only relevant for the Vietoris--Rips complex computed with the
 #'   `simplextree` engine).

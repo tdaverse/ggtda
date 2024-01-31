@@ -75,8 +75,7 @@
 #   be passed to the `dataset` aesthetic.
 
 #' @param filtration The type of filtration from which to compute persistent
-#'   homology; currently only `"Rips"` and `"Vietoris"` (equivalent) are
-#'   accepted.
+#'   homology; one of `"Rips"`, `"Vietoris"` (equivalent) or `"alpha"`.
 #' @param diameter_max,radius_max Maximum diameter or radius for the simplicial
 #'   filtration. Both default to `NULL`, in which case the complete filtration
 #'   is constructed.
