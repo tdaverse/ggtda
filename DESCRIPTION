@@ -61,7 +61,7 @@ Collate:
     'disk.R'
     'draw-key-simplex.R'
     'ggtda.R'
-    'persistence.r'
+    'persistence.R'
     'landscape.R'
     'persistence-engines.R'
     'simplicial-complex-engines.R'

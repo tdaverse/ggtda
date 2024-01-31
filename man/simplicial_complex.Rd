@@ -66,8 +66,8 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
-\item{complex}{The type of complex to compute, either \code{"Vietoris"}, \code{"Rips"},
-\code{"Cech"}, or \code{"alpha"}.}
+\item{complex}{The type of complex to compute, one of \code{"Vietoris"}, \code{"Rips"}
+(equivalent), \code{"Cech"}, or \code{"alpha"}.}
 
 \item{radius, diameter}{The (positive) radius or diameter used in the
 construction. Provide only one of these; if neither is provided, they

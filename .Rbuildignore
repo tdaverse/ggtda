@@ -14,9 +14,11 @@ man-roxygen
 # R project metadata
 ^.*\.Rproj$
 ^\.Rproj\.user$
+
 # hosting metadata
 ^codecov\.yml$
 ^appveyor\.yml$
 ^\.travis\.yml$
+^_pkgdown\.yml$
 ^doc$
 ^Meta$

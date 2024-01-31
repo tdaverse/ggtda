@@ -33,13 +33,13 @@ persistence diagram."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/grouped-list-data.html">Topological analysis of grouped data and list-columns</a>
+      <a href="../articles/visualize-persistence.html">Visualizing persistent homology data</a>
     </li>
     <li>
       <a href="../articles/illustrate-constructions.html">Illustrating topological constructions on point clouds</a>
     </li>
     <li>
-      <a href="../articles/visualize-persistence.html">Visualizing persistent homology data</a>
+      <a href="../articles/grouped-list-data.html">Topological analysis of grouped data and list-columns</a>
     </li>
   </ul></li>
 <li>
@@ -61,7 +61,7 @@ persistence diagram."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Persistence diagrams</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/R/persistence.r" class="external-link"><code>R/persistence.r</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/R/persistence.R" class="external-link"><code>R/persistence.R</code></a></small>
     <div class="hidden name"><code>persistence.Rd</code></div>
     </div>
 
@@ -143,8 +143,7 @@ settings of the adjustment.</p></dd>
 
 <dt>filtration</dt>
 <dd><p>The type of filtration from which to compute persistent
-homology; currently only <code>"Rips"</code> and <code>"Vietoris"</code> (equivalent) are
-accepted.</p></dd>
+homology; one of <code>"Rips"</code>, <code>"Vietoris"</code> (equivalent) or <code>"alpha"</code>.</p></dd>
 
 
 <dt>diameter_max, radius_max</dt>

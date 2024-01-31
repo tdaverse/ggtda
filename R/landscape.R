@@ -39,7 +39,7 @@
 #' )
 
 #' @name landscape
-#' @include persistence.r
+#' @include persistence.R
 #' @import ggplot2
 #' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.

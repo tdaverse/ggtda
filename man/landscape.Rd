@@ -70,8 +70,7 @@ position adjustment function. Use the latter if you need to change the
 settings of the adjustment.}
 
 \item{filtration}{The type of filtration from which to compute persistent
-homology; currently only \code{"Rips"} and \code{"Vietoris"} (equivalent) are
-accepted.}
+homology; one of \code{"Rips"}, \code{"Vietoris"} (equivalent) or \code{"alpha"}.}
 
 \item{diameter_max, radius_max}{Maximum diameter or radius for the simplicial
 filtration. Both default to \code{NULL}, in which case the complete filtration
