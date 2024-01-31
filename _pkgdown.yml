@@ -1,3 +1,22 @@
+reference:
+- title: Package 'ggtda'
+  contents:
+  - '`ggtda`'
+- title: Persistence layers
+  contents:
+  - '`stat_persistence`'
+  - '`geom_fundamental_box`'
+  - '`geom_barcode`'
+  - '`stat_landscape`'
+  - '`geom_landscape`'
+  - '`theme_persist`'
+  - '`theme_barcode`'
+- title: Construction layers
+  contents:
+  - '`geom_disk`'
+  - '`stat_simplicial_complex`'
+  - '`geom_simplicial_complex`'
+  - '`draw_key_simplex`'
 articles:
 - title: Vignettes
   navbar: ~
