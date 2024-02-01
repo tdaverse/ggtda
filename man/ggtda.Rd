@@ -2,10 +2,36 @@
 % Please edit documentation in R/ggtda.R
 \docType{package}
 \name{ggtda}
+\alias{ggtda-package}
 \alias{ggtda}
 \title{A \emph{ggplot2} Extension for Persistence Data}
 \description{
-\emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing data arising
-from topological data analysis, including persistence data and topological
-constructions on planar data.
+\emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing
+data arising from topological data analysis, including persistence data and
+topological constructions on planar data.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://rrrlw.github.io/ggtda/}
+  \item Report bugs at \url{https://github.com/rrrlw/ggtda/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jason Cory Brunson \email{cornelioid@gmail.com} (\href{https://orcid.org/0000-0003-3126-9494}{ORCID})
+
+Authors:
+\itemize{
+  \item James Otto \email{jamesotto852@gmail.com} (\href{https://orcid.org/0000-0002-0665-2515}{ORCID})
+  \item Raoul Wadhwa \email{raoulwadhwa@gmail.com} (\href{https://orcid.org/0000-0003-0503-9580}{ORCID})
+  \item David Kahle \email{david@kahle.io} (\href{https://orcid.org/0000-0002-9999-1558}{ORCID})
+  \item Jacob Scott (\href{https://orcid.org/0000-0003-2971-7673}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Nikola Milicevic [contributor]
+}
+
 }

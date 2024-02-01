@@ -5,17 +5,16 @@
 #' @keywords internal
 NULL
 
-#' A *ggplot2* Extension for Persistence Data
+#' @title A *ggplot2* Extension for Persistence Data
 #'
-#' *ggtda* is a user-friendly *ggplot2* extension for visualizing data arising
-#' from topological data analysis, including persistence data and topological
-#' constructions on planar data.
+#' @description *ggtda* is a user-friendly *ggplot2* extension for visualizing
+#'   data arising from topological data analysis, including persistence data and
+#'   topological constructions on planar data.
 #'
 #' @import ggplot2
 #' @name ggtda
 #' @importFrom rlang on_load run_on_load
-#' @docType package
-NULL
+"_PACKAGE"
 
 # installed versions of {simplextree} and {ripserr}, or `NULL` if not installed
 .onLoad <- function(...) {
