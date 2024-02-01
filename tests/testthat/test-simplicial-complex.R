@@ -64,7 +64,7 @@ test_that("Cech layers work as expected", {
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
   layer_p1 <- layer_data(p1)
-  expect_equal(nrow(layer_p1[layer_p1$dim == 0L, ]), nrow(d))
+  expect_equal(nrow(layer_p1[layer_p1$dimension == 0L, ]), nrow(d))
   # segment data requires two rows per simplex
   expect_equal(nrow(layer_p1), nrow(d) + 1090L * 2L)
   
@@ -75,7 +75,7 @@ test_that("Cech layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   layer_p2 <- layer_data(p2)
-  expect_equal(nrow(layer_p2[layer_p2$dim == 0L, ]), nrow(d))
+  expect_equal(nrow(layer_p2[layer_p2$dimension == 0L, ]), nrow(d))
   # face data requires three rows per simplex
   expect_equal(nrow(layer_p2), nrow(d) + 5735L * 3L)
   
@@ -108,7 +108,7 @@ test_that("Vietoris layers work as expected", {
   expect_is(p1$layer[[1]], "ggproto")
   expect_equal(c(p1$labels$x, p1$labels$y), c("x", "y"))
   layer_p1 <- layer_data(p1)
-  expect_equal(nrow(layer_p1[layer_p1$dim == 0L, ]), nrow(d))
+  expect_equal(nrow(layer_p1[layer_p1$dimension == 0L, ]), nrow(d))
   # segment data requires two rows per simplex
   expect_equal(nrow(layer_p1), nrow(d) + 1090L * 2L)
   
@@ -120,7 +120,7 @@ test_that("Vietoris layers work as expected", {
   expect_is(p2$layer[[1]], "ggproto")
   expect_equal(c(p2$labels$x, p2$labels$y), c("x", "y"))
   layer_p2 <- layer_data(p2)
-  expect_equal(nrow(layer_p2[layer_p2$dim == 0L, ]), nrow(d))
+  expect_equal(nrow(layer_p2[layer_p2$dimension == 0L, ]), nrow(d))
   # face data requires three rows per simplex
   expect_equal(nrow(layer_p2), nrow(d) + 5738L * 3L)
   

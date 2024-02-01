@@ -66,7 +66,7 @@ The [next section](#eg) will use `annulus_df` to show how the individual functio
 We will use a radius of `0.1` for the visualizations in this section.
 First, we explore `geom_disk()` that, in combination with `geom_point` from **ggplot2**, will draw disks centered at these points; since `0.1` is the circle radius, any pair of points less than a distance of `0.2` units away from each other will have overlapping circles, indicating an edge should be drawn between them to represent a 1-simplex.
 
-```{r disk, fig.width = 4, fig.height = 4}
+```{r disk}
 # set radius value
 rad_val <- 0.1
 
@@ -92,7 +92,7 @@ The radius is more intuitive to understand `geom_disk()`, but topological barcod
 Accordingly, we've parameterized disks using `radius` and complexes using `diameter`.
 Note that either parameter can be passed to each stat, and correct values must be provided with care.
 
-```{r disk-1skeleton, fig.height = 5, fig.width = 5}
+```{r disk-1skeleton}
 # combine 1-skeleton with disk cover
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
@@ -106,7 +106,7 @@ ggplot(unif_df, aes(x = x, y = y)) +
 Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), we set `dimension_max = 2L` to add the faces of the Vietoris--Rips complex. This produces the 2-skeleton.
 Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.
 
-```{r 2skeleton, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
+```{r 2skeleton}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = rad_val * 2,
@@ -116,7 +116,7 @@ ggplot(unif_df, aes(x = x, y = y)) +
 
 While using `stat_simplicial_complex()` in combination with `geom_disk()` can create a lot of overlap (figure below), it can be a helpful illustration when point clouds and diameters are small.
 
-```{r clutter, fig.height = 5, fig.width = 5}
+```{r clutter}
 ggplot(unif_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = rad_val * 2,
@@ -130,13 +130,13 @@ We plot an equilateral triangle using both constructions to illustrate the key d
 With a diameter of `1.1`, the three points are all pairwise connected, but the three corresponding circles do not all share a single point of overlap (bottom left panel).
 Thus, while the Vietoris--Rips complex and the Čech complex share the same 1-skeleton, only the Vietoris--Rips complex has a face between the three points.
 
-```{r cech, fig.height = 3.45, fig.width = 3.45, fig.show = 'hold'}
+```{r cech, fig.height = 4, fig.width = 4, fig.show = 'hold'}
 # create equilateral triangle point cloud
 eq_tri <- data.frame(x = c(0, 1, 0.5),
                      y = c(0, 0, sqrt(3)/2))
 diam <- 1.1
 
-# top left panel: VR with stat_vietoris*
+# top left panel: VR complex on vertices
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam, fill = "darkgoldenrod",
@@ -144,7 +144,7 @@ ggplot(eq_tri, aes(x = x, y = y)) +
   ggtitle("Vietoris-Rips complex") +
   theme_minimal()
 
-# top right panel: Čech with stat_cech*
+# top right panel: Čech complex on vertices
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam, fill = "darkgoldenrod",
@@ -152,7 +152,7 @@ ggplot(eq_tri, aes(x = x, y = y)) +
   ggtitle("Čech complex") +
   theme_minimal()
 
-# bottom left panel: equilateral triangle with geom_disk
+# bottom left panel: equilateral triangle with disk
 ggplot(eq_tri, aes(x = x, y = y)) +
   coord_fixed() +
   geom_disk(radius = diam / 2, fill = "blue", alpha = 0.1) +
@@ -165,7 +165,7 @@ ggplot(eq_tri, aes(x = x, y = y)) +
 The `annulus_df` dataset contains 100 points noisily distributed around a unit circle.
 We will calculate its persistent homology using the **ripserr** package (following code block) and then plot the result with corresponding simplicial complexes at various radii.
 
-```{r phom, fig.show = 'hold', fig.height = 3.45, fig.width = 3.45}
+```{r phom, fig.show = 'hold', fig.height = 4, fig.width = 4}
 # calculate persistent homology of annulus
 annulus_phom <- as.data.frame(ripserr::vietoris_rips(annulus_df))
 annulus_phom$dimension <- as.factor(annulus_phom$dimension)
@@ -206,7 +206,7 @@ rads <- diam / 2
 We use four panels to properly explore each diameter: (1) topological barcode with a vertical dotted line indicating diameter; (2) persistence diagram with horizontal and vertical lines, with points to the top-left of the intersection indicating current features; (3) ball cover visualization with `geom_disk()`; and (4) simplicial complex visualization with `geom_simplicial_complex()` (the companion geom to `stat_simplicial_complex()`).
 First, we generate the visualization for a diameter of ```r diam[1]```.
 
-```{r before, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+```{r before, fig.show = 'hold', fig.width = 4, fig.height = 4}
 # topological barcode
 ggplot(annulus_phom, aes(start = birth, end = death,
                          group = dimension, colour = dimension)) +
@@ -261,7 +261,7 @@ Interpretation at diameter ```r diam[1]```:
 * `geom_disk()` visualization (bottom-left panel):
   + the dominant feature (1-loop involving most, if not all, of the points) has not yet started because the circumference (loosely) of the annulus is not connected and is instead composed of multiple components
   + there could be 1-loops at this diameter, however, their presence is not clear
-* `stat_vietoris*` visualization (bottom-right panel):
+* `stat_simplicial_complex()` visualization (bottom-right panel):
   + the dominant feature has not yet started because the 1-skeleton has multiple components
   * there are at least a couple 1-loops at this diameter (adjacent to `(0.0, -1.0)`)
 
@@ -269,7 +269,7 @@ Each of the four panels complement one another by providing overlapping and cons
 Together, we get a good sense of what's going on in `annulus_df` at a diameter of ```r diam[1]```.
 Next, we look at diameter ```r diam[2]```, using the `'TDA'` engine to reduce runtime.
 
-```{r during, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+```{r during, fig.show = 'hold', fig.width = 4, fig.height = 4}
 # topological barcode
 ggplot(annulus_phom, aes(start = birth, end = death,
                          group = dimension, colour = dimension)) +
@@ -303,7 +303,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
   geom_disk(radius = rads[2], fill = "blue", alpha = 0.05) +
   theme_minimal()
 
-# stat_vietoris*
+# stat_simplicial_complex
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam[2], dimension_max = 2L,
@@ -326,7 +326,7 @@ Interpretation at diameter ```r diam[2]```:
   + given the widespread overlap, there is clearly a single 0-dimensional feature at this radius
   + there is clearly at least one 1-loop composed of most, if not all, of the point cloud
   + although unlikely based on the plot, it is possible that there exist other 1-loops at this diameter, e.g. at the periphery of the annulus
-* `stat_vietoris*` visualization:
+* `stat_simplicial_complex()` visualization:
   + there is clearly a 0-dimensional feature at this radius (faces connect all vertices)
   + there is clearly at least one 1-loop at this diameter (includes entire annulus)
   + Given the uniform color, it is possible that there is *only* one 1-loop at this diameter.
@@ -335,7 +335,7 @@ Lastly, we plot the four panels for diameter ```r diam[3]```.
 Note that the computation will take some time if an efficient engine (**TDA** or **ripserr**) is not installed.
 We leave interpretation of these panels as an exercise to the reader.
 
-```{r after, fig.show = 'hold', fig.width = 3.45, fig.height = 3.45}
+```{r after, fig.show = 'hold', fig.width = 4, fig.height = 4}
 # topological barcode
 ggplot(annulus_phom, aes(start = birth, end = death,
                          group = dimension, colour = dimension)) +
@@ -368,7 +368,7 @@ ggplot(annulus_df, aes(x = x, y = y)) +
   geom_disk(radius = rads[3], fill = "blue", alpha = 0.05) +
   theme_minimal()
 
-# stat_vietoris*
+# stat_simplicial_complex
 ggplot(annulus_df, aes(x = x, y = y)) +
   coord_fixed() +
   stat_simplicial_complex(diameter = diam[3], dimension_max = 2L,

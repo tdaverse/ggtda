@@ -51,9 +51,9 @@
 
 #' @eval rd_sec_computed_vars(
 #'   stat = "simplicial_complex",
-#'   dim = "dimension of the corresponding simplex.",
-#'   id = "simplex identifier within each `dim`.",
-#'   face = "encoding of `dim` for high-dimensional simplices (`dim >= 2L`)."
+#'   dimension = "integer dimension of the corresponding simplex.",
+#'   id = "character simplex identifier within each `dimension`.",
+#'   face = "factor encoding of `dimension` for `>= 2L`-dimensional simplices."
 #' )
 
 #' @name simplicial_complex
@@ -95,7 +95,7 @@ StatSimplicialComplex <-  ggproto(
   
   required_aes = c("x", "y"),
   
-  # Alternatively, could assign fill = after_stat(dim)
+  # Alternatively, could assign fill = after_stat(dimension)
   default_aes = aes(alpha = after_stat(face)),
   
   compute_group = function(
@@ -126,10 +126,11 @@ StatSimplicialComplex <-  ggproto(
     # logic to deduce reasonable values of engine
     # + issue warnings when choices are incompatible
     complex <- match.arg(complex, c("Vietoris", "Rips", "Cech", "alpha"))
-    engine <- match.arg(
-      engine, 
-      c("base", "RTriangle", "TDA", "GUDHI", "Dionysus", "simplextree")
-    )
+    if (! is.null(engine))
+      engine <- match.arg(
+        engine, 
+        c("base", "RTriangle", "TDA", "GUDHI", "Dionysus", "simplextree")
+      )
     engine <- assign_complex_engine(complex, engine, dimension_max)
     
     res <- switch(
@@ -159,27 +160,27 @@ StatSimplicialComplex <-  ggproto(
     
     # TODO:
     # Take care of zero_ or one_simplices == "none"
-    # and remove simplices w/ dim > dimension_max
+    # and remove simplices w/ dimension > dimension_max
     if (dimension_max < 2L) {
-      res <- res[res$dim < 2L, , drop = FALSE]
+      res <- res[res$dimension < 2L, , drop = FALSE]
     }
     if (dimension_max < 1L | one_simplices == "none") {
-      res <- res[res$dim != 1L, , drop = FALSE]
+      res <- res[res$dimension != 1L, , drop = FALSE]
     }
     # QUESTION: Require upstream that `dimension_max >= 0`?
     if (dimension_max < 0L | zero_simplices == "none") {
-      res <- res[res$dim != 0L, , drop = FALSE]
+      res <- res[res$dimension != 0L, , drop = FALSE]
     }
     
     # make a factor variable for high-dimensional simplices
-    if (max(res$dim >= 2L)) {
-      res$face <- as.character(ifelse(res$dim < 2L, 2L, res$dim))
+    if (max(res$dimension >= 2L)) {
+      res$face <- as.character(ifelse(res$dimension < 2L, 2L, res$dimension))
     } else {
       res$face <- NA_character_
     }
     res$face <- factor(
       res$face,
-      levels = as.character(seq(2L, max(c(2L, res$dim))))
+      levels = as.character(seq(2L, max(c(2L, res$dimension))))
     )
     
     res
@@ -262,10 +263,10 @@ GeomSimplicialComplex <- ggproto(
       # order
       munched <- munched[order(munched$id),]
       
-      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
-      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      zero_simplex_data <- data[data$dimension == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dimension == "1", , drop = FALSE]
       high_simplex_data <- 
-        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
+        data[data$dimension != "0" & data$dimension != "1", , drop = FALSE]
       
     } else {
       
@@ -273,17 +274,17 @@ GeomSimplicialComplex <- ggproto(
       
       data <- data[order(data$id), , drop = FALSE]
       
-      zero_simplex_data <- data[data$dim == "0", , drop = FALSE]
-      one_simplex_data <- data[data$dim == "1", , drop = FALSE]
+      zero_simplex_data <- data[data$dimension == "0", , drop = FALSE]
+      one_simplex_data <- data[data$dimension == "1", , drop = FALSE]
       high_simplex_data <- 
-        data[data$dim != "0" & data$dim != "1", , drop = FALSE]
+        data[data$dimension != "0" & data$dimension != "1", , drop = FALSE]
       
     }
     
     # List to hold various grobs (polygons, linesegments, points)
     grobs <- list()
     
-    # Drawing the simplices w/ dim > 1 -----
+    # Drawing the simplices w/ dimension > 1 -----
     if (nrow(high_simplex_data) > 0L) {
       
       # For gpar(), there is one entry per polygon (not one entry per point).
@@ -373,7 +374,7 @@ GeomSimplicialComplex <- ggproto(
                     linewidth = 0.5, linetype = 1,
                     shape = 21L, size = 1.5, stroke = .5),
   
-  required_aes = c("x", "y", "id", "dim"),
+  required_aes = c("x", "y", "id", "dimension"),
   
   draw_key = draw_key_simplex,
   

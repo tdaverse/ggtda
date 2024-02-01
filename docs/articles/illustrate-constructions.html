@@ -87,7 +87,7 @@
       <h1 data-toc-skip>Illustrating topological constructions on point clouds</h1>
                         <h4 data-toc-skip class="author">Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
             
-            <h4 data-toc-skip class="date">2024-01-31</h4>
+            <h4 data-toc-skip class="date">2024-02-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/vignettes/illustrate-constructions.Rmd" class="external-link"><code>vignettes/illustrate-constructions.Rmd</code></a></small>
       <div class="hidden name"><code>illustrate-constructions.Rmd</code></div>
@@ -147,7 +147,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/disk.html">geom_disk</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="va">rad_val</span>, fill <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/disk-1.png" width="384"></p>
+<p><img src="illustrate-constructions_files/figure-html/disk-1.png" width="700"></p>
 <p>To visualize the 0- and 1-simplices, we use <code><a href="../reference/simplicial_complex.html">stat_simplicial_complex()</a></code> with <code>dimension_max = 1L</code> and `one_simplices = “all”.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">unif_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -168,7 +168,7 @@
 <span>                          one_simplices <span class="op">=</span> <span class="st">"all"</span>, dimension_max <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/disk-1skeleton-1.png" width="480"></p>
+<p><img src="illustrate-constructions_files/figure-html/disk-1skeleton-1.png" width="700"></p>
 <p>Since edges themselves do not effectively visualize the entire simplicial complex (users do not want to count edges to determine if a set of 7 points are indeed all pairwise connected), we set <code>dimension_max = 2L</code> to add the faces of the Vietoris–Rips complex. This produces the 2-skeleton. Note that the 4-point clique in the top-left corner is shaded slightly darker than the other faces.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">unif_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -177,7 +177,7 @@
 <span>                          one_simplices <span class="op">=</span> <span class="st">"all"</span>, dimension_max <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/2skeleton-1.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/2skeleton-1.png" width="700"></p>
 <p>While using <code><a href="../reference/simplicial_complex.html">stat_simplicial_complex()</a></code> in combination with <code><a href="../reference/disk.html">geom_disk()</a></code> can create a lot of overlap (figure below), it can be a helpful illustration when point clouds and diameters are small.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">unif_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -187,7 +187,7 @@
 <span>  <span class="fu"><a href="../reference/disk.html">geom_disk</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="va">rad_val</span>, fill <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/clutter-1.png" width="480"></p>
+<p><img src="illustrate-constructions_files/figure-html/clutter-1.png" width="700"></p>
 <p>In addition to Vietoris-Rips complexes, <strong>ggtda</strong> can construct Čech complexes up to dimension 2. We plot an equilateral triangle using both constructions to illustrate the key difference: With a diameter of <code>1.1</code>, the three points are all pairwise connected, but the three corresponding circles do not all share a single point of overlap (bottom left panel). Thus, while the Vietoris–Rips complex and the Čech complex share the same 1-skeleton, only the Vietoris–Rips complex has a face between the three points.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create equilateral triangle point cloud</span></span>
@@ -195,7 +195,7 @@
 <span>                     y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">diam</span> <span class="op">&lt;-</span> <span class="fl">1.1</span></span>
 <span></span>
-<span><span class="co"># top left panel: VR with stat_vietoris*</span></span>
+<span><span class="co"># top left panel: VR complex on vertices</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eq_tri</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">stat_simplicial_complex</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="va">diam</span>, fill <span class="op">=</span> <span class="st">"darkgoldenrod"</span>,</span>
@@ -204,7 +204,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span>
 <span></span>
-<span><span class="co"># top right panel: Čech with stat_cech*</span></span>
+<span><span class="co"># top right panel: Čech complex on vertices</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eq_tri</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">stat_simplicial_complex</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="va">diam</span>, fill <span class="op">=</span> <span class="st">"darkgoldenrod"</span>,</span>
@@ -213,13 +213,13 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span>
 <span></span>
-<span><span class="co"># bottom left panel: equilateral triangle with geom_disk</span></span>
+<span><span class="co"># bottom left panel: equilateral triangle with disk</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eq_tri</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/disk.html">geom_disk</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="va">diam</span> <span class="op">/</span> <span class="fl">2</span>, fill <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/cech-1.png" width="331.2"><img src="illustrate-constructions_files/figure-html/cech-2.png" width="331.2"><img src="illustrate-constructions_files/figure-html/cech-3.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/cech-1.png" width="384"><img src="illustrate-constructions_files/figure-html/cech-2.png" width="384"><img src="illustrate-constructions_files/figure-html/cech-3.png" width="384"></p>
 </div>
 <div class="section level2">
 <h2 id="eg">Persistence, Punctuated<a class="anchor" aria-label="anchor" href="#eg"></a>
@@ -247,7 +247,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Feature disappearance"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/phom-1.png" width="331.2"><img src="illustrate-constructions_files/figure-html/phom-2.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/phom-1.png" width="384"><img src="illustrate-constructions_files/figure-html/phom-2.png" width="384"></p>
 <p>The dominant feature in <code>annulus_df</code> is a 1-dimensional loop that we can see in the following code block (second row of output).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">annulus_phom</span>, <span class="va">dimension</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -308,7 +308,7 @@
 <span>                          fill <span class="op">=</span> <span class="st">"darkgoldenrod"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/before-1.png" width="331.2"><img src="illustrate-constructions_files/figure-html/before-2.png" width="331.2"><img src="illustrate-constructions_files/figure-html/before-3.png" width="331.2"><img src="illustrate-constructions_files/figure-html/before-4.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/before-1.png" width="384"><img src="illustrate-constructions_files/figure-html/before-2.png" width="384"><img src="illustrate-constructions_files/figure-html/before-3.png" width="384"><img src="illustrate-constructions_files/figure-html/before-4.png" width="384"></p>
 <p>Interpretation at diameter <code>0.25</code>:</p>
 <ul>
 <li>topological barcode (top-left panel):
@@ -333,7 +333,7 @@
 </ul>
 </li>
 <li>
-<code>stat_vietoris*</code> visualization (bottom-right panel):
+<code><a href="../reference/simplicial_complex.html">stat_simplicial_complex()</a></code> visualization (bottom-right panel):
 <ul>
 <li>the dominant feature has not yet started because the 1-skeleton has multiple components</li>
 <li>there are at least a couple 1-loops at this diameter (adjacent to <code>(0.0, -1.0)</code>)</li>
@@ -375,7 +375,7 @@
 <span>  <span class="fu"><a href="../reference/disk.html">geom_disk</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="va">rads</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, fill <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># stat_vietoris*</span></span>
+<span><span class="co"># stat_simplicial_complex</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">annulus_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">stat_simplicial_complex</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="va">diam</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, dimension_max <span class="op">=</span> <span class="fl">2L</span>,</span>
@@ -383,7 +383,7 @@
 <span>                          engine <span class="op">=</span> <span class="st">"TDA"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/during-1.png" width="331.2"><img src="illustrate-constructions_files/figure-html/during-2.png" width="331.2"><img src="illustrate-constructions_files/figure-html/during-3.png" width="331.2"><img src="illustrate-constructions_files/figure-html/during-4.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/during-1.png" width="384"><img src="illustrate-constructions_files/figure-html/during-2.png" width="384"><img src="illustrate-constructions_files/figure-html/during-3.png" width="384"><img src="illustrate-constructions_files/figure-html/during-4.png" width="384"></p>
 <p>Interpretation at diameter <code>0.75</code>:</p>
 <ul>
 <li>topological barcode:
@@ -409,7 +409,7 @@
 </ul>
 </li>
 <li>
-<code>stat_vietoris*</code> visualization:
+<code><a href="../reference/simplicial_complex.html">stat_simplicial_complex()</a></code> visualization:
 <ul>
 <li>there is clearly a 0-dimensional feature at this radius (faces connect all vertices)</li>
 <li>there is clearly at least one 1-loop at this diameter (includes entire annulus)</li>
@@ -451,7 +451,7 @@
 <span>  <span class="fu"><a href="../reference/disk.html">geom_disk</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="va">rads</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, fill <span class="op">=</span> <span class="st">"blue"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># stat_vietoris*</span></span>
+<span><span class="co"># stat_simplicial_complex</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">annulus_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">stat_simplicial_complex</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="va">diam</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, dimension_max <span class="op">=</span> <span class="fl">2L</span>,</span>
@@ -459,7 +459,7 @@
 <span>                          engine <span class="op">=</span> <span class="st">"TDA"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="illustrate-constructions_files/figure-html/after-1.png" width="331.2"><img src="illustrate-constructions_files/figure-html/after-2.png" width="331.2"><img src="illustrate-constructions_files/figure-html/after-3.png" width="331.2"><img src="illustrate-constructions_files/figure-html/after-4.png" width="331.2"></p>
+<p><img src="illustrate-constructions_files/figure-html/after-1.png" width="384"><img src="illustrate-constructions_files/figure-html/after-2.png" width="384"><img src="illustrate-constructions_files/figure-html/after-3.png" width="384"><img src="illustrate-constructions_files/figure-html/after-4.png" width="384"></p>
 </div>
   </div>
 

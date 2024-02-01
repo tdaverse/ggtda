@@ -167,7 +167,7 @@ are implemented in {\strong{simplextree}}, they will be made available here.
 \item \strong{\code{x}}
 \item \strong{\code{y}}
 \item \strong{\code{id}}
-\item \strong{\code{dim}}
+\item \strong{\code{dimension}}
 \item \code{alpha}
 \item \code{colour}
 \item \code{fill}
@@ -185,9 +185,9 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
-\item \code{after_stat(dim)}\cr dimension of the corresponding simplex.
-\item \code{after_stat(id)}\cr simplex identifier within each \code{dim}.
-\item \code{after_stat(face)}\cr encoding of \code{dim} for high-dimensional simplices (\code{dim >= 2L}).
+\item \code{after_stat(dimension)}\cr integer dimension of the corresponding simplex.
+\item \code{after_stat(id)}\cr character simplex identifier within each \code{dimension}.
+\item \code{after_stat(face)}\cr factor encoding of \code{dimension} for \verb{>= 2L}-dimensional simplices.
 }
 }
 
@@ -230,15 +230,15 @@ df <- data.frame(
   y = sin(s) + rnorm(40, 0, .1)
 )
 
-# default, visualizing dim w/ alpha:
+# default, visualizing dimension w/ alpha:
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(radius = .4)
-# visualizing dim w/ fill:
+# visualizing dimension w/ fill:
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(
-    mapping = aes(fill = after_stat(dim)),
+    mapping = aes(fill = after_stat(dimension)),
     alpha = .5, radius = .4
   )
 

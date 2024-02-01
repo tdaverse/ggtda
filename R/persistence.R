@@ -41,9 +41,9 @@
 #'   stat = "persistence",
 #'   start = "birth value of each feature (from 'dataset' aesthetic).",
 #'   end = "death value of each feature (from 'dataset' aesthetic).",
-#'   dimension = "feature dimension (from 'dataset' aesthetic).",
+#'   dimension = "integer feature dimension (from 'dataset' aesthetic).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
-#'   id = "feature identifier (across 'group').",
+#'   id = "character feature identifier (across 'group').",
 #'   part =
 #'   "whether features belong to ordinary, relative, or extended homology.",
 #'   persistence =
@@ -130,8 +130,8 @@ StatPersistence <- ggproto(
       # + issue warnings when choices are incompatible
       params$filtration <-
         match.arg(params$filtration, c("Vietoris", "Rips", "alpha"))
-      params$engine <- 
-        match.arg(params$engine, c("TDA", "GUDHI", "Dionysus", "ripserr"))
+      if (! is.null(params$engine)) params$engine <- 
+          match.arg(params$engine, c("TDA", "GUDHI", "Dionysus", "ripserr"))
       params$engine <-
         assign_filtration_engine(params$filtration, params$engine)
       

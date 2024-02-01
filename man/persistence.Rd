@@ -180,9 +180,9 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \itemize{
 \item \code{after_stat(start)}\cr birth value of each feature (from 'dataset' aesthetic).
 \item \code{after_stat(end)}\cr death value of each feature (from 'dataset' aesthetic).
-\item \code{after_stat(dimension)}\cr feature dimension (from 'dataset' aesthetic).
+\item \code{after_stat(dimension)}\cr integer feature dimension (from 'dataset' aesthetic).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
-\item \code{after_stat(id)}\cr feature identifier (across 'group').
+\item \code{after_stat(id)}\cr character feature identifier (across 'group').
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
 }

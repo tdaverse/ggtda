@@ -6,15 +6,15 @@ df <- data.frame(
   y = sin(s) + rnorm(40, 0, .1)
 )
 
-# default, visualizing dim w/ alpha:
+# default, visualizing dimension w/ alpha:
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(radius = .4)
-# visualizing dim w/ fill:
+# visualizing dimension w/ fill:
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(
-    mapping = aes(fill = after_stat(dim)),
+    mapping = aes(fill = after_stat(dimension)),
     alpha = .5, radius = .4
   )
 
