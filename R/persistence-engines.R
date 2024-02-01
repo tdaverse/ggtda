@@ -132,7 +132,7 @@ filtration_engine_rules <- function(
     engine_options, engine_default = engine_options[[1L]]
 ) {
   
-  if (is.null(engine) || length(engine_options == 0L)) {
+  if (is.null(engine) || length(engine_options) == 0L) {
     
     if (is.null(engine_default)) {
       stop("No available engine can compute ", filt_name, " filtrations.")
