@@ -47,10 +47,10 @@ library(ggtda)
 #> Loading required package: ggplot2
 ```
 
-**ggtda** visualizes persistence data but also includes stat layers for
-common TDA constructions. This example illustrates them using an
-artificial point cloud $X$ and its persistent homology (PH) computed
-with [**ripserr**](https://cran.r-project.org/package=ripserr):
+### Sample data set
+
+This example illustrates **ggtda** features using an artificial point
+cloud $X$ sampled with noise from a circle:
 
 ``` r
 # generate a noisy circle
@@ -67,32 +67,11 @@ ggplot(d, aes(x, y)) + geom_point() + coord_equal() + theme_bw()
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-``` r
-# compute the persistent homology
-ph <- as.data.frame(ripserr::vietoris_rips(as.matrix(d), dim = 1))
-#> Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has
-#> been deprecated; use `max_dim` instead.
-print(head(ph, n = 12))
-#>    dimension birth      death
-#> 1          0     0 0.02903148
-#> 2          0     0 0.05579919
-#> 3          0     0 0.05754819
-#> 4          0     0 0.06145429
-#> 5          0     0 0.10973364
-#> 6          0     0 0.11006440
-#> 7          0     0 0.11076601
-#> 8          0     0 0.12968679
-#> 9          0     0 0.14783527
-#> 10         0     0 0.15895889
-#> 11         0     0 0.16171041
-#> 12         0     0 0.16548606
-ph <- transform(ph, dim = as.factor(dimension))
-```
-
 ### Topological constructions
 
-To first illustrate constructions, pick a proximity, or threshold, to
-consider points in the cloud to be neighbors:
+**ggtda** provides stat and geom layers for common TDA constructions. To
+illustrate, pick a proximity, or threshold, to consider points in the
+cloud to be neighbors:
 
 ``` r
 # choose a proximity threshold
@@ -135,31 +114,87 @@ gridExtra::grid.arrange(
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 This cover and simplex clearly contain a non-trivial 1-cycle (loop),
-which makes $H_1(B_r(X)) = H_1({VR}_r(X)) = 1$. Persistent homology
-encodes the homology group ranks across the full range
-$0 \leq r < \infty$, corresponding to the full filtration of simplicial
-complexes constructed on the point cloud.
+which makes $H_1(B_r(X)) = H_1({VR}_r(X)) = 1$. But detecting this
+feature depended crucially on the choice of `prox`, and there’s no
+guarantee with new data that this choice will be correct or even that a
+single best choice exists. Instead, we tend to be interested in
+considering those features that persist across many values of `prox`.
+The GIF below[^1] illustrates this point: Observe how features appear
+and disappear as the disk covers grow:
+
+<img src="man/figures/Small-Clouds.gif" width="100%" />
+
+### Persistent homology
+
+Persistent homology (PH) encodes the homology group ranks across the
+full range $0 \leq r < \infty$, corresponding to the full filtration of
+simplicial complexes constructed on the point cloud. We use
+[**ripserr**](https://cran.r-project.org/package=ripserr) to compute the
+PH of the point cloud $X$:
+
+``` r
+# compute the persistent homology
+ph <- ripserr::vietoris_rips(as.matrix(d), dim = 1)
+#> Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has
+#> been deprecated; use `max_dim` instead.
+print(ph)
+#> PHom object containing persistence data for 36 features.
+#> 
+#> Contains:
+#> * 35 0-dim features
+#> * 1 1-dim feature
+#> 
+#> Radius/diameter: min = 0; max = 1.3963.
+```
+
+The loop is detected, though we do not yet know whether its persistence
+stands out from that of other features. To prepare for `ggplot()`, we
+convert the result to a data frame and its numeric `dimension` column to
+a factor:
+
+``` r
+pd <- as.data.frame(ph)
+pd <- transform(pd, dimension = as.factor(dimension))
+head(pd)
+#>   dimension birth      death
+#> 1         0     0 0.02903148
+#> 2         0     0 0.05579919
+#> 3         0     0 0.05754819
+#> 4         0     0 0.06145429
+#> 5         0     0 0.10973364
+#> 6         0     0 0.11006440
+tail(pd)
+#>    dimension     birth     death
+#> 31         0 0.0000000 0.3775456
+#> 32         0 0.0000000 0.4159706
+#> 33         0 0.0000000 0.4386794
+#> 34         0 0.0000000 0.4664572
+#> 35         0 0.0000000 0.4708476
+#> 36         1 0.6282155 1.3962621
+```
 
 ### Persistence plots
 
-We can visualize the persistence data using a barcode (left) and a
-persistence diagram (right). In the barcode plot, the dashed line
-indicates the cutoff at the proximity `prox`; in the persistence diagram
-plot, the fundamental box contains the features that are detectable at
-this cutoff.
+**ggtda** also provides stat and geom layers for common visualizations
+of persistence data. We visualize these data using a barcode (left) and
+a persistence diagram (right). In the barcode, the dashed line indicates
+the cutoff at the proximity `prox`; in the persistence diagram, the
+fundamental box contains the features that are detectable at this
+cutoff.
 
 ``` r
 # visualize the persistence data, indicating cutoffs at this proximity
-p_bc <- ggplot(ph, aes(start = birth, end = death)) +
-  geom_barcode(linewidth = 1, aes(color = dim, linetype = dim)) +
+p_bc <- ggplot(pd, aes(start = birth, end = death)) +
+  geom_barcode(linewidth = 1, aes(color = dimension, linetype = dimension)) +
   labs(x = "Diameter", y = "Homological features",
        color = "Dimension", linetype = "Dimension") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dotted") +
   theme_barcode()
-max_prox <- max(ph$death)
-p_pd <- ggplot(ph) +
+max_prox <- max(pd$death)
+p_pd <- ggplot(pd) +
   coord_fixed() +
-  stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
+  stat_persistence(aes(start = birth, end = death,
+                       colour = dimension, shape = dimension)) +
   geom_abline(slope = 1) +
   labs(x = "Birth", y = "Death", color = "Dimension", shape = "Dimension") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
@@ -175,7 +210,7 @@ gridExtra::grid.arrange(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 The barcode lines are color- and linetype-coded by feature dimension:
 the 0-dimensional features, i.e. the gaps between connected components,
@@ -192,9 +227,9 @@ underlying space.
 
 ### Multiple data sets
 
-TDA almost always involves comparisons of topological data between
-spaces. To illustrate such a comparison, we construct a larger sample
-but then examine the persistence of its cumulative subsets:
+TDA usually involves comparisons of topological data between spaces. To
+illustrate such a comparison, we construct a larger sample and examine
+the persistence of its cumulative subsets:
 
 ``` r
 # larger point cloud sampled from a noisy circle
@@ -212,8 +247,8 @@ dl <- lapply(ns, function(n) d[seq(n), ])
 
 First we construct a nested data frame containing these subsets and plot
 their Vietoris complexes. (We specify the
-[**simplextree**](https://github.com/peekxc/simplextree) engine to
-reduce runtime.)
+[**simplextree**](https://github.com/peekxc/simplextree) engine and
+restrict to 2-simplices to reduce runtime.)
 
 ``` r
 # formatted as grouped data
@@ -224,15 +259,16 @@ ggplot(dg, aes(x, y)) +
   coord_fixed() +
   facet_wrap(facets = vars(n), labeller = label_both) +
   stat_simplicial_complex(
-    diameter = prox, fill = "darkgoldenrod",
-    engine = "simplextree"
+    diameter = prox, dimension_max = 2L,
+    engine = "simplextree",
+    fill = "darkgoldenrod"
   ) +
   theme_bw() +
   theme(legend.position = "none")
 #> Warning: Using alpha for a discrete variable is not advised.
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 The Vietoris complexes on these subsets for the fixed proximity are not
 a filtration; instead they show us how increasing the sample affects the
@@ -265,7 +301,7 @@ ggplot(ds, aes(dataset = d)) +
 #> Warning: Removed 2 rows containing missing values (`geom_point()`).
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 The diagrams reveal that a certain sample is necessary to distinguish
 bona fide features from noise, as only occurs here at $n = 36$. While
@@ -284,3 +320,7 @@ can also [fork this
 repository](https://help.github.com/en/articles/fork-a-repo) and [create
 a pull
 request](https://help.github.com/en/articles/creating-a-pull-request).
+
+[^1]: The GIF and many features of **ggtda** were originally developed
+    in the separate package
+    [**TDAvis**](https://github.com/jamesotto852/TDAvis).

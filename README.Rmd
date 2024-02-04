@@ -53,7 +53,9 @@ We aim to submit to [CRAN](https://CRAN.R-project.org) in Spring 2024!
 library(ggtda)
 ```
 
-**ggtda** visualizes persistence data but also includes stat layers for common TDA constructions. This example illustrates them using an artificial point cloud $X$ and its persistent homology (PH) computed with [**ripserr**](https://cran.r-project.org/package=ripserr):
+### Sample data set
+
+This example illustrates **ggtda** features using an artificial point cloud $X$ sampled with noise from a circle:
 
 ```{r, fig.height=3}
 # generate a noisy circle
@@ -66,15 +68,12 @@ d <- data.frame(
 )
 # plot the data
 ggplot(d, aes(x, y)) + geom_point() + coord_equal() + theme_bw()
-# compute the persistent homology
-ph <- as.data.frame(ripserr::vietoris_rips(as.matrix(d), dim = 1))
-print(head(ph, n = 12))
-ph <- transform(ph, dim = as.factor(dimension))
 ```
 
 ### Topological constructions
 
-To first illustrate constructions, pick a proximity, or threshold, to consider points in the cloud to be neighbors:
+**ggtda** provides stat and geom layers for common TDA constructions.
+To illustrate, pick a proximity, or threshold, to consider points in the cloud to be neighbors:
 
 ```{r}
 # choose a proximity threshold
@@ -107,25 +106,54 @@ gridExtra::grid.arrange(
 ```
 
 This cover and simplex clearly contain a non-trivial 1-cycle (loop), which makes $H_1(B_r(X)) = H_1({VR}_r(X)) = 1$.
-Persistent homology encodes the homology group ranks across the full range $0 \leq r < \infty$, corresponding to the full filtration of simplicial complexes constructed on the point cloud.
+But detecting this feature depended crucially on the choice of `prox`, and there's no guarantee with new data that this choice will be correct or even that a single best choice exists.
+Instead, we tend to be interested in considering those features that persist across many values of `prox`.
+The GIF below[^TDAvis] illustrates this point: Observe how features appear and disappear as the disk covers grow:
+
+[^TDAvis]: The GIF and many features of **ggtda** were originally developed in the separate package [**TDAvis**](https://github.com/jamesotto852/TDAvis).
+
+<img src="man/figures/Small-Clouds.gif" width="100%" />
+
+### Persistent homology
+
+Persistent homology (PH) encodes the homology group ranks across the full range $0 \leq r < \infty$, corresponding to the full filtration of simplicial complexes constructed on the point cloud.
+We use [**ripserr**](https://cran.r-project.org/package=ripserr) to compute the PH of the point cloud $X$:
+
+```{r}
+# compute the persistent homology
+ph <- ripserr::vietoris_rips(as.matrix(d), dim = 1)
+print(ph)
+```
+
+The loop is detected, though we do not yet know whether its persistence stands out from that of other features.
+To prepare for `ggplot()`, we convert the result to a data frame and its numeric `dimension` column to a factor:
+
+```{r}
+pd <- as.data.frame(ph)
+pd <- transform(pd, dimension = as.factor(dimension))
+head(pd)
+tail(pd)
+```
 
 ### Persistence plots
 
-We can visualize the persistence data using a barcode (left) and a persistence diagram (right).
-In the barcode plot, the dashed line indicates the cutoff at the proximity `prox`; in the persistence diagram plot, the fundamental box contains the features that are detectable at this cutoff.
+**ggtda** also provides stat and geom layers for common visualizations of persistence data.
+We visualize these data using a barcode (left) and a persistence diagram (right).
+In the barcode, the dashed line indicates the cutoff at the proximity `prox`; in the persistence diagram, the fundamental box contains the features that are detectable at this cutoff.
 
 ```{r, fig.height=3}
 # visualize the persistence data, indicating cutoffs at this proximity
-p_bc <- ggplot(ph, aes(start = birth, end = death)) +
-  geom_barcode(linewidth = 1, aes(color = dim, linetype = dim)) +
+p_bc <- ggplot(pd, aes(start = birth, end = death)) +
+  geom_barcode(linewidth = 1, aes(color = dimension, linetype = dimension)) +
   labs(x = "Diameter", y = "Homological features",
        color = "Dimension", linetype = "Dimension") +
   geom_vline(xintercept = prox, color = "darkgoldenrod", linetype = "dotted") +
   theme_barcode()
-max_prox <- max(ph$death)
-p_pd <- ggplot(ph) +
+max_prox <- max(pd$death)
+p_pd <- ggplot(pd) +
   coord_fixed() +
-  stat_persistence(aes(start = birth, end = death, colour = dim, shape = dim)) +
+  stat_persistence(aes(start = birth, end = death,
+                       colour = dimension, shape = dimension)) +
   geom_abline(slope = 1) +
   labs(x = "Birth", y = "Death", color = "Dimension", shape = "Dimension") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
@@ -148,8 +176,8 @@ The persistence diagram shows that the loop persists for longer than any of the 
 
 ### Multiple data sets
 
-TDA almost always involves comparisons of topological data between spaces.
-To illustrate such a comparison, we construct a larger sample but then examine the persistence of its cumulative subsets:
+TDA usually involves comparisons of topological data between spaces.
+To illustrate such a comparison, we construct a larger sample and examine the persistence of its cumulative subsets:
 
 ```{r}
 # larger point cloud sampled from a noisy circle
@@ -166,7 +194,7 @@ dl <- lapply(ns, function(n) d[seq(n), ])
 ```
 
 First we construct a nested data frame containing these subsets and plot their Vietoris complexes.
-(We specify the [**simplextree**](https://github.com/peekxc/simplextree) engine to reduce runtime.)
+(We specify the [**simplextree**](https://github.com/peekxc/simplextree) engine and restrict to 2-simplices to reduce runtime.)
 
 ```{r, fig.height=5}
 # formatted as grouped data
@@ -177,8 +205,9 @@ ggplot(dg, aes(x, y)) +
   coord_fixed() +
   facet_wrap(facets = vars(n), labeller = label_both) +
   stat_simplicial_complex(
-    diameter = prox, fill = "darkgoldenrod",
-    engine = "simplextree"
+    diameter = prox, dimension_max = 2L,
+    engine = "simplextree",
+    fill = "darkgoldenrod"
   ) +
   theme_bw() +
   theme(legend.position = "none")
