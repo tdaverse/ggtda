@@ -89,6 +89,7 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div class="section level1">
 <div class="page-header"><h1 id="ggtda">ggtda<a class="anchor" aria-label="anchor" href="#ggtda"></a>
 </h1></div>
@@ -122,7 +123,10 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rrrlw.github.io/ggtda/" class="external-link">ggtda</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: rlang</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span></code></pre></div>
-<p><strong>ggtda</strong> visualizes persistence data but also includes stat layers for common TDA constructions. This example illustrates them using an artificial point cloud <span class="math inline"><em>X</em></span> and its persistent homology (PH) computed with <a href="https://cran.r-project.org/package=ripserr" class="external-link"><strong>ripserr</strong></a>:</p>
+<div class="section level3">
+<h3 id="sample-data-set">Sample data set<a class="anchor" aria-label="anchor" href="#sample-data-set"></a>
+</h3>
+<p>This example illustrates <strong>ggtda</strong> features using an artificial point cloud <span class="math inline"><em>X</em></span> sampled with noise from a circle:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># generate a noisy circle</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">36</span></span>
@@ -135,36 +139,17 @@
 <span><span class="co"># plot the data</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">d</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># compute the persistent homology</span></span>
-<span><span class="va">ph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">ripserr</span><span class="fu">::</span><span class="fu"><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html" class="external-link">vietoris_rips</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, dim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has</span></span>
-<span><span class="co">#&gt; been deprecated; use `max_dim` instead.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ph</span>, n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    dimension birth      death</span></span>
-<span><span class="co">#&gt; 1          0     0 0.02903148</span></span>
-<span><span class="co">#&gt; 2          0     0 0.05579919</span></span>
-<span><span class="co">#&gt; 3          0     0 0.05754819</span></span>
-<span><span class="co">#&gt; 4          0     0 0.06145429</span></span>
-<span><span class="co">#&gt; 5          0     0 0.10973364</span></span>
-<span><span class="co">#&gt; 6          0     0 0.11006440</span></span>
-<span><span class="co">#&gt; 7          0     0 0.11076601</span></span>
-<span><span class="co">#&gt; 8          0     0 0.12968679</span></span>
-<span><span class="co">#&gt; 9          0     0 0.14783527</span></span>
-<span><span class="co">#&gt; 10         0     0 0.15895889</span></span>
-<span><span class="co">#&gt; 11         0     0 0.16171041</span></span>
-<span><span class="co">#&gt; 12         0     0 0.16548606</span></span>
-<span><span class="va">ph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">ph</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="topological-constructions">Topological constructions<a class="anchor" aria-label="anchor" href="#topological-constructions"></a>
 </h3>
-<p>To first illustrate constructions, pick a proximity, or threshold, to consider points in the cloud to be neighbors:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p><strong>ggtda</strong> provides stat and geom layers for common TDA constructions. To illustrate, pick a proximity, or threshold, to consider points in the cloud to be neighbors:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># choose a proximity threshold</span></span>
 <span><span class="va">prox</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span></span></code></pre></div>
 <p>The homology <span class="math inline"><em>H</em><sub><em>k</em></sub>(<em>X</em>)</span> of a point cloud is uninteresting (<span class="math inline"><em>H</em><sub>0</sub>(<em>X</em>) = |<em>X</em>|</span> and <span class="math inline"><em>H</em><sub><em>k</em></sub>(<em>X</em>) = 0</span> for <span class="math inline"><em>k</em> &gt; 0</span>). The most basic space of interest to the topological data analyst is the union of a <em>ball cover</em> <span class="math inline"><em>B</em><sub><em>r</em></sub>(<em>X</em>)</span> of <span class="math inline"><em>X</em></span>—a ball of common radius <span class="math inline"><em>r</em></span> around each point. The common radius will be <span class="math inline"><em>r</em>=</span> <code>prox / 2</code>.</p>
 <p>The figure below compares the ball cover (left) with the <em>Vietoris</em> (or <em>Rips</em>) <em>complex</em> <span class="math inline"><em>V</em><em>R</em><sub><em>r</em></sub>(<em>X</em>)</span> constructed using the same proximity (right). The complex comprises a simplex at each subset of points having diameter at most <code>prox</code>—that is, each pair of which are within <code>prox</code> of each other. A key result in TDA is that the homology of the ball union is “very close” to that of the complex.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize disks of fixed radii and the Vietoris complex for this proximity</span></span>
 <span><span class="va">p_d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">d</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -183,24 +168,64 @@
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
-<p>This cover and simplex clearly contain a non-trivial 1-cycle (loop), which makes <span class="math inline"><em>H</em><sub>1</sub>(<em>B</em><sub><em>r</em></sub>(<em>X</em>)) = <em>H</em><sub>1</sub>(<em>V</em><em>R</em><sub><em>r</em></sub>(<em>X</em>)) = 1</span>. Persistent homology encodes the homology group ranks across the full range <span class="math inline">0 ≤ <em>r</em> &lt; ∞</span>, corresponding to the full filtration of simplicial complexes constructed on the point cloud.</p>
+<p>This cover and simplex clearly contain a non-trivial 1-cycle (loop), which makes <span class="math inline"><em>H</em><sub>1</sub>(<em>B</em><sub><em>r</em></sub>(<em>X</em>)) = <em>H</em><sub>1</sub>(<em>V</em><em>R</em><sub><em>r</em></sub>(<em>X</em>)) = 1</span>. But detecting this feature depended crucially on the choice of <code>prox</code>, and there’s no guarantee with new data that this choice will be correct or even that a single best choice exists. Instead, we tend to be interested in considering those features that persist across many values of <code>prox</code>. The GIF below<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> illustrates this point: Observe how features appear and disappear as the disk covers grow:</p>
+<p><img src="reference/figures/Small-Clouds.gif" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="persistent-homology">Persistent homology<a class="anchor" aria-label="anchor" href="#persistent-homology"></a>
+</h3>
+<p>Persistent homology (PH) encodes the homology group ranks across the full range <span class="math inline">0 ≤ <em>r</em> &lt; ∞</span>, corresponding to the full filtration of simplicial complexes constructed on the point cloud. We use <a href="https://cran.r-project.org/package=ripserr" class="external-link"><strong>ripserr</strong></a> to compute the PH of the point cloud <span class="math inline"><em>X</em></span>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># compute the persistent homology</span></span>
+<span><span class="va">ph</span> <span class="op">&lt;-</span> <span class="fu">ripserr</span><span class="fu">::</span><span class="fu"><a href="https://rrrlw.github.io/ripserr/reference/vietoris_rips.html" class="external-link">vietoris_rips</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, dim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has</span></span>
+<span><span class="co">#&gt; been deprecated; use `max_dim` instead.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ph</span><span class="op">)</span></span>
+<span><span class="co">#&gt; PHom object containing persistence data for 36 features.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Contains:</span></span>
+<span><span class="co">#&gt; * 35 0-dim features</span></span>
+<span><span class="co">#&gt; * 1 1-dim feature</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Radius/diameter: min = 0; max = 1.3963.</span></span></code></pre></div>
+<p>The loop is detected, though we do not yet know whether its persistence stands out from that of other features. To prepare for <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code>, we convert the result to a data frame and its numeric <code>dimension</code> column to a factor:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">ph</span><span class="op">)</span></span>
+<span><span class="va">pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">pd</span>, dimension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   dimension birth      death</span></span>
+<span><span class="co">#&gt; 1         0     0 0.02903148</span></span>
+<span><span class="co">#&gt; 2         0     0 0.05579919</span></span>
+<span><span class="co">#&gt; 3         0     0 0.05754819</span></span>
+<span><span class="co">#&gt; 4         0     0 0.06145429</span></span>
+<span><span class="co">#&gt; 5         0     0 0.10973364</span></span>
+<span><span class="co">#&gt; 6         0     0 0.11006440</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    dimension     birth     death</span></span>
+<span><span class="co">#&gt; 31         0 0.0000000 0.3775456</span></span>
+<span><span class="co">#&gt; 32         0 0.0000000 0.4159706</span></span>
+<span><span class="co">#&gt; 33         0 0.0000000 0.4386794</span></span>
+<span><span class="co">#&gt; 34         0 0.0000000 0.4664572</span></span>
+<span><span class="co">#&gt; 35         0 0.0000000 0.4708476</span></span>
+<span><span class="co">#&gt; 36         1 0.6282155 1.3962621</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="persistence-plots">Persistence plots<a class="anchor" aria-label="anchor" href="#persistence-plots"></a>
 </h3>
-<p>We can visualize the persistence data using a barcode (left) and a persistence diagram (right). In the barcode plot, the dashed line indicates the cutoff at the proximity <code>prox</code>; in the persistence diagram plot, the fundamental box contains the features that are detectable at this cutoff.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><strong>ggtda</strong> also provides stat and geom layers for common visualizations of persistence data. We visualize these data using a barcode (left) and a persistence diagram (right). In the barcode, the dashed line indicates the cutoff at the proximity <code>prox</code>; in the persistence diagram, the fundamental box contains the features that are detectable at this cutoff.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize the persistence data, indicating cutoffs at this proximity</span></span>
-<span><span class="va">p_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ph</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/barcode.html">geom_barcode</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dim</span>, linetype <span class="op">=</span> <span class="va">dim</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">p_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pd</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/barcode.html">geom_barcode</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">dimension</span>, linetype <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Diameter"</span>, y <span class="op">=</span> <span class="st">"Homological features"</span>,</span>
 <span>       color <span class="op">=</span> <span class="st">"Dimension"</span>, linetype <span class="op">=</span> <span class="st">"Dimension"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">prox</span>, color <span class="op">=</span> <span class="st">"darkgoldenrod"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/themes.html">theme_barcode</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">max_prox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">ph</span><span class="op">$</span><span class="va">death</span><span class="op">)</span></span>
-<span><span class="va">p_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ph</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">max_prox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">pd</span><span class="op">$</span><span class="va">death</span><span class="op">)</span></span>
+<span><span class="va">p_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/persistence.html">stat_persistence</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>, colour <span class="op">=</span> <span class="va">dim</span>, shape <span class="op">=</span> <span class="va">dim</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/persistence.html">stat_persistence</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>start <span class="op">=</span> <span class="va">birth</span>, end <span class="op">=</span> <span class="va">death</span>,</span>
+<span>                       colour <span class="op">=</span> <span class="va">dimension</span>, shape <span class="op">=</span> <span class="va">dimension</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>slope <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Birth"</span>, y <span class="op">=</span> <span class="st">"Death"</span>, color <span class="op">=</span> <span class="st">"Dimension"</span>, shape <span class="op">=</span> <span class="st">"Dimension"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_prox</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_prox</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -214,15 +239,15 @@
 <span>  <span class="va">p_bc</span>, <span class="va">p_pd</span>,</span>
 <span>  layout_matrix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
 <p>The barcode lines are color- and linetype-coded by feature dimension: the 0-dimensional features, i.e. the gaps between connected components, versus the 1-dimensional feature, i.e. the loop. These groups of lines do not overlap, which means that the loop exists only in the persistence domain where all the data points are part of the same connected component. Our choice of <code>prox</code> is between the birth and death of the loop, which is why the complex above recovers it.</p>
 <p>The persistence diagram shows that the loop persists for longer than any of the gaps. This is consistent with the gaps being artifacts of the sampling procedure but the loop being an intrinsic property of the underlying space.</p>
 </div>
 <div class="section level3">
 <h3 id="multiple-data-sets">Multiple data sets<a class="anchor" aria-label="anchor" href="#multiple-data-sets"></a>
 </h3>
-<p>TDA almost always involves comparisons of topological data between spaces. To illustrate such a comparison, we construct a larger sample but then examine the persistence of its cumulative subsets:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>TDA usually involves comparisons of topological data between spaces. To illustrate such a comparison, we construct a larger sample and examine the persistence of its cumulative subsets:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># larger point cloud sampled from a noisy circle</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">180</span></span>
@@ -234,8 +259,8 @@
 <span><span class="co"># list of cumulative point clouds</span></span>
 <span><span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">36</span>, <span class="fl">60</span>, <span class="fl">180</span><span class="op">)</span></span>
 <span><span class="va">dl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ns</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="va">d</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p>First we construct a nested data frame containing these subsets and plot their Vietoris complexes. (We specify the <a href="https://github.com/peekxc/simplextree" class="external-link"><strong>simplextree</strong></a> engine to reduce runtime.)</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>First we construct a nested data frame containing these subsets and plot their Vietoris complexes. (We specify the <a href="https://github.com/peekxc/simplextree" class="external-link"><strong>simplextree</strong></a> engine and restrict to 2-simplices to reduce runtime.)</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># formatted as grouped data</span></span>
 <span><span class="va">dg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">dl</span><span class="op">)</span></span>
 <span><span class="va">dg</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">ns</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">dl</span>, <span class="va">nrow</span>, <span class="fl">0L</span><span class="op">)</span><span class="op">)</span></span>
@@ -244,16 +269,17 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span>facets <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, labeller <span class="op">=</span> <span class="va">label_both</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/simplicial_complex.html">stat_simplicial_complex</a></span><span class="op">(</span></span>
-<span>    diameter <span class="op">=</span> <span class="va">prox</span>, fill <span class="op">=</span> <span class="st">"darkgoldenrod"</span>,</span>
-<span>    engine <span class="op">=</span> <span class="st">"simplextree"</span></span>
+<span>    diameter <span class="op">=</span> <span class="va">prox</span>, dimension_max <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>    engine <span class="op">=</span> <span class="st">"simplextree"</span>,</span>
+<span>    fill <span class="op">=</span> <span class="st">"darkgoldenrod"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
 <p>The Vietoris complexes on these subsets for the fixed proximity are not a filtration; instead they show us how increasing the sample affects the detection of homology at that threshold. Notice that, while a cycle exists at <span class="math inline"><em>n</em> = 36</span>, the “true” cycle is only detected at <span class="math inline"><em>n</em> = 60</span>.</p>
 <p>We can also conveniently plot the persistence diagrams from all four cumulative subsets, this time using a list-column of data sets passed to the <code>dataset</code> aesthetic:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># nested data frame of samples of different cumulative sizes</span></span>
 <span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">ns</span>, d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">dl</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ds</span><span class="op">)</span></span>
@@ -273,7 +299,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_prox</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_prox</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 2 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
 <p>The diagrams reveal that a certain sample is necessary to distinguish bona fide features from noise, as only occurs here at <span class="math inline"><em>n</em> = 36</span>. While the true feature retains about the same persistence (death value less birth value) from diagram to diagram, the persistence of the noise gradually lowers.</p>
 </div>
 </div>
@@ -284,6 +310,11 @@
 <p>If you have a feature in mind you think will be useful for others, you can also <a href="https://help.github.com/en/articles/fork-a-repo" class="external-link">fork this repository</a> and <a href="https://help.github.com/en/articles/creating-a-pull-request" class="external-link">create a pull request</a>.</p>
 </div>
 </div>
+<div class="footnotes footnotes-end-of-document">
+<hr>
+<ol><li id="fn1"><p>The GIF and many features of <strong>ggtda</strong> were originally developed in the separate package <a href="https://github.com/jamesotto852/TDAvis" class="external-link"><strong>TDAvis</strong></a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li></ol>
+</div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
