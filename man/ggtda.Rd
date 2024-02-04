@@ -13,7 +13,7 @@ topological constructions on planar data.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://rrrlw.github.io/ggtda/}
+  \item \url{https://tdaverse.github.io/ggtda/}
   \item Report bugs at \url{https://github.com/rrrlw/ggtda/issues}
 }
 

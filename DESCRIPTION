@@ -27,7 +27,7 @@ Authors@R: c(
 Description: Topological data analysis often produces summary data
     consisting of birth and death values for topological features;
     see Chazal and Michel (2017) <arXiv:1710.04019>
-    and Wasserman (2018) <10.1146/annurev-statistics-031017-100045>.
+    and Wasserman (2018) <doi:10.1146/annurev-statistics-031017-100045>.
     This extends the user-friendly layered grammar of graphics
     of Wickham (2010) <doi:10.1198/jcgs.2009.07098>
     to conveniently visualize these persistence data in several standard ways.
@@ -51,7 +51,7 @@ Suggests:
     vdiffr (>= 0.3.0),
     knitr (>= 1.20),
     rmarkdown (>= 1.10)
-URL: https://rrrlw.github.io/ggtda/
+URL: https://tdaverse.github.io/ggtda/
 BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.3.1
