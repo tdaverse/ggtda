@@ -7,6 +7,9 @@
 #' @name draw_key
 #' @import ggplot2
 #' @inheritParams ggplot2::draw_key
+#' @example inst/examples/ex-draw-key-simplex.R
+
+# file.edit("inst/examples/ex-draw-key-simplex.R")
 
 draw_key_simplex <- function(data, params, size) {
   

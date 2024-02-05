@@ -19,10 +19,7 @@
 
 #' @eval rd_sec_aesthetics(
 #'   stat_landscape = StatLandscape,
-#'   geom_landscape = GeomLandscape,
-#'   extra_note = paste0(
-#'     "`start` and `end` are dropped during the statistical transformation."
-#'   )
+#'   geom_landscape = GeomLandscape
 #' )
 
 #' @eval rd_sec_computed_vars(
@@ -65,6 +62,8 @@ StatLandscape <- ggproto(
   required_aes = StatPersistence$required_aes,
   
   # default_aes = aes(group = interaction(after_stat(level), group)),
+  
+  dropped_aes = c("start", "end"),
   
   setup_data = StatPersistence$setup_data,
   

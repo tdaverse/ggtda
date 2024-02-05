@@ -150,8 +150,6 @@ Persistence landscapes do not currently recognize extended persistence data.
 \item \code{linetype}
 \item \code{linewidth}
 }
-\code{start} and \code{end} are dropped during the statistical transformation.
-
 Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
 }
 

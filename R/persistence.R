@@ -105,6 +105,8 @@ StatPersistence <- ggproto(
   
   # optional_aes = c("dataset"),
   
+  dropped_aes = c("start", "end"),
+  
   # only explicitly passed params
   setup_params = function(data, params) {
     
