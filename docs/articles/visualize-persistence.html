@@ -87,7 +87,7 @@
       <h1 data-toc-skip>Visualizing persistent homology data</h1>
                         <h4 data-toc-skip class="author">Jason Cory Brunson, Jacob G. Scott, Raoul R. Wadhwa</h4>
             
-            <h4 data-toc-skip class="date">2024-02-04</h4>
+            <h4 data-toc-skip class="date">2024-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/vignettes/visualize-persistence.Rmd" class="external-link"><code>vignettes/visualize-persistence.Rmd</code></a></small>
       <div class="hidden name"><code>visualize-persistence.Rmd</code></div>
@@ -102,7 +102,7 @@
 <p>The <strong>ggtda</strong> package provides users with <strong>ggplot2</strong> layers to visualize persistent homology, especially as part of a topological data analysis (TDA) pipeline. This vignette shows how to use ggtda to construct publication-quality barcode plots, persistence diagrams, and persistence landscapes.</p>
 <p>We set up our environment by attaching ggtda. Other packages will be called to generate a simulated data set and to compute persistent homology.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rrrlw.github.io/ggtda/" class="external-link">ggtda</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tdaverse.github.io/ggtda/" class="external-link">ggtda</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sample-data">Sample data<a class="anchor" aria-label="anchor" href="#sample-data"></a>
@@ -230,24 +230,7 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_alpha.html" class="external-link">scale_alpha_continuous</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"reverse"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The following aesthetics were dropped during statistical transformation: <span style="color: #00BB00;">end</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This can happen when ggplot fails to infer the correct grouping structure in</span></span>
-<span><span class="co">#&gt;   the data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
-<span><span class="co">#&gt;   variable into a factor?</span></span>
-<span><span class="co">#&gt; Warning: The following aesthetics were dropped during statistical transformation: <span style="color: #00BB00;">start,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">end</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This can happen when ggplot fails to infer the correct grouping structure in</span></span>
-<span><span class="co">#&gt;   the data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
-<span><span class="co">#&gt;   variable into a factor?</span></span>
-<span><span class="co">#&gt; The following aesthetics were dropped during statistical transformation: <span style="color: #00BB00;">start,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">end</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This can happen when ggplot fails to infer the correct grouping structure in</span></span>
-<span><span class="co">#&gt;   the data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
-<span><span class="co">#&gt;   variable into a factor?</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/themes.html">theme_persist</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="visualize-persistence_files/figure-html/persistence%20landscape-1.png" width="480"></p>
 <p>Because landscapes take up more space than diagrams, those for different dimensions are rarely if ever overlaid. Instead, above they are faceted into three panels for ease of comparison.</p>
 </div>
