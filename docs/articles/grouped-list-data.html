@@ -87,7 +87,7 @@
       <h1 data-toc-skip>Topological analysis of grouped data and list-columns</h1>
                         <h4 data-toc-skip class="author">James Otto, Jason Cory Brunson</h4>
             
-            <h4 data-toc-skip class="date">2024-02-10</h4>
+            <h4 data-toc-skip class="date">2024-03-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rrrlw/ggtda/blob/HEAD/vignettes/grouped-list-data.Rmd" class="external-link"><code>vignettes/grouped-list-data.Rmd</code></a></small>
       <div class="hidden name"><code>grouped-list-data.Rmd</code></div>
@@ -140,8 +140,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">.25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
 <p>Notice, the object in the plot above clearly has two “holes”. This kind of insight is one of the main motivators of TDA. We’ll see more formal ways of identifying relevant features like this after we discuss persistent homology in the next section.</p>
 <p>By default, the dimension of each simplex is communicated via opacity (the <code>alpha</code> aesthetic). In the next example, we’ll see how this is useful when plotting data with multiple groups. However, when we’re just interested in one complex, it can be helpful to instead map the computed variable <code>face</code>, a factor for polygonal objects representing simplices of dimension <span class="math inline">\(\geq 2\)</span>, to the <code>fill</code> aesthetic:</p>
@@ -152,8 +151,7 @@
 <span>    dimension_max <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>    alpha <span class="op">=</span> <span class="fl">.25</span>, radius <span class="op">=</span> <span class="fl">.25</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
 <div class="section level3">
 <h3 id="plotting-multiple-groups">Plotting multiple groups<a class="anchor" aria-label="anchor" href="#plotting-multiple-groups"></a>
@@ -185,8 +183,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fill <span class="op">=</span> <span class="va">lab</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/simplicial_complex.html">geom_simplicial_complex</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">.3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
 <p>It is also possible to use the <code>color</code> and <code>fill</code> aesthetics together to color-code all simplices by dimension, including vertices and edges. This may become important as higher-dimensional simplices are computed. Typically, faceting the resulting plot is a good idea:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -199,8 +196,7 @@
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span>direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, aesthetics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"color"</span>, <span class="st">"fill"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="grouped-list-data_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
 <p>In each example so far, the plots have depended heavily on the choice of <code>radius</code>. In reality, we tend to be interested in considering the topological features of complexes generated by all reasonable values of <code>radius</code>. This is what motivates the use of <a href="https://en.wikipedia.org/wiki/Persistent_homology" class="external-link">persistent homology</a>!</p>
 </div>
