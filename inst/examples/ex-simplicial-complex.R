@@ -6,17 +6,31 @@ df <- data.frame(
   y = sin(s) + rnorm(40, 0, .1)
 )
 
-# default, visualizing dimension w/ alpha:
+# default
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(radius = .4)
-# visualizing dimension w/ fill:
+# higher-dimensional simplices are not more opaque but cause overlap
+ggplot(df, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(radius = .4, dimension_max = 3L)
+
+# visualizing dimension w/ face & alpha:
+ggplot(df, aes(x, y)) +
+  coord_fixed() +
+  geom_simplicial_complex(
+    mapping = aes(alpha = after_stat(face)),
+    radius = .3, dimension_max = 4L
+  ) +
+  scale_alpha_ordinal(range = c(.1, .6))
+# visualizing dimension w/ dimension & fill:
 ggplot(df, aes(x, y)) +
   coord_fixed() +
   geom_simplicial_complex(
     mapping = aes(fill = after_stat(dimension)),
-    alpha = .5, radius = .4
-  )
+    radius = .3, dimension_max = 4L, alpha = .25
+  ) +
+  scale_fill_continuous(type = "viridis")
 
 # with a zero radius or diameter
 ggplot(df, aes(x = x, y = y)) +

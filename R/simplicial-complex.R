@@ -95,8 +95,8 @@ StatSimplicialComplex <-  ggproto(
   
   required_aes = c("x", "y"),
   
-  # Alternatively, could assign fill = after_stat(dimension)
-  default_aes = aes(alpha = after_stat(face)),
+  # default_aes = aes(fill = after_stat(dimension))
+  # default_aes = aes(alpha = after_stat(face))
   
   compute_group = function(
     data, scales,
@@ -370,7 +370,7 @@ GeomSimplicialComplex <- ggproto(
     grob
   },
  
-  default_aes = aes(colour = "black", fill = "grey30", alpha = NA,
+  default_aes = aes(colour = "black", fill = "grey30", alpha = .15,
                     linewidth = 0.5, linetype = 1,
                     shape = 21L, size = 1.5, stroke = .5),
   

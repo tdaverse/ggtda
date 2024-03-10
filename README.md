@@ -108,7 +108,6 @@ gridExtra::grid.arrange(
   p_d, p_sc,
   layout_matrix = matrix(c(1, 2), nrow = 1)
 )
-#> Warning: Using alpha for a discrete variable is not advised.
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -265,7 +264,6 @@ ggplot(dg, aes(x, y)) +
   ) +
   theme_bw() +
   theme(legend.position = "none")
-#> Warning: Using alpha for a discrete variable is not advised.
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
@@ -298,7 +296,8 @@ ggplot(ds, aes(dataset = d)) +
   labs(x = "Birth", y = "Death", color = "Dimension", shape = "Dimension") +
   lims(x = c(0, max_prox), y = c(0, max_prox)) +
   theme_persist()
-#> Warning: Removed 2 rows containing missing values (`geom_point()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_point()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
