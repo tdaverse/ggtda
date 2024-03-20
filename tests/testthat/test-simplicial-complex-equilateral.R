@@ -33,7 +33,6 @@ test_that("Vietoris-Rips complexes immediately close triangles", {
   p1 <- ggplot(equilateral_triangle, aes(x, y)) +
     geom_simplicial_complex(engine = "TDA", diameter = sqrt(3) + eps)
   b1 <- ggplot_build(p1)
-  # FIXME: when to include edges?
   expect_equal(sort(b1$data[[1L]]$dimension), rep(c(0L, 2L), each = 3L))
   
   # {simplextree}

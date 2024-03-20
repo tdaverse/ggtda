@@ -8,10 +8,10 @@ simplicial_complex_base <- function(
     data, complex, diameter, dimension_max, zero_simplices, one_simplices
 ) {
   
-  # df_zero_simplices <- indices_to_data(data)
-  df_zero_simplices <- data
-  df_zero_simplices$dimension <- 0L
-  df_zero_simplices$id <- seq(nrow(data))
+  df_zero_simplices <- indices_to_data(data)
+  # df_zero_simplices <- data
+  # df_zero_simplices$dimension <- 0L
+  # df_zero_simplices$id <- seq(nrow(data))
   
   # Compute other data.frame objects based on complex
   
@@ -62,13 +62,11 @@ simplicial_complex_base <- function(
   
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher simplices
-  # being plotted
-  if (one_simplices == "maximal" & dimension_max > 1L) {
+  if (one_simplices == "maximal" && dimension_max > 1L) {
     df_one_simplices <- 
       get_maximal_one_simplices(edges, faces, df_one_simplices)
   }
-  
-  if (zero_simplices == "maximal" & dimension_max > 0L) {
+  if (zero_simplices == "maximal" && dimension_max > 0L) {
     df_zero_simplices <- 
       get_maximal_zero_simplices(edges, df_zero_simplices)
   } 
@@ -176,13 +174,11 @@ simplicial_complex_RTriangle <- function(
   
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher simplices
-  # being plotted
-  if (one_simplices == "maximal" & dimension_max > 1L) {
+  if (one_simplices == "maximal" && dimension_max > 1L) {
     df_one_simplices <- 
       get_maximal_one_simplices(edges, faces, df_one_simplices)
   }
-  
-  if (zero_simplices == "maximal" & dimension_max > 0L) {
+  if (zero_simplices == "maximal" && dimension_max > 0L) {
     df_zero_simplices <- 
       get_maximal_zero_simplices(edges, df_zero_simplices)
   } 
@@ -488,35 +484,53 @@ simplicial_complex_TDA <- function(
     library
 ) {
   
-  # The entire set of 0-simplices needs to come from data
-  df_zero_simplices <- data
-  df_zero_simplices$id <- seq(nrow(data))
-  df_zero_simplices$dimension <- 0L
-  
   # Compute simplicial complex up to `dimension_max`, encoded as a 'Diagram'
   # (all further computed values derive from `pd`)
   pd <- data_to_Filtration(data[, c("x", "y")],
                            diameter, dimension_max,
                            complex, library)
-  
-  # data frame of coordinates with linking index
-  df_coords <- as.data.frame(pd$coordinates)
-  df_coords$row <- seq(nrow(df_coords))
-  
-  # data frame of combinatorics with linking index
   pd_dim <- vapply(pd$cmplx, length, 0L) - 1L
-  df_combin <- data.frame(
-    row = unlist(pd$cmplx),
-    id = rep(seq_along(pd_dim), pd_dim + 1L),
-    dimension = rep(pd_dim, pd_dim + 1L)
-  )
-  df_combin <-
-    df_combin[order(df_combin$dimension, df_combin$id), , drop = FALSE]
+  pd_high <- pd_dim >= 2L
   
-  # merge coordinates with combinatorics & return
-  df_simplices <- merge(df_coords, df_combin, by = "row")
-  df_simplices$row <- NULL
-  df_simplices
+  # vertices, edges, and faces
+  vertices <- seq(nrow(data))
+  edges <- do.call(rbind, lapply(pd$cmplx[pd_dim == 1L], sort))
+  edges <- unique(edges)
+  faces <- do.call(rbind, lapply(pd$cmplx[pd_dim == 2L], sort))
+  
+  # specified vertices
+  if (zero_simplices == "maximal" && dimension_max > 0L) {
+    vertices <- setdiff(vertices, edges)
+  }
+  # 0-simplices, preserving plotting data
+  df_zero_simplices <- indices_to_data(data)
+  # if no edges, return vertices
+  if (length(edges) == 0L) return(df_zero_simplices)
+  
+  # specified edges
+  if (one_simplices == "maximal" && dimension_max > 1L) {
+    edges_maximal <- apply(edges, 1L, is_maximal, faces)
+    edges <- edges[edges_maximal, , drop = FALSE]
+  }
+  # 1-simplices, preserving plotting data
+  df_one_simplices <- indices_to_data(data, edges)
+  
+  # data frame of high-dimensional simplices with linking index
+  df_high_simplices <- data.frame(
+    row = unlist(pd$cmplx[pd_high]),
+    id = rep(seq_along(pd_dim[pd_high]), pd_dim[pd_high] + 1L),
+    dimension = rep(pd_dim[pd_high], pd_dim[pd_high] + 1L)
+  )
+  df_high_simplices <-
+    df_high_simplices[order(df_combin$dimension, df_combin$id), , drop = FALSE]
+  df_high_simplices <- merge(
+    transform(data, row = seq(nrow(data))),
+    df_high_simplices,
+    by = "row"
+  )
+  df_high_simplices$row <- NULL
+  
+  rbind(df_high_simplices, df_one_simplices, df_zero_simplices)
 }
 
 # Helper function, returns 'Diag' to be manipulated into 'data.frame'
