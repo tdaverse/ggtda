@@ -47,9 +47,7 @@ simplicial_complex_base <- function(
     
     df_high_simplices <- indices_to_data(data, faces)
     
-  }
-  
-  if (complex == "Cech") {
+  } else if (complex == "Cech") {
     
     edges <- proximate_pairs(data, diameter)
     df_one_simplices <- indices_to_data(data, edges)
@@ -63,8 +61,9 @@ simplicial_complex_base <- function(
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher simplices
   if (one_simplices == "maximal" && dimension_max > 1L) {
-    df_one_simplices <- 
-      get_maximal_one_simplices(edges, faces, df_one_simplices)
+    edges_maximal <- are_edges_maximal(edges, faces)
+    df_one_simplices <-
+      df_one_simplices[rep(edges_maximal, each = 2L), , drop = FALSE]
   }
   if (zero_simplices == "maximal" && dimension_max > 0L) {
     df_zero_simplices <- 
@@ -175,8 +174,9 @@ simplicial_complex_RTriangle <- function(
   # Pair down to maximal simplices if necessary
   # necessary <=> only want maximal 0/1-simplices AND no higher simplices
   if (one_simplices == "maximal" && dimension_max > 1L) {
+    edges_maximal <- are_edges_maximal(edges, faces)
     df_one_simplices <- 
-      get_maximal_one_simplices(edges, faces, df_one_simplices)
+      df_one_simplices[rep(edges_maximal, each = 2L), , drop = FALSE]
   }
   if (zero_simplices == "maximal" && dimension_max > 0L) {
     df_zero_simplices <- 
@@ -234,24 +234,15 @@ indices_to_data <- function(
   
 }
 
-# Get maximal one_simplices from edges + faces (subset of df_one_simplices)
-# Pretty computationally expensive: O(|1-simplices| x |2-simplices|)?
-get_maximal_one_simplices <- function(edges, faces, df_one_simplices) {
-  
-  edges_unique <- apply(edges, 1L, is_maximal, faces)
-  
-  are_maximal <- rep(edges_unique, each = 2L)
-  df_one_simplices[are_maximal, , drop = FALSE]
-  
-}
-
-# Determine if edge is contained in faces (is edge a maximal simplex)
-is_maximal <- function(edge, faces) {
-  
-  res <- apply(faces, 1L, function(face) all(edge %in% face))
-  
-  ! any(res)
-  
+# Which edges in an edge matrix are contained in some face of a face matrix?
+are_edges_maximal <- function(edges, faces) {
+  if (nrow(as.matrix(edges)) == 0L) return(logical(0L))
+  ! apply(
+    apply(
+      outer(as.matrix(edges), as.matrix(faces), `==`),
+      c(1L, 2L), any
+    ), 1L, all
+  )
 }
 
 # Get maximal 0-simplices from edges + vertices (rows of df_zero_simplices)
@@ -509,7 +500,7 @@ simplicial_complex_TDA <- function(
   
   # specified edges
   if (one_simplices == "maximal" && dimension_max > 1L) {
-    edges_maximal <- apply(edges, 1L, is_maximal, faces)
+    edges_maximal <- are_edges_maximal(edges, faces)
     edges <- edges[edges_maximal, , drop = FALSE]
   }
   # 1-simplices, preserving plotting data
@@ -521,8 +512,9 @@ simplicial_complex_TDA <- function(
     id = rep(seq_along(pd_dim[pd_high]), pd_dim[pd_high] + 1L),
     dimension = rep(pd_dim[pd_high], pd_dim[pd_high] + 1L)
   )
+  df_high_order <- order(df_high_simplices$dimension, df_high_simplices$id)
   df_high_simplices <-
-    df_high_simplices[order(df_combin$dimension, df_combin$id), , drop = FALSE]
+    df_high_simplices[df_high_order, , drop = FALSE]
   df_high_simplices <- merge(
     transform(data, row = seq(nrow(data))),
     df_high_simplices,

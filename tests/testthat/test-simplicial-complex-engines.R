@@ -1,7 +1,7 @@
 
 df <- data.frame(
-  x = c(1, -0.5, -0.5),
-  y = c(0, 0.866025403784439, -0.866025403784438),
+  x = c(1, -1/2, -1/2),
+  y = c(0, sqrt(3)/2, - sqrt(3)/2),
   PANEL = structure(c(1L, 1L, 1L), levels = "1", class = "factor"), 
   group = c(-1L, -1L, -1L)
 )
