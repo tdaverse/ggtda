@@ -467,18 +467,10 @@ diagram_transform <- function(data, diagram) {
       x = (data$x + data$y) / 2,
       y = ifelse(
         is.infinite(data$x) & is.infinite(data$y),
+        # accommodate landscape horizons
         0,
         (data$y - data$x) / 2
       )
     )
-  )
-}
-
-diagram_slope <- function(diagram) {
-  switch(
-    match.arg(diagram, c("flat", "diagonal", "landscape")),
-    flat = 0,
-    diagonal = 1,
-    landscape = 0
   )
 }

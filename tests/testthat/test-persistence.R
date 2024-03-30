@@ -1,4 +1,33 @@
 
+test_that("`diagram_transform()` correctly transforms key points", {
+  d <- data.frame(
+    x = c(-Inf, 0, 0, exp(1), exp(1), pi,  Inf),
+    y = c(-Inf, 0, 1, exp(1), pi,     Inf, Inf)
+  )
+  
+  # diagonal transform (do nothing)
+  d_diag <- diagram_transform(d, "diagonal")
+  expect_identical(d, d_diag)
+  
+  # flat transform
+  d2 <- d
+  d2$y <- d$y - d$x
+  d_flat <- diagram_transform(d, "flat")
+  expect_identical(d2, d_flat)
+  
+  # landscape transform
+  d3 <- transform(
+    d,
+    x = (x + y) / 2,
+    y = (y - x) / 2
+  )
+  # accommodate landscape horizons
+  d3$y[c(1L, nrow(d3))] <- 0
+  d_land <- diagram_transform(d, "landscape")
+  expect_identical(d3, d_land)
+  
+})
+
 # ggplot object tests ----------------------------------------------------------
 
 # sample data set
