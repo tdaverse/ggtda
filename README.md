@@ -4,7 +4,7 @@
 # ggtda
 
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/tdaverse/ggtda/master.svg)](https://codecov.io/github/tdaverse/ggtda?branch=master)
+Status](https://img.shields.io/codecov/c/github/tdaverse/ggtda/main.svg)](https://codecov.io/github/tdaverse/ggtda?branch=main)
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -134,16 +134,44 @@ PH of the point cloud $X$:
 ``` r
 # compute the persistent homology
 ph <- ripserr::vietoris_rips(as.matrix(d), dim = 1)
-#> Warning in vietoris_rips.matrix(as.matrix(d), dim = 1): `dim` parameter has
-#> been deprecated; use `max_dim` instead.
 print(ph)
-#> PHom object containing persistence data for 36 features.
-#> 
-#> Contains:
-#> * 35 0-dim features
-#> * 1 1-dim feature
-#> 
-#> Radius/diameter: min = 0; max = 1.3963.
+#>    dimension     birth      death
+#> 1          0 0.0000000 0.02903148
+#> 2          0 0.0000000 0.05579919
+#> 3          0 0.0000000 0.05754819
+#> 4          0 0.0000000 0.06145429
+#> 5          0 0.0000000 0.10973364
+#> 6          0 0.0000000 0.11006440
+#> 7          0 0.0000000 0.11076601
+#> 8          0 0.0000000 0.12968679
+#> 9          0 0.0000000 0.14783527
+#> 10         0 0.0000000 0.15895889
+#> 11         0 0.0000000 0.16171041
+#> 12         0 0.0000000 0.16548606
+#> 13         0 0.0000000 0.18487403
+#> 14         0 0.0000000 0.22148925
+#> 15         0 0.0000000 0.22522546
+#> 16         0 0.0000000 0.23144975
+#> 17         0 0.0000000 0.23833826
+#> 18         0 0.0000000 0.24347463
+#> 19         0 0.0000000 0.24621173
+#> 20         0 0.0000000 0.24877669
+#> 21         0 0.0000000 0.25618632
+#> 22         0 0.0000000 0.27190520
+#> 23         0 0.0000000 0.28831319
+#> 24         0 0.0000000 0.30491738
+#> 25         0 0.0000000 0.30827205
+#> 26         0 0.0000000 0.31391084
+#> 27         0 0.0000000 0.32506632
+#> 28         0 0.0000000 0.32904677
+#> 29         0 0.0000000 0.33786610
+#> 30         0 0.0000000 0.34781266
+#> 31         0 0.0000000 0.37754559
+#> 32         0 0.0000000 0.41597062
+#> 33         0 0.0000000 0.43867939
+#> 34         0 0.0000000 0.46645722
+#> 35         0 0.0000000 0.47084765
+#> 36         1 0.6282155 1.39626210
 ```
 
 The loop is detected, though we do not yet know whether its persistence
