@@ -307,7 +307,7 @@ GeomPersistence <- ggproto(
     }
     
     # diagram transformation
-    data <- diagram_transform(data, diagram)
+    data <- diagram_transform(data, params$diagram)
     
     # return point data
     data
