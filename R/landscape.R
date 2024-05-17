@@ -51,36 +51,60 @@ NULL
 
 # file.edit("inst/examples/ex-landscape.R")
 
+
+
+#' @rdname landscape
+#' @export
+stat_landscape <- function(mapping = NULL,
+                           data = NULL,
+                           geom = "landscape",
+                           position = "identity",
+                           filtration = "Rips",
+                           diameter_max = NULL, radius_max = NULL,
+                           dimension_max = 1L,
+                           field_order = 2L,
+                           engine = NULL,
+                           na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE,
+                           ...) {
+  layer(
+    stat = StatLandscape,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      filtration = filtration,
+      diameter_max = diameter_max, radius_max = radius_max,
+      dimension_max = dimension_max,
+      field_order = field_order,
+      engine = engine,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 #' @rdname ggtda-ggproto
 #' @format NULL
 #' @usage NULL
 #' @export
-StatLandscape <- ggproto(
-  "StatLandscape", Stat,
+GeomLandscape <- ggproto(
+  "GeomLandscape", Geom,
   
-  # required_aes = c("start", "end"),
-  required_aes = StatPersistence$required_aes,
+  required_aes = c("dataset|start", "dataset|end"),
   
-  # default_aes = aes(group = interaction(after_stat(level), group)),
+  default_aes = GeomPath$default_aes,
   
-  dropped_aes = c("start", "end"),
+  draw_key = GeomPath$draw_key,
   
-  setup_data = StatPersistence$setup_data,
-  
-  setup_params = StatPersistence$setup_params,
-  
-  # compute_panel = Stat$compute_panel,
-  
-  compute_group = function(
-    data, scales,
-    diagram = "landscape",
-    # 'dataset' aesthetic
-    filtration = "Rips",
-    diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
-    field_order = 2L,
-    engine = NULL,
-    n_levels = Inf
-  ) {
+  draw_group = function(data, panel_params, coord, 
+                        diagram = "landscape", n_levels = Inf,
+                        lineend = "butt", linejoin = "round", linemitre = 10) {
+     
     
     # empty case
     if (nrow(data) == 0L) {
@@ -152,58 +176,8 @@ StatLandscape <- ggproto(
     data$slope <- diagram_slope(diagram)
     
     # return landscape data
-    cbind(data, first_row)
-  }
-)
-
-#' @rdname landscape
-#' @export
-stat_landscape <- function(mapping = NULL,
-                          data = NULL,
-                          geom = "landscape",
-                          position = "identity",
-                          filtration = "Rips",
-                          diameter_max = NULL, radius_max = NULL,
-                          dimension_max = 1L,
-                          field_order = 2L,
-                          engine = NULL,
-                          diagram = "landscape",
-                          n_levels = Inf,
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE,
-                          ...) {
-  layer(
-    stat = StatLandscape,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      filtration = filtration,
-      diameter_max = diameter_max, radius_max = radius_max,
-      dimension_max = dimension_max,
-      field_order = field_order,
-      engine = engine,
-      diagram = diagram,
-      n_levels = n_levels,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomLandscape <- ggproto(
-  "GeomLandscape", GeomPath,
-  
-  draw_panel = function(data, panel_params, coord,
-                        lineend = "butt", linejoin = "round", linemitre = 10) {
+    data <- cbind(data, first_row)
+    
     
     # # adapted from `ggplot2::GeomPath`
     # # (data should already be ordered; or, order by slope)
@@ -248,6 +222,8 @@ geom_landscape <- function(mapping = NULL,
                            data = NULL,
                            stat = "landscape",
                            position = "identity",
+                           diagram = "landscape",
+                           n_levels = Inf,
                            lineend = "butt",
                            linejoin = "round",
                            linemitre = 10,
@@ -264,6 +240,8 @@ geom_landscape <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      diagram = diagram,
+      n_levels = n_levels,
       lineend = lineend,
       linejoin = linejoin,
       linemitre = linemitre,

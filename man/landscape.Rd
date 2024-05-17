@@ -17,8 +17,6 @@ stat_landscape(
   dimension_max = 1L,
   field_order = 2L,
   engine = NULL,
-  diagram = "landscape",
-  n_levels = Inf,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -30,6 +28,8 @@ geom_landscape(
   data = NULL,
   stat = "landscape",
   position = "identity",
+  diagram = "landscape",
+  n_levels = Inf,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -84,12 +84,6 @@ persistent homology.}
 \item{engine}{The computational engine to use (see 'Details'). Reasonable
 defaults are chosen based on \code{filtration}.}
 
-\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
-orientation for the diagram should take.}
-
-\item{n_levels}{The number of levels to compute and plot. If \code{Inf} (the
-default), determined to be all levels.}
-
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
 
@@ -114,6 +108,12 @@ layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
 stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
 \code{"stat_count"})}
 
+\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
+orientation for the diagram should take.}
+
+\item{n_levels}{The number of levels to compute and plot. If \code{Inf} (the
+default), determined to be all levels.}
+
 \item{lineend}{Line end style (round, butt, square).}
 
 \item{linejoin}{Line join style (round, mitre, bevel).}
@@ -136,14 +136,13 @@ Persistence landscapes do not currently recognize extended persistence data.
 
 \code{stat_landscape()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start} \emph{or} \code{dataset}}
-\item \strong{\code{end} \emph{or} \code{dataset}}
+\item \strong{\code{dataset}}
 \item \code{group}
 }
 \code{geom_landscape()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{x}}
-\item \strong{\code{y}}
+\item \strong{\code{dataset} \emph{or} \code{start}}
+\item \strong{\code{dataset} \emph{or} \code{end}}
 \item \code{alpha}
 \item \code{colour}
 \item \code{group}
@@ -179,17 +178,20 @@ ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_persistence() +
-  stat_landscape(aes(alpha = -after_stat(level)), diagram = "diagonal") +
+  geom_persistence(stat = "Identity") +
+  geom_landscape(stat = "Identity") +
+  # geom_landscape(stat = "Identity", diagram = "diagonal") +
   lims(x = c(0, 8), y = c(0, NA)) +
   guides(alpha = "none")
+
 # persistence landscape with diagram overlaid
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  stat_landscape(aes(linetype = after_stat(factor(level)))) +
-  stat_persistence(diagram = "landscape") +
+  # stat_landscape(aes(linetype = after_stat(factor(level)))) +
+  # geom_persistence(stat = "Identity", diagram = "diagonal") +
+  geom_persistence(stat = "Identity") +
   lims(x = c(0, 8), y = c(0, NA)) +
   labs(linetype = "level")
 

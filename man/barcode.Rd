@@ -2,9 +2,30 @@
 % Please edit documentation in R/barcode.R
 \name{barcode}
 \alias{barcode}
+\alias{stat_barcode}
 \alias{geom_barcode}
 \title{Barcodes}
 \usage{
+stat_barcode(
+  mapping = NULL,
+  data = NULL,
+  geom = "barcode",
+  position = "identity",
+  filtration = "Rips",
+  diameter_max = NULL,
+  radius_max = NULL,
+  dimension_max = 1L,
+  field_order = 2L,
+  engine = NULL,
+  order_by = c("persistence", "start"),
+  decreasing = FALSE,
+  diagram = "diagonal",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
 geom_barcode(
   mapping = NULL,
   data = NULL,
@@ -37,8 +58,9 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{stat}{The The statistical transformation to use on the data.
-Defaults to \code{identity}; pass a string to override the default.}
+\item{geom}{The geometric object to use to display the data, either as a
+\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
+\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
 
 \item{position}{Position adjustment, either as a string naming the adjustment
 (e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
@@ -62,6 +84,9 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+
+\item{stat}{The The statistical transformation to use on the data.
+Defaults to \code{identity}; pass a string to override the default.}
 }
 \description{
 Visualize persistence data in a barcode diagram.
@@ -99,8 +124,8 @@ features of different dimension, by vertical grouping or by faceting.
 
 \code{geom_barcode()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start}}
-\item \strong{\code{end}}
+\item \strong{\code{dataset} \emph{or} \code{start}}
+\item \strong{\code{dataset} \emph{or} \code{end}}
 \item \code{alpha}
 \item \code{colour}
 \item \code{group}

@@ -49,13 +49,56 @@ NULL
 # file.edit("tests/testthat/test-barcode.R")
 # file.edit("inst/examples/ex-barcode.R")
 
+
+
+#' @rdname barcode
+#' @export
+stat_barcode <- function(mapping = NULL,
+                         data = NULL,
+                         geom = "barcode",
+                         position = "identity",
+                         filtration = "Rips",
+                         diameter_max = NULL, radius_max = NULL,
+                         dimension_max = 1L,
+                         field_order = 2L,
+                         engine = NULL,
+                         order_by = c("persistence", "start"),
+                         decreasing = FALSE,
+                         diagram = "diagonal",
+                         na.rm = FALSE,
+                         show.legend = NA,
+                         inherit.aes = TRUE,
+                         ...) {
+  layer(
+    stat = StatBarcode,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      filtration = filtration,
+      diameter_max = diameter_max, radius_max = radius_max,
+      dimension_max = dimension_max,
+      field_order = field_order,
+      engine = engine,
+      order_by = order_by,
+      decreasing = decreasing,
+      diagram = diagram,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 #' @rdname ggtda-ggproto
 #' @usage NULL
 #' @export
 GeomBarcode <- ggproto(
   "GeomBarcode", GeomSegment,
   
-  required_aes = c("start", "end"),
+  required_aes = c("dataset|start", "dataset|end"),
   
   # pre-process of the data set
   setup_data = function(data, params) {

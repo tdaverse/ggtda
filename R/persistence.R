@@ -101,43 +101,32 @@ NULL
 StatPersistence <- ggproto(
   "StatPersistence", Stat,
   
-  required_aes = c("start|dataset", "end|dataset"),
+  required_aes = "dataset",
   
-  # optional_aes = c("dataset"),
-  
-  dropped_aes = c("start", "end"),
+  dropped_aes = "dataset",
   
   # only explicitly passed params
-  setup_params = function(data, params) {
+  setup_params = function(self, data, params) {
     
-    if (is.null(data$dataset)) {
-      # discard unused parameters
-      
-      dataset_params <- intersect(
-        names(data),
-        c("filtration", "diameter_max", "radius_max", "dimension_max",
-          "field_order")
-      )
-      if (length(dataset_params) > 0L) {
-        params_vec <- paste0("`", dataset_params, "`", collapse = ", ")
-        warning("Parameters ", params_vec,
-                " are only used with the `dataset` aesthetic.")
-        params <- params[setdiff(names(params), params_vec)]
-      }
-      
-    } else {
-      # pre-process filtration parameters
-      
-      # logic to deduce reasonable values of engine
-      # + issue warnings when choices are incompatible
-      params$filtration <-
-        match.arg(params$filtration, c("Vietoris", "Rips", "alpha"))
-      if (! is.null(params$engine)) params$engine <- 
-          match.arg(params$engine, c("TDA", "GUDHI", "Dionysus", "ripserr"))
-      params$engine <-
-        assign_filtration_engine(params$filtration, params$engine)
-      
+    # Check that `start` and `end` aesthetics haven't been incorrectly supplied
+    if (!is.null(data$start) | !is.null(data$end)) {
+      # TODO -- This error message is too long and needs rewording
+      stop(paste0("`start` and `end` aesthetics have been supplied.\n", class(self)[1], " only accepts the `dataset` aesthetic.\nDid you mean to use `stat = \"identity\"`?"))
     }
+    
+    # pre-process filtration parameters
+    
+    # logic to deduce reasonable values of engine
+    # + issue warnings when choices are incompatible
+    params$filtration <-
+      match.arg(params$filtration, c("Vietoris", "Rips", "alpha"))
+    
+    if (! is.null(params$engine)) params$engine <- 
+        match.arg(params$engine, c("TDA", "GUDHI", "Dionysus", "ripserr"))
+    
+    params$engine <-
+      assign_filtration_engine(params$filtration, params$engine)
+      
     
     # reconcile thresholds
     if (is.null(params$radius_max) && is.null(params$diameter_max)) {
@@ -170,80 +159,47 @@ StatPersistence <- ggproto(
   
   setup_data = function(data, params) {
     
-    # REVIEW: Single data set param?
-    # # check if data was provided via 'point_cloud' argument
-    # if (! is.null(params$point_cloud)) {
-    #   
-    #   if (is.null(data$dataset)) {
-    #     
-    #     if (nrow(data) > 1) {
-    #       # TODO: fix this message
-    #       stop("The 'point_cloud' argument requires at most 1 row of `data`.")
-    #     }
-    #     data$dataset <- I(list(point_cloud))
-    #     
-    #   } else {
-    #     
-    #     warning(
-    #       "An argument was passed to the 'dataset' aesthetic,",
-    #       " so the 'point_cloud' argument will be ignored."
-    #     )
-    #     params$point_cloud <- NULL
-    #     
-    #   }
-    #   
-    # }
-    
-    if (! is.null(data$dataset)) {
-      
-      if (! is.null(data$start) || ! is.null(data$end)) {
-        warning("Map to either `start` and `end` or to `dataset` aesthetic, ",
-                "not both. `dataset` will be used.")
-        data$end <- data$start <- NULL
-      }
-      
-      # compute PH listwise
-      ph_list <- switch(
-        params$engine,
-        "TDA" = simplicial_filtration_TDA(
-          data$dataset, params$filtration,
-          params$diameter_max, params$dimension_max, params$field_order,
-          library = "GUDHI"
-        ),
-        "GUDHI" = simplicial_filtration_TDA(
-          data$dataset, params$filtration,
-          params$diameter_max, params$dimension_max, params$field_order,
-          library = "GUDHI"
-        ),
-        "Dionysus" = simplicial_filtration_TDA(
-          data$dataset, params$filtration,
-          params$diameter_max, params$dimension_max, params$field_order,
-          library = "Dionysus"
-        ),
-        "ripserr" = simplicial_filtration_ripserr(
-          data$dataset,
-          params$diameter_max, params$dimension_max, params$field_order
-        )
+    # compute PH listwise
+    ph_list <- switch(
+      params$engine,
+      "TDA" = simplicial_filtration_TDA(
+        data$dataset, params$filtration,
+        params$diameter_max, params$dimension_max, params$field_order,
+        library = "GUDHI"
+      ),
+      "GUDHI" = simplicial_filtration_TDA(
+        data$dataset, params$filtration,
+        params$diameter_max, params$dimension_max, params$field_order,
+        library = "GUDHI"
+      ),
+      "Dionysus" = simplicial_filtration_TDA(
+        data$dataset, params$filtration,
+        params$diameter_max, params$dimension_max, params$field_order,
+        library = "Dionysus"
+      ),
+      "ripserr" = simplicial_filtration_ripserr(
+        data$dataset,
+        params$diameter_max, params$dimension_max, params$field_order
       )
-      
-      # introduce identifier (and overwrite `dataset` column)
-      data$dataset <- seq(nrow(data))
-      for (i in seq_along(ph_list)) ph_list[[i]]$dataset <- i
-      # bind the list of output data frames
-      ph_data <- do.call(rbind, ph_list)
-      
-      # merge persistent homology data back into original data
-      data <- merge(data, ph_data, by = "dataset")
-      
-      # introduce or interact with 'group' aesthetic
-      data$group <- if (is.null(data$group)) {
-        interaction(as.character(data$dataset), data$dimension)
-      } else {
-        interaction(data$group, as.character(data$dataset), data$dimension)
-      }
-      data$dataset <- NULL
-      
+    )
+    
+    # introduce identifier (and overwrite `dataset` column)
+    data$dataset <- seq(nrow(data))
+    for (i in seq_along(ph_list)) ph_list[[i]]$dataset <- i
+    # bind the list of output data frames
+    ph_data <- do.call(rbind, ph_list)
+    
+    # merge persistent homology data back into original data
+    data <- merge(data, ph_data, by = "dataset")
+    
+    # introduce or interact with 'group' aesthetic
+    data$group <- if (is.null(data$group)) {
+      interaction(as.character(data$dataset), data$dimension)
+    } else {
+      interaction(data$group, as.character(data$dataset), data$dimension)
     }
+    # data$dataset <- NULL
+      
     
     data
   },
@@ -253,9 +209,6 @@ StatPersistence <- ggproto(
     order_by = c("persistence", "start"),
     decreasing = FALSE,
     diagram = "diagonal",
-    # REVIEW: Single data set param?
-    # point_cloud = NULL,
-    # 'dataset' aesthetic
     filtration = "Rips",
     diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
     field_order = 2L,
@@ -293,10 +246,6 @@ StatPersistence <- ggproto(
     # re-distinguish duplicates
     data$id <- order(order(data$id))
     
-    # diagram transformation
-    data <- diagram_transform(data, diagram)
-    
-    # return point data
     data
   }
 )
@@ -305,10 +254,8 @@ StatPersistence <- ggproto(
 #' @export
 stat_persistence <- function(mapping = NULL,
                              data = NULL,
-                             geom = "point",
+                             geom = "persistence",
                              position = "identity",
-                             # REVIEW: Single data set param?
-                             # point_cloud = NULL,
                              filtration = "Rips",
                              diameter_max = NULL, radius_max = NULL,
                              dimension_max = 1L,
@@ -316,7 +263,6 @@ stat_persistence <- function(mapping = NULL,
                              engine = NULL,
                              order_by = c("persistence", "start"),
                              decreasing = FALSE,
-                             diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
@@ -330,8 +276,6 @@ stat_persistence <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      # REVIEW: Single data set param?
-      # point_cloud = point_cloud,
       filtration = filtration,
       diameter_max = diameter_max, radius_max = radius_max,
       dimension_max = dimension_max,
@@ -339,8 +283,62 @@ stat_persistence <- function(mapping = NULL,
       engine = engine,
       order_by = order_by,
       decreasing = decreasing,
-      diagram = diagram,
       na.rm = na.rm,
+      ...
+    )
+  )
+}
+
+#' @rdname ggtda-ggproto
+#' @usage NULL
+#' @export
+GeomPersistence <- ggproto(
+  "GeomPersistence", GeomPoint,
+  
+  # Can use our StatPersistence
+  # OW, can pre-process and use StatIdentity
+  required_aes = c("dataset|start", "dataset|end"),
+  
+  setup_data = function(data, params) {
+    
+    if (is.null(data$dataset)) {
+      data$x <- data$start
+      data$y <- data$end
+    }
+    
+    # diagram transformation
+    data <- diagram_transform(data, diagram)
+    
+    # return point data
+    data
+    
+  }
+  
+  
+)
+
+#' @rdname persistence
+#' @export
+geom_persistence <- function(mapping = NULL,
+                             data = NULL,
+                             stat = "persistence",
+                             position = "identity",
+                             diagram = "diagonal",
+                             na.rm = FALSE,
+                             show.legend = NA,
+                             inherit.aes = TRUE,
+                             ...) {
+  
+  layer(
+    stat = stat,
+    data = data,
+    mapping = mapping,
+    geom = GeomPersistence,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      diagram = diagram,
       ...
     )
   )
@@ -419,6 +417,27 @@ GeomFundamentalBox <- ggproto(
   # https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/
   non_missing_aes = "size",
   rename_size = TRUE
+)
+
+
+# TODO -- This is odd, but devtools::load_all()
+#         is struggling with loading the prototypes of StatPersistence,
+#         unless they're all here.
+
+#' @rdname ggtda-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+StatBarcode <- ggproto(
+  "StatBarcode", StatPersistence
+)
+
+#' @rdname ggtda-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+StatLandscape <- ggproto(
+  "StatLandscape", StatPersistence
 )
 
 #' @rdname persistence

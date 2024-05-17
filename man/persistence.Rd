@@ -3,13 +3,14 @@
 \name{persistence}
 \alias{persistence}
 \alias{stat_persistence}
+\alias{geom_persistence}
 \alias{geom_fundamental_box}
 \title{Persistence diagrams}
 \usage{
 stat_persistence(
   mapping = NULL,
   data = NULL,
-  geom = "point",
+  geom = "persistence",
   position = "identity",
   filtration = "Rips",
   diameter_max = NULL,
@@ -19,6 +20,17 @@ stat_persistence(
   engine = NULL,
   order_by = c("persistence", "start"),
   decreasing = FALSE,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+geom_persistence(
+  mapping = NULL,
+  data = NULL,
+  stat = "persistence",
+  position = "identity",
   diagram = "diagonal",
   na.rm = FALSE,
   show.legend = NA,
@@ -91,9 +103,6 @@ features should be ordered (within \code{group}); defaults to \code{c("persisten
 \item{decreasing}{Logical; whether to sort features by decreasing values of
 \code{order_by} (again, within \code{group}).}
 
-\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
-orientation for the diagram should take.}
-
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
 (regardless of the color scheme).}
@@ -115,6 +124,9 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
 stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
 \code{"stat_count"})}
+
+\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
+orientation for the diagram should take.}
 
 \item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
@@ -158,8 +170,7 @@ time points (Chung & Lawson, 2020).
 
 \code{stat_persistence()} understands the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{start} \emph{or} \code{dataset}}
-\item \strong{\code{end} \emph{or} \code{dataset}}
+\item \strong{\code{dataset}}
 \item \code{group}
 }
 \code{geom_fundamental_box()} understands the following aesthetics (required aesthetics are in bold):
