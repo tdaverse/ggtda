@@ -60,14 +60,31 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use to display the data, either as a
-\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
-\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
+\item{geom}{The geometric object to use to display the data for this layer.
+When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
+can be used to override the default coupling between stats and geoms. The
+\code{geom} argument accepts the following:
+\itemize{
+\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
+\item A string naming the geom. To give the geom as a string, strip the
+function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
+give the geom as \code{"point"}.
+\item For more information and other ways to specify the geom, see the
+\link[ggplot2:layer_geoms]{layer geom} documentation.
+}}
 
-\item{position}{Position adjustment, either as a string naming the adjustment
-(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
-position adjustment function. Use the latter if you need to change the
-settings of the adjustment.}
+\item{position}{A position adjustment to use on the data for this layer. This
+can be used in various ways, including to prevent overplotting and
+improving the display. The \code{position} argument accepts the following:
+\itemize{
+\item The result of calling a position function, such as \code{position_jitter()}.
+This method allows for passing extra arguments to the position.
+\item A string naming the position adjustment. To give the position as a
+string, strip the function name of the \code{position_} prefix. For example,
+to use \code{position_jitter()}, give the position as \code{"jitter"}.
+\item For more information and other ways to specify the position, see the
+\link[ggplot2:layer_positions]{layer position} documentation.
+}}
 
 \item{filtration}{The type of filtration from which to compute persistent
 homology; one of \code{"Rips"}, \code{"Vietoris"} (equivalent) or \code{"alpha"}.}
@@ -85,7 +102,7 @@ persistent homology.}
 defaults are chosen based on \code{filtration}.}
 
 \item{order_by}{A character vector of required or computed variables
-(\code{"start"}, \code{"end"}, \code{"part"}, and/or \code{"persistence"}) by which the
+(\code{"start"}, \code{"end"}, and/or \code{"persistence"}) by which the
 features should be ordered (within \code{group}); defaults to \code{c("persistence", "start")}. This will most notably impact the appearance of \link{barcode}s.}
 
 \item{decreasing}{Logical; whether to sort features by decreasing values of
@@ -111,10 +128,18 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{stat}{The statistical transformation to use on the data for this
-layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
-stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
-\code{"stat_count"})}
+\item{stat}{The statistical transformation to use on the data for this layer.
+When using a \verb{geom_*()} function to construct a layer, the \code{stat}
+argument can be used the override the default coupling between geoms and
+stats. The \code{stat} argument accepts the following:
+\itemize{
+\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
+\item A string naming the stat. To give the stat as a string, strip the
+function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
+give the stat as \code{"count"}.
+\item For more information and other ways to specify the stat, see the
+\link[ggplot2:layer_stats]{layer stat} documentation.
+}}
 
 \item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
@@ -142,9 +167,6 @@ death, and dimension.
 }
 
 \section{Persistence diagrams}{
-
-Persistence diagrams recognize extended persistence data, with negative
-birth/death values arising from the relative part of the filtration.
 
 The original persistence diagrams plotted persistence against birth in what
 we call "flat" diagrams, but most plot death against birth in "diagonal"
@@ -183,7 +205,6 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \item \code{after_stat(dimension)}\cr integer feature dimension (from 'dataset' aesthetic).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
 \item \code{after_stat(id)}\cr character feature identifier (across 'group').
-\item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
 }
 }
@@ -237,8 +258,9 @@ ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
 # toy extended persistence data, adapted from Carriere & Oudot (2015)
 eph.data <- data.frame(
   dimension = c(0L, 1L, 0L, 1L),
-  birth = c(1, -9, 1, 8),
-  death = c(5, -7, -11, -3)
+  part = c("Ord", "Rel", "Ext+", "Ext–"),
+  birth = c(1, 9, 1, 8),
+  death = c(5, 7, 11, 3)
 )
 # extended persistence diagram
 ggplot(eph.data,
