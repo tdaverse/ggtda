@@ -110,7 +110,6 @@ StatPersistence <- ggproto(
     
     # Check that `start` and `end` aesthetics haven't been incorrectly supplied
     if (!is.null(data$start) | !is.null(data$end)) {
-      # TODO -- This error message is too long and needs rewording
       stop(paste0("`start` and `end` aesthetics have been supplied.\n", class(self)[1], " only accepts the `dataset` aesthetic.\nDid you mean to use `stat = \"identity\"`?"))
     }
     
@@ -208,17 +207,19 @@ StatPersistence <- ggproto(
     data, scales,
     order_by = c("persistence", "start"),
     decreasing = FALSE,
-    diagram = "diagonal",
     filtration = "Rips",
     diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
     field_order = 2L,
     engine = NULL
   ) {
     
-    # points in cartesian coordinates (un-negated from opposite filtration)
-    data$x <- abs(data$start)
-    data$y <- abs(data$end)
+    data$x <- data$start
+    data$y <- data$end
     
+    # Cast dimension as ordered factor, with levels ranging from 0 to specified max dim
+    data$dimension <- ordered(data$dimension, c(0, seq_len(dimension_max)))
+    
+    # TODO -- check main, Cory thinks this has been removed
     # compute 'part'
     data$part <- with(data, {
       part <- NA_character_
@@ -306,16 +307,24 @@ GeomPersistence <- ggproto(
       data$y <- data$end
     }
     
-    # diagram transformation
-    data <- diagram_transform(data, params$diagram)
-    
-    # return point data
     data
+    
+  },
+  
+  draw_panel = function(self, data, panel_params, coord, na.rm = FALSE, diagram = "diagonal") {
+    
+    # First transform (start, end) x-y pairs to desired parameterization
+    data <- diagram_transform(data, diagram)
+    
+    # Use GeomPoint's draw method with transformed data
+    grob <- GeomPoint$draw_panel(data, panel_params, coord, na.rm)
+    grob$name <- grid::grobName(grob, "geom_persistence")
+    grob
     
   }
   
-  
 )
+
 
 #' @rdname persistence
 #' @export
@@ -339,6 +348,7 @@ geom_persistence <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       diagram = diagram,
+      na.rm = na.rm,
       ...
     )
   )
@@ -422,7 +432,7 @@ GeomFundamentalBox <- ggproto(
 
 # TODO -- This is odd, but devtools::load_all()
 #         is struggling with loading the prototypes of StatPersistence,
-#         unless they're all here.
+#         unless they're all here (as opposed to other, more reasonable .R files)
 
 #' @rdname ggtda-ggproto
 #' @format NULL
@@ -473,6 +483,8 @@ geom_fundamental_box <- function(mapping = NULL,
 
 order_by_options <- c("start", "end", "part", "persistence")
 
+# Transform given (x, y) columns in `data` which represent (birth, death) values
+# into different parameterizations/coordinate systems
 diagram_transform <- function(data, diagram) {
   switch(
     match.arg(diagram, c("flat", "diagonal", "landscape")),

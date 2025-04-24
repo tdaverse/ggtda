@@ -169,7 +169,14 @@ GeomLandscape <- ggproto(
     data <- as.data.frame(data)
     names(data) <- c("x", "y")
     # compute level of each frontier
+    # TODO -- this is NOT available via `after_stat()` as this is now in `$draw_group()`
+    #      -- see below note on refactor to fix this
     data$level <- rep(seq(length(pl)), sapply(pl, nrow))
+    
+    # TODO -- factor out everything above, use function implementation in specific StatLandscape$compute_group()
+    #      -- would inherit from StatPersistence, compute_group() would first 
+    #      -- do persistence compute_group(), then landscape-specific computation w/ function implementation
+    #      -- this allows for pre-processing (birth, death) data into landscape style data to plot w/ StatIdentity
     
     # diagram transformation
     data <- diagram_transform(data, diagram)
