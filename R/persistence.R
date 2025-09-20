@@ -442,14 +442,6 @@ StatBarcode <- ggproto(
   "StatBarcode", StatPersistence
 )
 
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
-StatLandscape <- ggproto(
-  "StatLandscape", StatPersistence
-)
-
 #' @rdname persistence
 #' @export
 geom_fundamental_box <- function(mapping = NULL,

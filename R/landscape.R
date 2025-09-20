@@ -51,7 +51,54 @@ NULL
 
 # file.edit("inst/examples/ex-landscape.R")
 
-
+#' @rdname ggtda-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+StatLandscape <- ggproto(
+  
+  # "StatLandscape", StatPersistence,
+  
+  # Don't want StatPersistence's compute_panel()
+  # compute_panel = Stat$compute_panel,
+  # compute_panel = function(data, scales, ...) {
+  #   Stat$compute_panel(data, scales, ...)
+  # },
+  
+  # Can't get inheritance to work w/ StatPersistence,
+  # it uses $compute_panel(), we need to use $compute_group()
+  "StatLandscape", StatPersistence,
+  
+  compute_panel = function(
+    data, scales,
+    order_by = c("persistence", "start"),
+    decreasing = FALSE,
+    filtration = "Rips",
+    diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
+    field_order = 2L,
+    engine = NULL,
+    n_levels = Inf
+  ) { 
+    
+    # First, get persistence representation
+    data <- StatPersistence$compute_panel(
+      data, scales,
+      order_by,
+      decreasing,
+      filtration,
+      diameter_max,
+      radius_max,
+      dimension_max,
+      field_order,
+      engine
+    )
+    
+    # Next, transform to landscape (path) representation
+    # TODO -- need to join these results back into all the extra columns in `data`
+    landscape_path(data, n_levels)
+  }
+  
+)
 
 #' @rdname landscape
 #' @export
@@ -59,11 +106,13 @@ stat_landscape <- function(mapping = NULL,
                            data = NULL,
                            geom = "landscape",
                            position = "identity",
+                           order_by = c("persistence", "start"),
                            filtration = "Rips",
                            diameter_max = NULL, radius_max = NULL,
                            dimension_max = 1L,
-                           field_order = 2L,
+                           field_order = 2L, 
                            engine = NULL,
+                           n_levels = Inf,
                            na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE,
@@ -82,6 +131,7 @@ stat_landscape <- function(mapping = NULL,
       dimension_max = dimension_max,
       field_order = field_order,
       engine = engine,
+      n_levels = n_levels,
       na.rm = na.rm,
       ...
     )
@@ -95,96 +145,20 @@ stat_landscape <- function(mapping = NULL,
 GeomLandscape <- ggproto(
   "GeomLandscape", Geom,
   
-  required_aes = c("dataset|start", "dataset|end"),
+  # required_aes = c("dataset|start", "dataset|end"),
+  required_aes = c("x", "y"),
   
   default_aes = GeomPath$default_aes,
   
   draw_key = GeomPath$draw_key,
   
   draw_group = function(data, panel_params, coord, 
-                        diagram = "landscape", n_levels = Inf,
+                        diagram = "landscape",
                         lineend = "butt", linejoin = "round", linemitre = 10) {
-     
-    
-    # empty case
-    if (nrow(data) == 0L) {
-      names(data)[match(c("start", "end"), names(data))] <- c("x", "y")
-      return(data)
-    }
-    
-    # first row (for aesthetics)
-    first_row <- data[1L, setdiff(names(data), c("start", "end")), drop = FALSE]
-    rownames(first_row) <- NULL
-    
-    # iteratively peel and stack frontiers
-    # NB: points along slopes are not discarded
-    pd <- as.matrix(data[, c("start", "end"), drop = FALSE])
-    pl <- list()
-    k <- 0L
-    while (k < n_levels && nrow(pd) > 0L) {
-      k <- k + 1L
-      
-      # identify frontier points
-      pd <- pd[order(pd[, 1L], -pd[, 2L]), , drop = FALSE]
-      peak_ids <- which(! duplicated(cummax(pd[, 2L])))
-      peaks <- pd[peak_ids, , drop = FALSE]
-      
-      # identify col points
-      cols <- cbind(
-        start = c(peaks[, 1L], peaks[nrow(peaks), 2L]),
-        end = c(peaks[1L, 1L], peaks[, 2L])
-      )
-      
-      # flatten valleys
-      valley_ids <- which(cols[, 1L] > cols[, 2L])
-      for (i in rev(valley_ids)) {
-        cols <- rbind(
-          cols[seq(i - 1L), , drop = FALSE],
-          cols[i, c(2L, 2L), drop = FALSE],
-          cols[i, c(1L, 1L), drop = FALSE],
-          cols[seq(i + 1L, nrow(cols)), , drop = FALSE]
-        )
-      }
-      
-      # extract frontier
-      frontier <- rbind(peaks, cols)
-      frontier <- frontier[order(frontier[, 1L], frontier[, 2L]), ]
-      frontier <- rbind(
-        # frontier[1L, ] - Inf,
-        c(-Inf, -Inf),
-        frontier,
-        # frontier[nrow(frontier), ] + Inf
-        c(Inf, Inf)
-      )
-      pl[[k]] <- frontier
-      
-      # reset persistence diagram
-      pd <- pd[-peak_ids, , drop = FALSE]
-      pd <- rbind(pd, cols[-c(1L, nrow(cols)), , drop = FALSE])
-      pd <- pd[pd[, 1L] < pd[, 2L], , drop = FALSE]
-    }
-    
-    # data frame
-    data <- do.call(rbind, pl)
-    data <- as.data.frame(data)
-    names(data) <- c("x", "y")
-    # compute level of each frontier
-    # TODO -- this is NOT available via `after_stat()` as this is now in `$draw_group()`
-    #      -- see below note on refactor to fix this
-    data$level <- rep(seq(length(pl)), sapply(pl, nrow))
-    
-    # TODO -- factor out everything above, use function implementation in specific StatLandscape$compute_group()
-    #      -- would inherit from StatPersistence, compute_group() would first 
-    #      -- do persistence compute_group(), then landscape-specific computation w/ function implementation
-    #      -- this allows for pre-processing (birth, death) data into landscape style data to plot w/ StatIdentity
-    
+
     # diagram transformation
     data <- diagram_transform(data, diagram)
     data$slope <- diagram_slope(diagram)
-    
-    # return landscape data
-    data <- cbind(data, first_row)
-    
     
     # # adapted from `ggplot2::GeomPath`
     # # (data should already be ordered; or, order by slope)
@@ -230,7 +204,6 @@ geom_landscape <- function(mapping = NULL,
                            stat = "landscape",
                            position = "identity",
                            diagram = "landscape",
-                           n_levels = Inf,
                            lineend = "butt",
                            linejoin = "round",
                            linemitre = 10,
@@ -248,7 +221,6 @@ geom_landscape <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       diagram = diagram,
-      n_levels = n_levels,
       lineend = lineend,
       linejoin = linejoin,
       linemitre = linemitre,
@@ -275,6 +247,82 @@ geom_landscape <- function(mapping = NULL,
 #   names(x) <- c("start", "end")
 #   rPref::psel.indices(x, rPref::low("start") * rPref::high("end"))
 # }
+
+# data argument is a data.frame with columns "start" and "end",
+# as returned by engines
+# TODO -- Currently dropping `$dimension` column in data
+#         need to join elements of pl to their dimensions.
+landscape_path <- function(data, n_levels = Inf) {
+  
+  # empty case
+  if (nrow(data) == 0L) {
+    names(data)[match(c("start", "end"), names(data))] <- c("x", "y")
+    return(data)
+  }
+  
+  # first row (for aesthetics)
+  first_row <- data[1L, setdiff(names(data), c("start", "end", "x", "y")), drop = FALSE]
+  rownames(first_row) <- NULL
+  
+  # iteratively peel and stack frontiers
+  # NB: points along slopes are not discarded
+  pd <- as.matrix(data[, c("start", "end"), drop = FALSE])
+  pl <- list()
+  k <- 0L
+  while (k < n_levels && nrow(pd) > 0L) {
+    k <- k + 1L
+    
+    # identify frontier points
+    pd <- pd[order(pd[, 1L], -pd[, 2L]), , drop = FALSE]
+    peak_ids <- which(! duplicated(cummax(pd[, 2L])))
+    peaks <- pd[peak_ids, , drop = FALSE]
+    
+    # identify col points
+    cols <- cbind(
+      start = c(peaks[, 1L], peaks[nrow(peaks), 2L]),
+      end = c(peaks[1L, 1L], peaks[, 2L])
+    )
+    
+    # flatten valleys
+    valley_ids <- which(cols[, 1L] > cols[, 2L])
+    for (i in rev(valley_ids)) {
+      cols <- rbind(
+        cols[seq(i - 1L), , drop = FALSE],
+        cols[i, c(2L, 2L), drop = FALSE],
+        cols[i, c(1L, 1L), drop = FALSE],
+        cols[seq(i + 1L, nrow(cols)), , drop = FALSE]
+      )
+    }
+    
+    # extract frontier
+    frontier <- rbind(peaks, cols)
+    frontier <- frontier[order(frontier[, 1L], frontier[, 2L]), ]
+    frontier <- rbind(
+      # frontier[1L, ] - Inf,
+      c(-Inf, -Inf),
+      frontier,
+      # frontier[nrow(frontier), ] + Inf
+      c(Inf, Inf)
+    )
+    pl[[k]] <- frontier
+    
+    # reset persistence diagram
+    pd <- pd[-peak_ids, , drop = FALSE]
+    pd <- rbind(pd, cols[-c(1L, nrow(cols)), , drop = FALSE])
+    pd <- pd[pd[, 1L] < pd[, 2L], , drop = FALSE]
+  }
+  
+  # data frame
+  data <- do.call(rbind, pl)
+  data <- as.data.frame(data)
+  names(data) <- c("x", "y")
+  data$level <- rep(seq(length(pl)), sapply(pl, nrow))
+  
+  data <- cbind(data, first_row)
+  
+  data
+}
+
 
 diagram_slope <- function(diagram) {
   switch(
