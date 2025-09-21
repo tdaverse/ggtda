@@ -9,8 +9,6 @@
 \alias{StatPersistence}
 \alias{GeomPersistence}
 \alias{GeomFundamentalBox}
-\alias{StatBarcode}
-\alias{StatLandscape}
 \alias{GeomLandscape}
 \alias{StatSimplicialComplex}
 \alias{GeomSimplicialComplex}
@@ -18,7 +16,7 @@
 \format{
 An object of class \code{GeomBarcode} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{GeomPersistence} (inherits from \code{GeomPoint}, \code{Geom}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{GeomPersistence} (inherits from \code{GeomPoint}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
 }
 \description{
 Base \code{ggproto} classes for \emph{ggtda}

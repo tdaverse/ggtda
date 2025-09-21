@@ -2,30 +2,9 @@
 % Please edit documentation in R/barcode.R
 \name{barcode}
 \alias{barcode}
-\alias{stat_barcode}
 \alias{geom_barcode}
 \title{Barcodes}
 \usage{
-stat_barcode(
-  mapping = NULL,
-  data = NULL,
-  geom = "barcode",
-  position = "identity",
-  filtration = "Rips",
-  diameter_max = NULL,
-  radius_max = NULL,
-  dimension_max = 1L,
-  field_order = 2L,
-  engine = NULL,
-  order_by = c("persistence", "start"),
-  decreasing = FALSE,
-  diagram = "diagonal",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
 geom_barcode(
   mapping = NULL,
   data = NULL,
@@ -58,14 +37,21 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use to display the data, either as a
-\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
-\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
+\item{stat}{The The statistical transformation to use on the data.
+Defaults to \code{identity}; pass a string to override the default.}
 
-\item{position}{Position adjustment, either as a string naming the adjustment
-(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
-position adjustment function. Use the latter if you need to change the
-settings of the adjustment.}
+\item{position}{A position adjustment to use on the data for this layer. This
+can be used in various ways, including to prevent overplotting and
+improving the display. The \code{position} argument accepts the following:
+\itemize{
+\item The result of calling a position function, such as \code{position_jitter()}.
+This method allows for passing extra arguments to the position.
+\item A string naming the position adjustment. To give the position as a
+string, strip the function name of the \code{position_} prefix. For example,
+to use \code{position_jitter()}, give the position as \code{"jitter"}.
+\item For more information and other ways to specify the position, see the
+\link[ggplot2:layer_positions]{layer position} documentation.
+}}
 
 \item{na.rm}{Logical:
 if \code{FALSE}, the default, \code{NA} lodes are not included;
@@ -84,9 +70,6 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
-
-\item{stat}{The The statistical transformation to use on the data.
-Defaults to \code{identity}; pass a string to override the default.}
 }
 \description{
 Visualize persistence data in a barcode diagram.

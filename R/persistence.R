@@ -219,7 +219,7 @@ StatPersistence <- ggproto(
     # Cast dimension as ordered factor, with levels ranging from 0 to specified max dim
     data$dimension <- ordered(data$dimension, c(0, seq_len(dimension_max)))
     
-    # TODO -- check main, Cory thinks this has been removed
+    # TODO -- Cory thinks these should likely be removed?
     # compute 'part'
     data$part <- with(data, {
       part <- NA_character_
@@ -429,18 +429,6 @@ GeomFundamentalBox <- ggproto(
   rename_size = TRUE
 )
 
-
-# TODO -- This is odd, but devtools::load_all()
-#         is struggling with loading the prototypes of StatPersistence,
-#         unless they're all here (as opposed to other, more reasonable .R files)
-
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
-StatBarcode <- ggproto(
-  "StatBarcode", StatPersistence
-)
 
 #' @rdname persistence
 #' @export

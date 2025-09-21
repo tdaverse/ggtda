@@ -2,34 +2,16 @@
 % Please edit documentation in R/landscape.R
 \name{landscape}
 \alias{landscape}
-\alias{stat_landscape}
 \alias{geom_landscape}
 \title{Persistence landscapes}
 \usage{
-stat_landscape(
-  mapping = NULL,
-  data = NULL,
-  geom = "landscape",
-  position = "identity",
-  filtration = "Rips",
-  diameter_max = NULL,
-  radius_max = NULL,
-  dimension_max = 1L,
-  field_order = 2L,
-  engine = NULL,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  ...
-)
-
 geom_landscape(
   mapping = NULL,
   data = NULL,
-  stat = "landscape",
+  stat = "persistence",
+  n_levels = Inf,
   position = "identity",
   diagram = "landscape",
-  n_levels = Inf,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -60,29 +42,43 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use to display the data, either as a
-\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
-\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
+\item{stat}{The statistical transformation to use on the data for this layer.
+When using a \verb{geom_*()} function to construct a layer, the \code{stat}
+argument can be used the override the default coupling between geoms and
+stats. The \code{stat} argument accepts the following:
+\itemize{
+\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
+\item A string naming the stat. To give the stat as a string, strip the
+function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
+give the stat as \code{"count"}.
+\item For more information and other ways to specify the stat, see the
+\link[ggplot2:layer_stats]{layer stat} documentation.
+}}
 
-\item{position}{Position adjustment, either as a string naming the adjustment
-(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
-position adjustment function. Use the latter if you need to change the
-settings of the adjustment.}
+\item{n_levels}{The number of levels to compute and plot. If \code{Inf} (the
+default), determined to be all levels.}
 
-\item{filtration}{The type of filtration from which to compute persistent
-homology; one of \code{"Rips"}, \code{"Vietoris"} (equivalent) or \code{"alpha"}.}
+\item{position}{A position adjustment to use on the data for this layer. This
+can be used in various ways, including to prevent overplotting and
+improving the display. The \code{position} argument accepts the following:
+\itemize{
+\item The result of calling a position function, such as \code{position_jitter()}.
+This method allows for passing extra arguments to the position.
+\item A string naming the position adjustment. To give the position as a
+string, strip the function name of the \code{position_} prefix. For example,
+to use \code{position_jitter()}, give the position as \code{"jitter"}.
+\item For more information and other ways to specify the position, see the
+\link[ggplot2:layer_positions]{layer position} documentation.
+}}
 
-\item{diameter_max, radius_max}{Maximum diameter or radius for the simplicial
-filtration. Both default to \code{NULL}, in which case the complete filtration
-is constructed.}
+\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
+orientation for the diagram should take.}
 
-\item{dimension_max}{Maximum dimension of the simplicial filtration.}
+\item{lineend}{Line end style (round, butt, square).}
 
-\item{field_order}{(Prime) order of the field over which to compute
-persistent homology.}
+\item{linejoin}{Line join style (round, mitre, bevel).}
 
-\item{engine}{The computational engine to use (see 'Details'). Reasonable
-defaults are chosen based on \code{filtration}.}
+\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
@@ -98,27 +94,33 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
-often aesthetics, used to set an aesthetic to a fixed value, like
-\code{colour = "red"} or \code{size = 3}. They may also be parameters
-to the paired geom/stat.}
-
-\item{stat}{The statistical transformation to use on the data for this
-layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
-stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
-\code{"stat_count"})}
-
-\item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
-orientation for the diagram should take.}
-
-\item{n_levels}{The number of levels to compute and plot. If \code{Inf} (the
-default), determined to be all levels.}
-
-\item{lineend}{Line end style (round, butt, square).}
-
-\item{linejoin}{Line join style (round, mitre, bevel).}
-
-\item{linemitre}{Line mitre limit (number greater than 1).}
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
+arguments broadly fall into one of 4 categories below. Notably, further
+arguments to the \code{position} argument, or aesthetics that are required
+can \emph{not} be passed through \code{...}. Unknown arguments that are not part
+of the 4 categories below are ignored.
+\itemize{
+\item Static aesthetics that are not mapped to a scale, but are at a fixed
+value and apply to the layer as a whole. For example, \code{colour = "red"}
+or \code{linewidth = 3}. The geom's documentation has an \strong{Aesthetics}
+section that lists the available options. The 'required' aesthetics
+cannot be passed on to the \code{params}. Please note that while passing
+unmapped aesthetics as vectors is technically possible, the order and
+required length is not guaranteed to be parallel to the input data.
+\item When constructing a layer using
+a \verb{stat_*()} function, the \code{...} argument can be used to pass on
+parameters to the \code{geom} part of the layer. An example of this is
+\code{stat_density(geom = "area", outline.type = "both")}. The geom's
+documentation lists which parameters it can accept.
+\item Inversely, when constructing a layer using a
+\verb{geom_*()} function, the \code{...} argument can be used to pass on parameters
+to the \code{stat} part of the layer. An example of this is
+\code{geom_area(stat = "density", adjust = 0.5)}. The stat's documentation
+lists which parameters it can accept.
+\item The \code{key_glyph} argument of \code{\link[ggplot2:layer]{layer()}} may also be passed on through
+\code{...}. This can be one of the functions described as
+\link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
+}}
 }
 \description{
 Visualize persistence data as a persistence landscape.
@@ -132,26 +134,6 @@ been generated from the same underlying topological structure.
 
 Persistence landscapes do not currently recognize extended persistence data.
 }
-\section{Aesthetics}{
-
-\code{stat_landscape()} understands the following aesthetics (required aesthetics are in bold):
-\itemize{
-\item \strong{\code{dataset}}
-\item \code{group}
-}
-\code{geom_landscape()} understands the following aesthetics (required aesthetics are in bold):
-\itemize{
-\item \strong{\code{dataset} \emph{or} \code{start}}
-\item \strong{\code{dataset} \emph{or} \code{end}}
-\item \code{alpha}
-\item \code{colour}
-\item \code{group}
-\item \code{linetype}
-\item \code{linewidth}
-}
-Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
-}
-
 \section{Computed variables}{
 
 \code{stat_landscape} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
@@ -178,20 +160,17 @@ ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  geom_persistence(stat = "Identity") +
-  geom_landscape(stat = "Identity") +
-  # geom_landscape(stat = "Identity", diagram = "diagonal") +
+  stat_persistence() +
+  stat_landscape(aes(alpha = -after_stat(level)), diagram = "diagonal") +
   lims(x = c(0, 8), y = c(0, NA)) +
   guides(alpha = "none")
-
 # persistence landscape with diagram overlaid
 ggplot(toy.data,
        aes(start = birth, end = death, colour = dim, shape = dim)) +
   theme_persist() +
   coord_equal() +
-  # stat_landscape(aes(linetype = after_stat(factor(level)))) +
-  # geom_persistence(stat = "Identity", diagram = "diagonal") +
-  geom_persistence(stat = "Identity") +
+  stat_landscape(aes(linetype = after_stat(factor(level)))) +
+  stat_persistence(diagram = "landscape") +
   lims(x = c(0, 8), y = c(0, NA)) +
   labs(linetype = "level")
 

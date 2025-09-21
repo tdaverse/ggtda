@@ -54,7 +54,7 @@ Suggests:
 URL: https://tdaverse.github.io/ggtda/
 BugReports: https://github.com/rrrlw/ggtda/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Collate: 
     'barcode.R'

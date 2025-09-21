@@ -55,135 +55,69 @@ NULL
 #' @format NULL
 #' @usage NULL
 #' @export
-StatLandscape <- ggproto(
-  
-  # "StatLandscape", StatPersistence,
-  
-  # Don't want StatPersistence's compute_panel()
-  # compute_panel = Stat$compute_panel,
-  # compute_panel = function(data, scales, ...) {
-  #   Stat$compute_panel(data, scales, ...)
-  # },
-  
-  # Can't get inheritance to work w/ StatPersistence,
-  # it uses $compute_panel(), we need to use $compute_group()
-  "StatLandscape", StatPersistence,
-  
-  compute_panel = function(
-    data, scales,
-    order_by = c("persistence", "start"),
-    decreasing = FALSE,
-    filtration = "Rips",
-    diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
-    field_order = 2L,
-    engine = NULL,
-    n_levels = Inf
-  ) { 
-    
-    # First, get persistence representation
-    data <- StatPersistence$compute_panel(
-      data, scales,
-      order_by,
-      decreasing,
-      filtration,
-      diameter_max,
-      radius_max,
-      dimension_max,
-      field_order,
-      engine
-    )
-    
-    # Next, transform to landscape (path) representation
-    # TODO -- need to join these results back into all the extra columns in `data`
-    landscape_path(data, n_levels)
-  }
-  
-)
-
-#' @rdname landscape
-#' @export
-stat_landscape <- function(mapping = NULL,
-                           data = NULL,
-                           geom = "landscape",
-                           position = "identity",
-                           order_by = c("persistence", "start"),
-                           filtration = "Rips",
-                           diameter_max = NULL, radius_max = NULL,
-                           dimension_max = 1L,
-                           field_order = 2L, 
-                           engine = NULL,
-                           n_levels = Inf,
-                           na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE,
-                           ...) {
-  layer(
-    stat = StatLandscape,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      filtration = filtration,
-      diameter_max = diameter_max, radius_max = radius_max,
-      dimension_max = dimension_max,
-      field_order = field_order,
-      engine = engine,
-      n_levels = n_levels,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
 GeomLandscape <- ggproto(
   "GeomLandscape", Geom,
   
-  # required_aes = c("dataset|start", "dataset|end"),
-  required_aes = c("x", "y"),
+  required_aes = c("dataset|start", "dataset|end"),
   
   default_aes = GeomPath$default_aes,
   
   draw_key = GeomPath$draw_key,
   
-  draw_group = function(data, panel_params, coord, 
-                        diagram = "landscape",
-                        lineend = "butt", linejoin = "round", linemitre = 10) {
+  setup_data = function(data, params) {
 
+    # introduce numerical x-values in order to allow coordinate transforms
+    data$x <- data$start
+    data$y <- data$end
+
+    data
+  },
+  
+  draw_group = function(
+    data,
+    panel_params,
+    coord,
+    n_levels = Inf,
+    diagram = "landscape",
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10
+  ) {
+    
+    # persistence homology -> path representation of landscape diagram
+    data <- landscape_path(data, n_levels)
+    
     # diagram transformation
     data <- diagram_transform(data, diagram)
     data$slope <- diagram_slope(diagram)
-    
+  
     # # adapted from `ggplot2::GeomPath`
     # # (data should already be ordered; or, order by slope)
     # data <- data[order(data$group), , drop = FALSE]
-    
+  
     # adapted from `ggplot2::GeomAbline`
     ranges <- coord$backtransform_range(panel_params)
     if (coord$clip == "on" && coord$is_linear()) {
       ranges$x <- ranges$x + c(-1, 1) * diff(ranges$x)
     }
-    
+  
     # extend each level to the extended range
     data <- diagram_horizon(data, ranges)
-    
+  
     # adapted from `ggplot2::GeomPath`
     munched <- coord_munch(coord, data, panel_params)
     group_diff <- munched$group[-1L] != munched$group[-nrow(munched)]
     start <- c(TRUE, group_diff)
-    end   <- c(group_diff, TRUE)
+    end <- c(group_diff, TRUE)
     grob <- grid::segmentsGrob(
-      x0 = munched$x[!end],   y0 = munched$y[!end],
-      x1 = munched$x[!start], y1 = munched$y[!start],
-      default.units = "native", arrow = NULL,
+      x0 = munched$x[!end],
+      y0 = munched$y[!end],
+      x1 = munched$x[!start],
+      y1 = munched$y[!start],
+      default.units = "native",
+      arrow = NULL,
       gp = grid::gpar(
-        col =  alpha(munched$colour, munched$alpha)[!end],
+        col = alpha(munched$colour, munched$alpha)[!end],
         fill = alpha(munched$colour, munched$alpha)[!end],
         lwd = (munched$linewidth[!end] %||% munched$size[!end]) * .pt,
         lty = munched$linetype[!end],
@@ -201,7 +135,8 @@ GeomLandscape <- ggproto(
 #' @export
 geom_landscape <- function(mapping = NULL,
                            data = NULL,
-                           stat = "landscape",
+                           stat = "persistence",
+                           n_levels = Inf,
                            position = "identity",
                            diagram = "landscape",
                            lineend = "butt",
@@ -220,6 +155,7 @@ geom_landscape <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      n_levels = n_levels,
       diagram = diagram,
       lineend = lineend,
       linejoin = linejoin,
@@ -250,8 +186,6 @@ geom_landscape <- function(mapping = NULL,
 
 # data argument is a data.frame with columns "start" and "end",
 # as returned by engines
-# TODO -- Currently dropping `$dimension` column in data
-#         need to join elements of pl to their dimensions.
 landscape_path <- function(data, n_levels = Inf) {
   
   # empty case
@@ -260,7 +194,7 @@ landscape_path <- function(data, n_levels = Inf) {
     return(data)
   }
   
-  # first row (for aesthetics)
+  # first row (for group-level aesthetics)
   first_row <- data[1L, setdiff(names(data), c("start", "end", "x", "y")), drop = FALSE]
   rownames(first_row) <- NULL
   
