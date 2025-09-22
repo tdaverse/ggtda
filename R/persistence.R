@@ -1,42 +1,120 @@
-#' @title Persistence diagrams
+#' @title Persistence homologies
 #'
-#' @description Visualize persistence data in a (flat, diagonal, or landscape)
-#'   persistence diagram.
+#' @description 
+#'   Compute persistence homologies with `stat_persistence()` and
+#'   plot different visual representations with
+#'   persistence diagrams, persistence landscapes, and barcode diagrams
+#'   using `geom_persistence()`, `geom_landscape()`, and `geom_barcode()`, respectively.
 #'   
-
-#' @details
-#'
-#' {*Persistence diagrams*} are
-#' [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
-#' persistence data.
+#'   Briefly, these representations can be understood as follows:
+#'   \itemize{
+#'   
+#'   \item{**Persistence diagrams**}{
+#'   are [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
+#'   persistence data.
+#'   }
+#'   
+#'   \item{**Persistence landscapes**}{
+#'   TODO
+#'   }
+#'   
+#'   \item{**Barcode diagrams**}{
+#'   are [vertical interval
+#'   plots](https://ggplot2.tidyverse.org/reference/geom_linerange.html) of
+#'   persistence data.
+#'   }
+#'   
+#'   }
+#'   
+#'   For a more thorough treatment of these representations,
+#'   refer to the **Details** section below and
+#'   \code{vignette("visualize-persistence", package = "ggtda")}.
+#'   
+#' @eval rd_sec_aesthetics(
+#'   stat_persistence = StatPersistence,
+#'   geom_persistence = GeomPersistence,
+#'   geom_landscape = GeomLandscape,
+#'   geom_barcode = GeomBarcode,
+#'   geom_fundamental_box = GeomFundamentalBox
+#' )
 #' 
-
-#' @template persistence-data
+#' @details
+#' 
+#' Here we provide clarification on the two ways these functions accept data 
+#' (via the `dataset` aesthetic with `stat_persistence()` and the 
+#' `start` and `end` aesthetics in with `stat_identity()`).
+#' We also provide basic theoretical treatments of the methods for visualizing 
+#' persistent homologies.
+#' 
+#' ## Point cloud data:
+#' 
+#'   TODO - Speak to types of data `dataset` aesthetic accepts, preempting 
+#'   discussion of "persistence data".
+#'   
+#'   TODO - Include minor details on how **ggtda** accepts point cloud data
+#'   (list column with matrix, dataframe, etc).
+#'   Direct to \code{vignette("grouped-list-data", package = "ggtda")}.
+#' 
+#' ## Persistence data:
+#' 
+#'   *Persistence data* encode the values of an underlying parameter
+#'   \eqn{\epsilon} at which topological features appear ("birth") and disappear
+#'   ("death"). The difference between the birth and the death of a feature is
+#'   called its *persistence*. As topological features may be of different
+#'   dimensions, persistence data sets usually also include the dimension of
+#'   each feature.
 #'
-
-#' @section Persistence diagrams:
-
+#'   Persistence data can be provided to `geom_persistence()`, `geom_landscape()`,
+#'   and `geom_landscape()` by specifying `stat = "identity"` and mapping the
+#'   `start` and `end` aesthetics to the "birth" and "death" values in the layer data.
+#'   It is standard to also map aesthetics such as `color` or `linetype` to
+#'   features' "dimension" values in the layer data.
+#'
+#' ## Persistence diagrams:
+#' 
 #'   Persistence diagrams recognize extended persistence data, with negative
 #'   birth/death values arising from the relative part of the filtration.
 #'
 #'   The original persistence diagrams plotted persistence against birth in what
 #'   we call "flat" diagrams, but most plot death against birth in "diagonal"
 #'   diagrams, often with a diagonal line indicating zero persistence.
+#'   In `geom_persistence()`, these alternatives can be specified with 
+#'   the `diagram` parameter.
 #'
 #'   The `geom_fundamental_box()` layer renders fundamental boxes at specified
 #'   time points (Chung & Lawson, 2020).
 #'   
-
+#' ## Persistence landscapes:
+#' 
+#' Persistence landscapes, anticipated by some alternative coordinatizations
+#' of persistence diagrams, were proposed as Lipschitz functions that demarcate
+#' the Pareto frontiers of persistence diagrams. They can be averaged over the
+#' diagrams obtained from multiple data sets designed or hypothesized to have
+#' been generated from the same underlying topological structure.
+#' 
+#' Note: `geom_persistence()` does not currently recognize extended persistence data.
+#'   
+#' ## Barcode diagrams:
+#'
+#'   Barcode diagrams traditionally extend along the horizontal axis and are arranged
+#'   vertically in order of group (e.g. dimension) and birth. They may also be
+#'   transposed and juxtaposed with persistence diagrams. While
+#'   topological features of different dimensions are usually plotted together
+#'   in persistence diagrams, barcode diagrams often separate segments corresponding to
+#'   features of different dimension, by vertical grouping or by faceting.
+#'
+#'   
 #' @template ref-edelsbrunner2000
 #' @template ref-edelsbrunner2012
 #' @template ref-chung2020
-#'   
-
-#' @eval rd_sec_aesthetics(
-#'   stat_persistence = StatPersistence,
-#'   geom_fundamental_box = GeomFundamentalBox
-#' )
-
+#' 
+#' @template ref-bubenik2015
+#' @template ref-chazal2017
+#' 
+#' @template ref-carlsson2004
+#' @template ref-carlsson2014
+#' @template ref-chazal2017
+#'
 #' @eval rd_sec_computed_vars(
 #'   stat = "persistence",
 #'   start = "birth value of each feature (from 'dataset' aesthetic).",
@@ -49,7 +127,7 @@
 #'   persistence =
 #'   "differences between birth and death values of features."
 #' )
-
+#' 
 #' @name persistence
 #' @import ggplot2
 #' @family plot layers for persistence data
@@ -68,12 +146,6 @@
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
-
-# REVIEW: Single data set param?
-# @param point_cloud Optional; a single data set for which methods exist to
-#   compute persistent homology. Alternatively, a list column of data sets can
-#   be passed to the `dataset` aesthetic.
-
 #' @param filtration The type of filtration from which to compute persistent
 #'   homology; one of `"Rips"`, `"Vietoris"` (equivalent) or `"alpha"`.
 #' @param diameter_max,radius_max Maximum diameter or radius for the simplicial
@@ -85,6 +157,9 @@
 #' @param engine The computational engine to use (see 'Details'). Reasonable
 #'   defaults are chosen based on `filtration`.
 #' @example inst/examples/ex-persistence.R
+#' @example inst/examples/ex-landscape.R
+#' @example inst/examples/ex-barcode.R
+#' @example inst/examples/ex-barcode.R
 #' @example inst/examples/ex-persistence-extended.R
 #' @example inst/examples/ex-persistence-dataset.R
 NULL
@@ -252,6 +327,7 @@ StatPersistence <- ggproto(
 )
 
 #' @rdname persistence
+#' @order 1
 #' @export
 stat_persistence <- function(mapping = NULL,
                              data = NULL,
@@ -327,6 +403,7 @@ GeomPersistence <- ggproto(
 
 
 #' @rdname persistence
+#' @order 2
 #' @export
 geom_persistence <- function(mapping = NULL,
                              data = NULL,
@@ -354,110 +431,6 @@ geom_persistence <- function(mapping = NULL,
   )
 }
 
-#' @rdname ggtda-ggproto
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomFundamentalBox <- ggproto(
-  "GeomFundamentalBox", GeomPolygon,
-  
-  required_aes = c(),
-  default_aes = aes(colour = "black", fill = "grey",
-                    linewidth = 0.5, linetype = 1, alpha = .25),
-  
-  setup_data = function(data, params) {
-    
-    # keep only columns that are constant throughout the data
-    data <- dplyr::select_if(
-      data,
-      function(x) length(unique(x)) == 1L
-    )[1L, , drop = FALSE]
-    rownames(data) <- NULL
-    
-    data
-  },
-  
-  draw_panel = function(data, panel_params, coord,
-                        order_by = c("persistence", "start"),
-                        decreasing = FALSE,
-                        diagram = "diagonal", t = NULL) {
-    
-    # expand ranges if appropriate
-    # adapted from `GeomAbline$draw_panel`
-    ranges <- coord$backtransform_range(panel_params)
-    if (coord$clip == "on" && coord$is_linear()) {
-      #ranges$x <- ranges$x + c(-1, 1) * diff(ranges$x)
-      ranges$y <- ranges$y + c(-1, 1) * diff(ranges$y)
-    }
-    
-    # define segments and interior in default (diagonal) layout
-    # use `group` to separate boxes for different times
-    data$x <- NULL; data$xend <- NULL
-    data$y <- NULL; data$yend <- NULL
-    data$group <- NULL
-    ray_data <- data.frame(
-      x = as.vector(rbind(0, t)), xend = rep(t, each = 2L),
-      y = rep(t, each = 2L), yend = as.vector(rbind(t, ranges$y[[2L]])),
-      group = rep(seq_along(t), each = 2L)
-    )
-    ray_data <- merge(ray_data, data)
-    ray_data$group <- -1L
-    int_data <- data.frame(
-      x = as.vector(rbind(t, t, 0, 0)),
-      y = as.vector(rbind(t, ranges$y[[2L]], ranges$y[[2L]], t)),
-      group = rep(seq_along(t), each = 4L)
-    )
-    int_data <- merge(int_data, data)
-    int_data$colour <- "transparent"
-    
-    # diagram transformations
-    ray_data <- diagram_transform(ray_data, diagram)
-    int_data <- diagram_transform(int_data, diagram)
-    
-    # combine grobs for rays and interior
-    ray_grob <- GeomSegment$draw_panel(ray_data, panel_params, coord)
-    int_grob <- GeomPolygon$draw_panel(int_data, panel_params, coord)
-    grob <- do.call(grid::grobTree, list(ray_grob, int_grob))
-    grob$name <- grid::grobName(grob, "geom_fundamental_box")
-    grob
-  },
-  
-  draw_key = draw_key_blank,
-  
-  # https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/
-  non_missing_aes = "size",
-  rename_size = TRUE
-)
-
-
-#' @rdname persistence
-#' @export
-geom_fundamental_box <- function(mapping = NULL,
-                                 data = NULL,
-                                 stat = "identity",
-                                 position = "identity",
-                                 diagram = "diagonal",
-                                 t = NULL,
-                                 na.rm = FALSE,
-                                 show.legend = NA,
-                                 inherit.aes = TRUE,
-                                 ...) {
-  layer(
-    geom = GeomFundamentalBox,
-    data = data,
-    mapping = mapping,
-    stat = stat,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      diagram = diagram,
-      t = t,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
 
 # Helper functions ---------------------------------------------------------
 

@@ -60,6 +60,7 @@ Collate:
     'barcode.R'
     'disk.R'
     'draw-key-simplex.R'
+    'fundamental-box.R'
     'ggtda.R'
     'persistence.R'
     'landscape.R'

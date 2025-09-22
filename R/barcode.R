@@ -1,54 +1,11 @@
-#' @title Barcodes
-#'
-#' @description Visualize persistence data in a barcode diagram.
-#'
-
-#' @details
-#'
-#' *Barcodes* or *barcode diagrams* are [vertical interval
-#' plots](https://ggplot2.tidyverse.org/reference/geom_linerange.html) of
-#' persistence data.
-#' 
-
-#' @template persistence-data
-#' 
-
-#' @section Barcodes:
-#'
-#'   Barcodes traditionally extend along the horizontal axis and are arranged
-#'   vertically in order of group (e.g. dimension) and birth. They may also be
-#'   transposed and juxtaposed with [persistence diagrams](persist). While
-#'   topological features of different dimensions are usually plotted together
-#'   in persistence diagrams, barcodes often separate segments corresponding to
-#'   features of different dimension, by vertical grouping or by faceting.
-#'
-#' @template ref-carlsson2004
-#' @template ref-carlsson2014
-#' @template ref-chazal2017
-#'
-
-#' @eval rd_sec_aesthetics(
-#'   geom_barcode = GeomBarcode
-#' )
-
-#' @name barcode
+#' @name persistence
 #' @import ggplot2
 #' @family plot layers for persistence data
-#' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
-#' @param na.rm Logical:
-#'   if `FALSE`, the default, `NA` lodes are not included;
-#'   if `TRUE`, `NA` lodes constitute a separate category,
-#'   plotted in grey (regardless of the color scheme).
-#' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param stat The The statistical transformation to use on the data.
-#'   Defaults to `identity`; pass a string to override the default.
-#' @example inst/examples/ex-barcode.R
 NULL
 
 # file.edit("tests/testthat/test-barcode.R")
 # file.edit("inst/examples/ex-barcode.R")
-
 
 #' @rdname ggtda-ggproto
 #' @usage NULL
@@ -100,7 +57,8 @@ GeomBarcode <- ggproto(
   }
 )
 
-#' @rdname barcode
+#' @rdname persistence
+#' @order 4
 #' @export
 geom_barcode <- function(mapping = NULL,
                          data = NULL,

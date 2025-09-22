@@ -1,52 +1,11 @@
-#' @title Persistence landscapes
-#'
-#' @description Visualize persistence data as a persistence landscape.
-#'   
-
-#' @details
-#'
-#' {*Persistence landscapes*}, anticipated by some alternative coordinatizations
-#' of persistence diagrams, were proposed as Lipschitz functions that demarcate
-#' the Pareto frontiers of persistence diagrams. They can be averaged over the
-#' diagrams obtained from multiple data sets designed or hypothesized to have
-#' been generated from the same underlying topological structure.
-#'
-#' Persistence landscapes do not currently recognize extended persistence data.
-#' 
-
-#' @template ref-bubenik2015
-#' @template ref-chazal2017
-
-#' @eval rd_sec_aesthetics(
-#'   stat_landscape = StatLandscape,
-#'   geom_landscape = GeomLandscape
-#' )
-
-#' @eval rd_sec_computed_vars(
-#'   stat = "landscape",
-#'   "x,y" = "coordinates of segment endpoints of each frontier.",
-#'   dimension = "feature dimension (with 'dataset' aesthetic only).",
-#'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
-#'   "level" = "position of each frontier, starting from the outermost.",
-#'   "slope" = "slope of the landscape abscissa.",
-#'   extra_note = paste0(
-#'     "Note that ",
-#'     "`start` and `end` are dropped during the statistical transformation."
-#'   )
-#' )
-
-#' @name landscape
+#' @name persistence
 #' @include persistence.R
 #' @import ggplot2
 #' @family plot layers for persistence data
-#' @seealso [ggplot2::layer()] for additional arguments.
 #' @inheritParams ggplot2::layer
 #' @inheritParams ggplot2::geom_path
-#' @inheritParams persistence
 #' @param n_levels The number of levels to compute and plot. If `Inf` (the
 #'   default), determined to be all levels.
-#' @example inst/examples/ex-landscape.R
-#' @example inst/examples/ex-persistence-dataset.R
 NULL
 
 # file.edit("inst/examples/ex-landscape.R")
@@ -131,7 +90,8 @@ GeomLandscape <- ggproto(
   }
 )
 
-#' @rdname landscape
+#' @rdname persistence
+#' @order 3
 #' @export
 geom_landscape <- function(mapping = NULL,
                            data = NULL,
