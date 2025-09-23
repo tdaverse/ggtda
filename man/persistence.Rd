@@ -18,7 +18,7 @@ stat_persistence(
   filtration = "Rips",
   diameter_max = NULL,
   radius_max = NULL,
-  dimension_max = 1L,
+  max_hom_degree = 1L,
   field_order = 2L,
   engine = NULL,
   order_by = c("persistence", "start"),
@@ -135,7 +135,8 @@ homology; one of \code{"Rips"}, \code{"Vietoris"} (equivalent) or \code{"alpha"}
 filtration. Both default to \code{NULL}, in which case the complete filtration
 is constructed.}
 
-\item{dimension_max}{Maximum dimension of the simplicial filtration.}
+\item{max_hom_degree}{Maximum dimension of the simplicial filtration,
+the highest-dimensional features to be calculated.}
 
 \item{field_order}{(Prime) order of the field over which to compute
 persistent homology.}

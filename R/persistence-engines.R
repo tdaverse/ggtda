@@ -3,7 +3,7 @@
 ## {TDA}
 
 simplicial_filtration_TDA <- function(
-    dataset_list, filtration, diameter_max, dimension_max, field_order,
+    dataset_list, filtration, diameter_max, max_hom_degree, field_order,
     library
 ) {
   
@@ -23,7 +23,7 @@ simplicial_filtration_TDA <- function(
     ph_list <- lapply(
       dataset_list,
       TDA::ripsDiag,
-      maxdimension = dimension_max %||% 1L,
+      maxdimension = max_hom_degree %||% 1L,
       maxscale = diameter_max,
       library = library
     )
@@ -31,7 +31,7 @@ simplicial_filtration_TDA <- function(
     ph_list <- lapply(
       dataset_list,
       TDA::alphaComplexDiag,
-      maxdimension = dimension_max %||% 1L,
+      maxdimension = max_hom_degree %||% 1L,
       library = library
     )
   }
@@ -50,7 +50,7 @@ simplicial_filtration_TDA <- function(
 ## {ripserr}
 
 simplicial_filtration_ripserr <- function(
-    dataset_list, diameter_max, dimension_max, field_order
+    dataset_list, diameter_max, max_hom_degree, field_order
 ) {
   
   # ensure that engine can handle data
@@ -79,7 +79,7 @@ simplicial_filtration_ripserr <- function(
       dataset_list,
       ripserr::vietoris_rips,
       threshold = diameter_max,
-      dim = dimension_max %||% 1L,
+      dim = max_hom_degree %||% 1L,
       p = field_order %||% 2L,
       return_format = "df"
     )
@@ -88,7 +88,7 @@ simplicial_filtration_ripserr <- function(
       dataset_list,
       ripserr::vietoris_rips,
       threshold = diameter_max,
-      max_dim = dimension_max %||% 1L,
+      max_dim = max_hom_degree %||% 1L,
       p = field_order %||% 2L
     )
   }

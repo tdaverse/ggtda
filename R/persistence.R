@@ -151,7 +151,8 @@
 #' @param diameter_max,radius_max Maximum diameter or radius for the simplicial
 #'   filtration. Both default to `NULL`, in which case the complete filtration
 #'   is constructed.
-#' @param dimension_max Maximum dimension of the simplicial filtration.
+#' @param max_hom_degree Maximum dimension of the simplicial filtration,
+#'  the highest-dimensional features to be calculated.
 #' @param field_order (Prime) order of the field over which to compute
 #'   persistent homology.
 #' @param engine The computational engine to use (see 'Details'). Reasonable
@@ -185,7 +186,11 @@ StatPersistence <- ggproto(
     
     # Check that `start` and `end` aesthetics haven't been incorrectly supplied
     if (!is.null(data$start) | !is.null(data$end)) {
-      stop(paste0("`start` and `end` aesthetics have been supplied.\n", class(self)[1], " only accepts the `dataset` aesthetic.\nDid you mean to use `stat = \"identity\"`?"))
+      stop(paste0(
+        "`start` and `end` aesthetics have been supplied.\n",
+        class(self)[1],
+        " only accepts the `dataset` aesthetic.\nDid you mean to use `stat = \"identity\"`?"
+      ))
     }
     
     # pre-process filtration parameters
@@ -238,22 +243,22 @@ StatPersistence <- ggproto(
       params$engine,
       "TDA" = simplicial_filtration_TDA(
         data$dataset, params$filtration,
-        params$diameter_max, params$dimension_max, params$field_order,
+        params$diameter_max, params$max_hom_degree, params$field_order,
         library = "GUDHI"
       ),
       "GUDHI" = simplicial_filtration_TDA(
         data$dataset, params$filtration,
-        params$diameter_max, params$dimension_max, params$field_order,
+        params$diameter_max, params$max_hom_degree, params$field_order,
         library = "GUDHI"
       ),
       "Dionysus" = simplicial_filtration_TDA(
         data$dataset, params$filtration,
-        params$diameter_max, params$dimension_max, params$field_order,
+        params$diameter_max, params$max_hom_degree, params$field_order,
         library = "Dionysus"
       ),
       "ripserr" = simplicial_filtration_ripserr(
         data$dataset,
-        params$diameter_max, params$dimension_max, params$field_order
+        params$diameter_max, params$max_hom_degree, params$field_order
       )
     )
     
@@ -279,11 +284,14 @@ StatPersistence <- ggproto(
   },
   
   compute_panel = function(
-    data, scales,
+    data, 
+    scales,
     order_by = c("persistence", "start"),
     decreasing = FALSE,
     filtration = "Rips",
-    diameter_max = NULL, radius_max = NULL, dimension_max = 1L,
+    diameter_max = NULL, 
+    radius_max = NULL, 
+    max_hom_degree = 1L,
     field_order = 2L,
     engine = NULL
   ) {
@@ -292,7 +300,7 @@ StatPersistence <- ggproto(
     data$y <- data$end
     
     # Cast dimension as ordered factor, with levels ranging from 0 to specified max dim
-    data$dimension <- ordered(data$dimension, c(0, seq_len(dimension_max)))
+    data$dimension <- ordered(data$dimension, c(0, seq_len(max_hom_degree)))
     
     # TODO -- Cory thinks these should likely be removed?
     # compute 'part'
@@ -334,8 +342,9 @@ stat_persistence <- function(mapping = NULL,
                              geom = "persistence",
                              position = "identity",
                              filtration = "Rips",
-                             diameter_max = NULL, radius_max = NULL,
-                             dimension_max = 1L,
+                             diameter_max = NULL,
+                             radius_max = NULL,
+                             max_hom_degree = 1L,
                              field_order = 2L,
                              engine = NULL,
                              order_by = c("persistence", "start"),
@@ -355,7 +364,7 @@ stat_persistence <- function(mapping = NULL,
     params = list(
       filtration = filtration,
       diameter_max = diameter_max, radius_max = radius_max,
-      dimension_max = dimension_max,
+      max_hom_degree = max_hom_degree,
       field_order = field_order,
       engine = engine,
       order_by = order_by,
