@@ -8,7 +8,7 @@ persistence <- function(
   engine_classes <- list(
     ripserr = if (is.na(.ripserr_version)) {
       stop("Package {ripserr} is required but could not be found.")
-    } else if (.ripserr_version == "0.1.1") {
+    } else if (.ripserr_version == as.package_version("0.1.1")) {
       # https://github.com/cran/ripserr/blob/
       # 8cadc3a86009149418d6f9a61124af9d6372d34e/R/calculate.R#L68
       c(
@@ -16,7 +16,7 @@ persistence <- function(
         gsub("as\\.matrix\\.", "",
              as.character(methods(base::as.matrix)))
       )
-    } else if (.ripserr_version >= "0.2.0") {
+    } else if (.ripserr_version >= as.package_version("0.2.0")) {
       gsub("vietoris_rips\\.", "",
            as.character(methods(ripserr::vietoris_rips)))
     },
@@ -75,7 +75,7 @@ persistence_ripserr <- function(
   pd <- switch(
     complex,
     Vietoris = {
-      if (.ripserr_version == "0.1.1") {
+      if (.ripserr_version == as.package_version("0.1.1")) {
         ripserr::vietoris_rips(
           data,
           threshold = diameter_max,
@@ -85,7 +85,7 @@ persistence_ripserr <- function(
           # ignored in v0.2.0
           return_format = "df"
         )
-      } else if (.ripserr_version >= "0.2.0") {
+      } else if (.ripserr_version >= as.package_version("0.2.0")) {
         ripserr::vietoris_rips(
           data,
           threshold = diameter_max,

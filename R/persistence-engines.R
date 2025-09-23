@@ -54,7 +54,7 @@ simplicial_filtration_ripserr <- function(
 ) {
   
   # ensure that engine can handle data
-  ph_classes <- if (.ripserr_version == "0.1.1") {
+  ph_classes <- if (.ripserr_version == as.package_version("0.1.1")) {
     # https://github.com/cran/ripserr/blob/
     # 8cadc3a86009149418d6f9a61124af9d6372d34e/R/calculate.R#L68
     c(
@@ -62,7 +62,7 @@ simplicial_filtration_ripserr <- function(
       gsub("as\\.matrix\\.", "",
            as.character(utils::methods(base::as.matrix)))
     )
-  } else if (.ripserr_version >= "0.2.0") {
+  } else if (.ripserr_version >= as.package_version("0.2.0")) {
     gsub("vietoris_rips\\.", "",
          as.character(utils::methods(ripserr::vietoris_rips)))
   }
@@ -74,7 +74,7 @@ simplicial_filtration_ripserr <- function(
   
   # compute PH
   if (diameter_max == Inf) diameter_max <- -1L
-  ph_list <- if (.ripserr_version == "0.1.1") {
+  ph_list <- if (.ripserr_version == as.package_version("0.1.1")) {
     lapply(
       dataset_list,
       ripserr::vietoris_rips,
@@ -83,7 +83,7 @@ simplicial_filtration_ripserr <- function(
       p = field_order %||% 2L,
       return_format = "df"
     )
-  } else if (.ripserr_version >= "0.2.0") {
+  } else if (.ripserr_version >= as.package_version("0.2.0")) {
     lapply(
       dataset_list,
       ripserr::vietoris_rips,
