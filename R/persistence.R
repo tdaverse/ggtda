@@ -121,7 +121,6 @@
 #'   end = "death value of each feature (from 'dataset' aesthetic).",
 #'   dimension = "integer feature dimension (from 'dataset' aesthetic).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
-#'   id = "character feature identifier (across 'group').",
 #'   part =
 #'   "whether features belong to ordinary, relative, or extended homology.",
 #'   persistence =
@@ -137,10 +136,9 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param order_by A character vector of required or computed variables
-#'   (`"start"`, `"end"`, `"part"`, and/or `"persistence"`) by which the
-#'   features should be ordered (within `group`); defaults to `c("persistence",
-#'   "start")`. This will most notably impact the appearance of [barcode]s.
+#' @param order_by A character vector comprised of (`"start"`, `"end"`,
+#'  `"part"`, and/or `"persistence"`) by which the features should be ordered 
+#'  (within `group`); defaults to `c("persistence", "start")`.
 #' @param decreasing Logical; whether to sort features by decreasing values of
 #'   `order_by` (again, within `group`).
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
@@ -220,20 +218,8 @@ StatPersistence <- ggproto(
       }
     }
     
-    # discard unrecognized feature properties with a warning
-    if (! all(params$order_by %in% order_by_options)) {
-      ignore_by <- setdiff(params$order_by, order_by_options)
-      warning(
-        "`order_by` recognizes only: `",
-        paste0(order_by_options, collapse = "`, `"),
-        "`; `",
-        paste0(ignore_by, collapse = "`, `"),
-        "` will be ignored."
-      )
-      params$order_by <- intersect(params$order_by, order_by_options)
-    }
-    
     params
+
   },
   
   setup_data = function(data, params) {
@@ -286,8 +272,6 @@ StatPersistence <- ggproto(
   compute_panel = function(
     data, 
     scales,
-    order_by = c("persistence", "start"),
-    decreasing = FALSE,
     filtration = "Rips",
     diameter_max = NULL, 
     radius_max = NULL, 
@@ -317,19 +301,6 @@ StatPersistence <- ggproto(
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
-    # computed variable: `id` (sort by `group`, then `order_by`)
-    interaction_args <- c(
-      # always sort first by `group`
-      if (! is.null(data$group)) list(data$group),
-      # sort by specified properties in order
-      lapply(order_by, \(f) if (decreasing) -xtfrm(data[[f]]) else data[[f]]),
-      # drop unused levels and use lexicographic order
-      list(drop = TRUE, lex.order = TRUE)
-    )
-    data$id <- do.call(interaction, args = interaction_args)
-    # re-distinguish duplicates
-    data$id <- order(order(data$id))
-    
     data
   }
 )
@@ -347,8 +318,6 @@ stat_persistence <- function(mapping = NULL,
                              max_hom_degree = 1L,
                              field_order = 2L,
                              engine = NULL,
-                             order_by = c("persistence", "start"),
-                             decreasing = FALSE,
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
@@ -442,8 +411,6 @@ geom_persistence <- function(mapping = NULL,
 
 
 # Helper functions ---------------------------------------------------------
-
-order_by_options <- c("start", "end", "part", "persistence")
 
 # Transform given (x, y) columns in `data` which represent (birth, death) values
 # into different parameterizations/coordinate systems

@@ -21,8 +21,6 @@ stat_persistence(
   max_hom_degree = 1L,
   field_order = 2L,
   engine = NULL,
-  order_by = c("persistence", "start"),
-  decreasing = FALSE,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -62,6 +60,8 @@ geom_barcode(
   data = NULL,
   stat = "persistence",
   position = "identity",
+  order_by = c("persistence", "start"),
+  decreasing = FALSE,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -144,13 +144,6 @@ persistent homology.}
 \item{engine}{The computational engine to use (see 'Details'). Reasonable
 defaults are chosen based on \code{filtration}.}
 
-\item{order_by}{A character vector of required or computed variables
-(\code{"start"}, \code{"end"}, \code{"part"}, and/or \code{"persistence"}) by which the
-features should be ordered (within \code{group}); defaults to \code{c("persistence", "start")}. This will most notably impact the appearance of \link{barcode}s.}
-
-\item{decreasing}{Logical; whether to sort features by decreasing values of
-\code{order_by} (again, within \code{group}).}
-
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
 (regardless of the color scheme).}
@@ -192,6 +185,13 @@ default), determined to be all levels.}
 \item{linejoin}{Line join style (round, mitre, bevel).}
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
+
+\item{order_by}{A character vector comprised of (\code{"start"}, \code{"end"},
+\code{"part"}, and/or \code{"persistence"}) by which the features should be ordered
+(within \code{group}); defaults to \code{c("persistence", "start")}.}
+
+\item{decreasing}{Logical; whether to sort features by decreasing values of
+\code{order_by} (again, within \code{group}).}
 
 \item{t}{A numeric vector of time points at which to place fundamental boxes.}
 }
@@ -351,7 +351,6 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 \item \code{after_stat(end)}\cr death value of each feature (from 'dataset' aesthetic).
 \item \code{after_stat(dimension)}\cr integer feature dimension (from 'dataset' aesthetic).
 \item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
-\item \code{after_stat(id)}\cr character feature identifier (across 'group').
 \item \code{after_stat(part)}\cr whether features belong to ordinary, relative, or extended homology.
 \item \code{after_stat(persistence)}\cr differences between birth and death values of features.
 }
