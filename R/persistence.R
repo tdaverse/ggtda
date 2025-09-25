@@ -393,19 +393,24 @@ geom_persistence <- function(mapping = NULL,
                              inherit.aes = TRUE,
                              ...) {
   
-  layer(
-    stat = stat,
-    data = data,
-    mapping = mapping,
-    geom = GeomPersistence,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      diagram = diagram,
-      na.rm = na.rm,
-      ...
-    )
+  c(
+    layer(
+      stat = stat,
+      data = data,
+      mapping = mapping,
+      geom = GeomPersistence,
+      position = position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = list(
+        diagram = diagram,
+        na.rm = na.rm,
+        ...
+      )
+    ),
+    # TODO: While this ensures equal aspect ratio, it doesn't ensure equal limits.
+    #       Is there a way to force `xlim = ylim`?
+    coord_fixed()
   )
 }
 
