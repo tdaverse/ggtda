@@ -57,12 +57,12 @@ VignetteBuilder: knitr
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Collate: 
+    'persistence.R'
     'barcode.R'
     'disk.R'
     'draw-key-simplex.R'
     'fundamental-box.R'
     'ggtda.R'
-    'persistence.R'
     'landscape.R'
     'persistence-engines.R'
     'simplicial-complex-engines.R'

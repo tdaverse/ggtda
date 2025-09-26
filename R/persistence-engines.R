@@ -42,7 +42,7 @@ simplicial_filtration_TDA <- function(
   )
   # rename to required aesthetics
   for (i in seq_along(ph_list))
-    names(ph_list[[i]]) <- c("dimension", "start", "end")
+    names(ph_list[[i]]) <- c("dimension", "birth", "death")
   
   ph_list
 }
@@ -97,7 +97,7 @@ simplicial_filtration_ripserr <- function(
   ph_list <- lapply(ph_list, as.data.frame)
   # rename to required aesthetics
   for (i in seq_along(ph_list))
-    names(ph_list[[i]]) <- c("dimension", "start", "end")
+    names(ph_list[[i]]) <- c("dimension", "birth", "death")
   
   ph_list
 }

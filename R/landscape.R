@@ -1,3 +1,6 @@
+#' @include persistence.R
+NULL
+
 #' @name persistence
 #' @include persistence.R
 #' @import ggplot2
@@ -10,6 +13,87 @@ NULL
 
 # file.edit("inst/examples/ex-landscape.R")
 
+
+#' @rdname ggtda-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export    
+StatLandscape <- ggproto(
+  "StatLandscape", StatPersistence,
+  
+  positional_aes = c("x", "y"),
+  extra_params = c(StatPersistence$extra_params, "n_levels"),
+  
+  setup_params = function(self, data, params) {
+    
+    # Different default `diagram` compared to StatPersistence
+    params$diagram <- params$diagram %||% "landscape"
+    
+    # StatPersistence doesn't have `n_levels`
+    params$n_levels <- params$n_levels %||% Inf
+    
+    # Continue with `StatPersistence$setup_params()`
+    StatPersistence$setup_params(data, params)
+  },
+  
+  derive_positional_aes = function(data, params) {
+    
+    # persistence homology -> path representation of landscape diagram
+    data <- landscape_path(data, params$n_levels %||% Inf)
+    
+    # diagram transformation
+    data <- diagram_transform(data, params$diagram %||% "landscape")
+    data$slope <- diagram_slope(params$diagram %||% "landscape")
+    
+    # TODO: If birth + death is specified they're dropped!
+    #       Need to keep them around as they're "required" aesthetics!
+    
+    data
+  }
+)
+
+#' @rdname persistence
+#' @order 3
+#' @export
+stat_landscape <- function(mapping = NULL,
+                           data = NULL,
+                           geom = "landscape",
+                           position = "identity",
+                           filtration = "Rips",
+                           diameter_max = NULL,
+                           radius_max = NULL,
+                           max_hom_degree = 1L,
+                           field_order = 2L,
+                           engine = NULL,                          
+                           diagram = "landscape",
+                           n_levels = Inf,
+                           na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE,
+                           ...) {
+  layer(
+    geom = geom,
+    data = data,
+    mapping = mapping,
+    stat = StatLandscape,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      filtration = filtration,
+      diameter_max = diameter_max,
+      radius_max = radius_max,
+      max_hom_degree = max_hom_degree,
+      field_order = field_order,
+      engine = engine,      
+      diagram = diagram,
+      n_levels = n_levels,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 #' @rdname ggtda-ggproto
 #' @format NULL
 #' @usage NULL
@@ -17,39 +101,21 @@ NULL
 GeomLandscape <- ggproto(
   "GeomLandscape", Geom,
   
-  required_aes = c("dataset|start", "dataset|end"),
+  required_aes = c("x", "y"),
   
   default_aes = GeomPath$default_aes,
   
   draw_key = GeomPath$draw_key,
   
-  setup_data = function(data, params) {
-
-    # introduce numerical x-values in order to allow coordinate transforms
-    data$x <- data$start
-    data$y <- data$end
-
-    data
-  },
-  
   draw_group = function(
     data,
     panel_params,
     coord,
-    n_levels = Inf,
-    diagram = "landscape",
     lineend = "butt",
     linejoin = "round",
     linemitre = 10
   ) {
     
-    # persistence homology -> path representation of landscape diagram
-    data <- landscape_path(data, n_levels)
-    
-    # diagram transformation
-    data <- diagram_transform(data, diagram)
-    data$slope <- diagram_slope(diagram)
-  
     # # adapted from `ggplot2::GeomPath`
     # # (data should already be ordered; or, order by slope)
     # data <- data[order(data$group), , drop = FALSE]
@@ -95,10 +161,8 @@ GeomLandscape <- ggproto(
 #' @export
 geom_landscape <- function(mapping = NULL,
                            data = NULL,
-                           stat = "persistence",
-                           n_levels = Inf,
+                           stat = "landscape",
                            position = "identity",
-                           diagram = "landscape",
                            lineend = "butt",
                            linejoin = "round",
                            linemitre = 10,
@@ -115,8 +179,6 @@ geom_landscape <- function(mapping = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      n_levels = n_levels,
-      diagram = diagram,
       lineend = lineend,
       linejoin = linejoin,
       linemitre = linemitre,
@@ -125,6 +187,7 @@ geom_landscape <- function(mapping = NULL,
     )
   )
 }
+
 
 # pareto_ids <- function(x) {
 #   if ("rPref" %in% rownames(utils::installed.packages())) {
@@ -150,19 +213,35 @@ landscape_path <- function(data, n_levels = Inf) {
   
   # empty case
   if (nrow(data) == 0L) {
-    names(data)[match(c("start", "end"), names(data))] <- c("x", "y")
+    data$x <- data$birth
+    data$y <- data$death
+    
     return(data)
   }
   
-  # first row (for group-level aesthetics)
-  first_row <- data[1L, setdiff(names(data), c("start", "end", "x", "y")), drop = FALSE]
+  # `data$group` encodes both PANEL and group (dimension)
+  data_split <- split(data, data$group)
+  data_split <- lapply(data_split, landscape_path_group, n_levels = n_levels)
+  data <- do.call(rbind, data_split)
+  
+  data
+}
+
+landscape_path_group <- function(data, n_levels = Inf) {
+  
+  # Keep group-level aesthetics to attach to landscape representation
+  first_row <- data[1L, setdiff(names(data), c("birth", "death", "part", "persistence")), drop = FALSE]
   rownames(first_row) <- NULL
   
   # iteratively peel and stack frontiers
   # NB: points along slopes are not discarded
-  pd <- as.matrix(data[, c("start", "end"), drop = FALSE])
+  # Including additional columns to preserve as computed variables,
+  # this allows mapping to, for example, aes(linewidth = after_stat(persistence))
+  pd <- as.data.frame(data[, c("birth", "death", "birth", "death", "part", "persistence"), drop = FALSE])
+  colnames(pd) <- c("x", "y", "birth", "death", "part", "persistence")
   pl <- list()
   k <- 0L
+  
   while (k < n_levels && nrow(pd) > 0L) {
     k <- k + 1L
     
@@ -171,10 +250,13 @@ landscape_path <- function(data, n_levels = Inf) {
     peak_ids <- which(! duplicated(cummax(pd[, 2L])))
     peaks <- pd[peak_ids, , drop = FALSE]
     
+    # information about feature
+    feature_info <- peaks[1 , c("birth", "death", "part", "persistence")]
+    
     # identify col points
     cols <- cbind(
-      start = c(peaks[, 1L], peaks[nrow(peaks), 2L]),
-      end = c(peaks[1L, 1L], peaks[, 2L])
+      x = c(peaks[, 1L], peaks[nrow(peaks), 2L]),
+      y = c(peaks[1L, 1L], peaks[, 2L])
     )
     
     # flatten valleys
@@ -189,7 +271,7 @@ landscape_path <- function(data, n_levels = Inf) {
     }
     
     # extract frontier
-    frontier <- rbind(peaks, cols)
+    frontier <- rbind(peaks[, c("x", "y")], cols)
     frontier <- frontier[order(frontier[, 1L], frontier[, 2L]), ]
     frontier <- rbind(
       # frontier[1L, ] - Inf,
@@ -198,6 +280,10 @@ landscape_path <- function(data, n_levels = Inf) {
       # frontier[nrow(frontier), ] + Inf
       c(Inf, Inf)
     )
+    
+    # Include birth and death in output?
+    frontier <- cbind(frontier, feature_info)
+      
     pl[[k]] <- frontier
     
     # reset persistence diagram
@@ -209,10 +295,10 @@ landscape_path <- function(data, n_levels = Inf) {
   # data frame
   data <- do.call(rbind, pl)
   data <- as.data.frame(data)
-  names(data) <- c("x", "y")
   data$level <- rep(seq(length(pl)), sapply(pl, nrow))
   
   data <- cbind(data, first_row)
+  rownames(data) <- NULL
   
   data
 }

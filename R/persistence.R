@@ -139,8 +139,6 @@
 #' @param order_by A character vector comprised of (`"start"`, `"end"`,
 #'  `"part"`, and/or `"persistence"`) by which the features should be ordered 
 #'  (within `group`); defaults to `c("persistence", "start")`.
-#' @param decreasing Logical; whether to sort features by decreasing values of
-#'   `order_by` (again, within `group`).
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
@@ -173,23 +171,38 @@ NULL
 #' @usage NULL
 #' @export
 StatPersistence <- ggproto(
-  "StatPersistence", Stat,
+  "StatPersistence", Stat, 
   
-  required_aes = "dataset",
+  # "StatPersistence", StatIdentity, 
+  # Inhereit from StatIdentity because it allows points at infinity?
+  # But it skips compute_group()...
+  
+  required_aes = c("dataset|birth", "dataset|death"),
   
   dropped_aes = "dataset",
   
-  # only explicitly passed params
+  extra_params = c(
+    "filtration", 
+    "diameter_max",
+    "radius_max",
+    "max_hom_degree",
+    "field_order",
+    "engine",
+    "diagram",
+    "na.rm"
+  ),
+  
   setup_params = function(self, data, params) {
     
-    # Check that `start` and `end` aesthetics haven't been incorrectly supplied
-    if (!is.null(data$start) | !is.null(data$end)) {
-      stop(paste0(
-        "`start` and `end` aesthetics have been supplied.\n",
-        class(self)[1],
-        " only accepts the `dataset` aesthetic.\nDid you mean to use `stat = \"identity\"`?"
-      ))
-    }
+    # Assign default values, in case they're not specified in `geom_*()` call
+    # (`self$setup_data()` doesn't get default parameter values!)
+    params$filtration <- params$filtration %||% "Rips"
+    params$diameter_max <- params$diameter_max %||% NULL
+    params$radius_max <- params$radius_max %||% NULL
+    params$max_hom_degree <- params$max_hom_degree %||% 1L
+    params$field_order <- params$field_order %||% 2L
+    params$engine <- params$engine %||% NULL
+    params$diagram <- params$diagram %||% "diagonal"
     
     # pre-process filtration parameters
     
@@ -222,88 +235,123 @@ StatPersistence <- ggproto(
 
   },
   
-  setup_data = function(data, params) {
+  # calculations are all rowwise, no danger to do them here vs `$compute_*()`
+  setup_data = function(self, data, params) {
     
-    # compute PH listwise
-    ph_list <- switch(
-      params$engine,
-      "TDA" = simplicial_filtration_TDA(
-        data$dataset, params$filtration,
-        params$diameter_max, params$max_hom_degree, params$field_order,
-        library = "GUDHI"
-      ),
-      "GUDHI" = simplicial_filtration_TDA(
-        data$dataset, params$filtration,
-        params$diameter_max, params$max_hom_degree, params$field_order,
-        library = "GUDHI"
-      ),
-      "Dionysus" = simplicial_filtration_TDA(
-        data$dataset, params$filtration,
-        params$diameter_max, params$max_hom_degree, params$field_order,
-        library = "Dionysus"
-      ),
-      "ripserr" = simplicial_filtration_ripserr(
-        data$dataset,
-        params$diameter_max, params$max_hom_degree, params$field_order
+    # If `dataset` aesthetic is supplied first calculate persistence homology
+    if (! is.null(data$dataset)) {
+    
+      # Compute PH listwise
+      # `switch()` will be replaced by {pheng} exports
+      ph_list <- switch(
+        params$engine,
+        "TDA" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$max_hom_degree, params$field_order,
+          library = "GUDHI"
+        ),
+        "GUDHI" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$max_hom_degree, params$field_order,
+          library = "GUDHI"
+        ),
+        "Dionysus" = simplicial_filtration_TDA(
+          data$dataset, params$filtration,
+          params$diameter_max, params$max_hom_degree, params$field_order,
+          library = "Dionysus"
+        ),
+        "ripserr" = simplicial_filtration_ripserr(
+          data$dataset,
+          params$diameter_max, params$max_hom_degree, params$field_order
+        )
       )
-    )
-    
-    # introduce identifier (and overwrite `dataset` column)
-    data$dataset <- seq(nrow(data))
-    for (i in seq_along(ph_list)) ph_list[[i]]$dataset <- i
-    # bind the list of output data frames
-    ph_data <- do.call(rbind, ph_list)
-    
-    # merge persistent homology data back into original data
-    data <- merge(data, ph_data, by = "dataset")
-    
-    # introduce or interact with 'group' aesthetic
-    data$group <- if (is.null(data$group)) {
-      interaction(as.character(data$dataset), data$dimension)
-    } else {
-      interaction(data$group, as.character(data$dataset), data$dimension)
-    }
-    # data$dataset <- NULL
       
-    
-    data
-  },
-  
-  compute_panel = function(
-    data, 
-    scales,
-    filtration = "Rips",
-    diameter_max = NULL, 
-    radius_max = NULL, 
-    max_hom_degree = 1L,
-    field_order = 2L,
-    engine = NULL
-  ) {
-    
-    data$x <- data$start
-    data$y <- data$end
-    
-    # Cast dimension as ordered factor, with levels ranging from 0 to specified max dim
-    data$dimension <- ordered(data$dimension, c(0, seq_len(max_hom_degree)))
-    
+      # introduce identifier (and overwrite `dataset` column)
+      data$dataset <- seq(nrow(data))
+      for (i in seq_along(ph_list)) ph_list[[i]]$dataset <- i
+      # bind the list of output data frames
+      ph_data <- do.call(rbind, ph_list)
+      
+      # merge persistent homology data back into original data
+      data <- merge(data, ph_data, by = "dataset")
+      
+      # introduce or interact with 'group' aesthetic
+      data$group <- if (is.null(data$group)) {
+        interaction(as.character(data$dataset), data$dimension)
+      } else {
+        interaction(data$group, as.character(data$dataset), data$dimension)
+      }
+      
+      # Cast dimension as ordered factor, with levels ranging from 0 to specified max dim
+      # TODO -- should this instead be just a factor? Avoid Viridis w/ 2 levels?
+      data$dimension <- ordered(data$dimension, c(0, seq_len(params$max_hom_degree)))
+    }
+      
     # TODO -- Cory thinks these should likely be removed?
     # compute 'part'
     data$part <- with(data, {
       part <- NA_character_
-      part[start >= 0 & end >= 0] <- "ordinary"
-      part[start <  0 & end <  0] <- "relative"
-      part[start >= 0 & end <  0] <- "extended"
+      part[birth >= 0 & death >= 0] <- "ordinary"
+      part[birth <  0 & death <  0] <- "relative"
+      part[birth >= 0 & death <  0] <- "extended"
       factor(part, levels = c("ordinary", "relative", "extended"))
     })
     
     # compute 'persistence'
-    data$persistence <- data$end - data$start
+    data$persistence <- data$death - data$birth
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
     
+    # Different Stats will derive these in other ways, custom method to handle
+    # Note: these must be rowwise, calculated on entire `data`, not group-level
+    self$derive_positional_aes(data, params)
+    
+  },
+  
+  # Stat-specific positional aesthetics,
+  # must manually handle there scale transforms in $compute_group()
+  positional_aes = c("x", "y"),
+  
+  derive_positional_aes = function(data, params) {
+    data$x <- data$birth
+    data$y <- data$death
+    
+    data <- diagram_transform(data, params$diagram)
+    
     data
+  },
+  
+  # Stat$compute_layer is removing points at infinity!
+  # Can't access `scales` in compute_layer... how to fix?
+  
+  compute_group = function(self, data, scales) {
+    # Make sure positional aesthetics get back transformed from scales
+    fix_positional_aes_scales(data, scales, self$positional_aes)
   }
+  
 )
+
+
+# Apply scale transformations (if specified) to `positional_aes`
+fix_positional_aes_scales <- function(data, scales, positional_aes) {
+
+  # axis each positional aesthetic belongs to
+  axes <- regmatches(positional_aes, regexpr("^(x|y)", positional_aes))
+  
+  for (i in seq_along(positional_aes)) {
+    # current positional aesthetic 
+    var <- positional_aes[i]
+    var_axis <- axes[i]
+    
+    # If there is a scale transformation overwrite data$var (positional_aes[i])
+    if (! is.null(scales[[var_axis]])) {
+      # fix the column in `data` corresponding to var, per axis transformation
+      data[[var]] <- scales[[var_axis]]$get_transformation()$transform(data[[var]])
+    }
+  }
+  
+  data
+}
 
 #' @rdname persistence
 #' @order 1
@@ -318,6 +366,7 @@ stat_persistence <- function(mapping = NULL,
                              max_hom_degree = 1L,
                              field_order = 2L,
                              engine = NULL,
+                             diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
@@ -332,12 +381,12 @@ stat_persistence <- function(mapping = NULL,
     inherit.aes = inherit.aes,
     params = list(
       filtration = filtration,
-      diameter_max = diameter_max, radius_max = radius_max,
+      diameter_max = diameter_max,
+      radius_max = radius_max,
       max_hom_degree = max_hom_degree,
       field_order = field_order,
       engine = engine,
-      order_by = order_by,
-      decreasing = decreasing,
+      diagram = diagram,
       na.rm = na.rm,
       ...
     )
@@ -348,35 +397,7 @@ stat_persistence <- function(mapping = NULL,
 #' @usage NULL
 #' @export
 GeomPersistence <- ggproto(
-  "GeomPersistence", GeomPoint,
-  
-  # Can use our StatPersistence
-  # OW, can pre-process and use StatIdentity
-  required_aes = c("dataset|start", "dataset|end"),
-  
-  setup_data = function(data, params) {
-    
-    if (is.null(data$dataset)) {
-      data$x <- data$start
-      data$y <- data$end
-    }
-    
-    data
-    
-  },
-  
-  draw_panel = function(self, data, panel_params, coord, na.rm = FALSE, diagram = "diagonal") {
-    
-    # First transform (start, end) x-y pairs to desired parameterization
-    data <- diagram_transform(data, diagram)
-    
-    # Use GeomPoint's draw method with transformed data
-    grob <- GeomPoint$draw_panel(data, panel_params, coord, na.rm)
-    grob$name <- grid::grobName(grob, "geom_persistence")
-    grob
-    
-  }
-  
+  "GeomPersistence", GeomPoint
 )
 
 
@@ -387,30 +408,23 @@ geom_persistence <- function(mapping = NULL,
                              data = NULL,
                              stat = "persistence",
                              position = "identity",
-                             diagram = "diagonal",
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
                              ...) {
   
-  c(
-    layer(
-      stat = stat,
-      data = data,
-      mapping = mapping,
-      geom = GeomPersistence,
-      position = position,
-      show.legend = show.legend,
-      inherit.aes = inherit.aes,
-      params = list(
-        diagram = diagram,
-        na.rm = na.rm,
-        ...
-      )
-    ),
-    # TODO: While this ensures equal aspect ratio, it doesn't ensure equal limits.
-    #       Is there a way to force `xlim = ylim`?
-    coord_fixed()
+  layer(
+    stat = stat,
+    data = data,
+    mapping = mapping,
+    geom = GeomPersistence,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      ...
+    )
   )
 }
 
