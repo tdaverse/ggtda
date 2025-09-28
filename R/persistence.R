@@ -304,8 +304,15 @@ StatPersistence <- ggproto(
     
     # Different Stats will derive these in other ways, custom method to handle
     # Note: these must be rowwise, calculated on entire `data`, not group-level
-    self$derive_positional_aes(data, params)
+    data <- self$derive_positional_aes(data, params)
     
+    # Temporarily recode infinite death values as
+    # This gets around the automatic filtering of rows of `data`
+    # with required aesthetics at `Inf`
+    # This is reverse in `compute_group()`.
+    data$death[is.infinite(data$death)] <- 1i
+    
+    data
   },
   
   # Stat-specific positional aesthetics,
@@ -325,6 +332,10 @@ StatPersistence <- ggproto(
   # Can't access `scales` in compute_layer... how to fix?
   
   compute_group = function(self, data, scales) {
+    # Reintroduce infinite values of `data$death
+    data$death[which(Im(data$death) > 0)] <- Inf
+    data$death <- Re(data$death) # Re-cast as real
+    
     # Make sure positional aesthetics get back transformed from scales
     fix_positional_aes_scales(data, scales, self$positional_aes)
   }
