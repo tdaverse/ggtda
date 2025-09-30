@@ -252,15 +252,15 @@ landscape_path <- function(data, n_levels = Inf) {
 landscape_path_group <- function(data, n_levels = Inf) {
   
   # Keep group-level aesthetics to attach to landscape representation
-  first_row <- data[1L, setdiff(names(data), c("birth", "death", "part", "persistence")), drop = FALSE]
+  first_row <- data[1L, setdiff(names(data), c("birth", "death", "persistence")), drop = FALSE]
   rownames(first_row) <- NULL
   
   # iteratively peel and stack frontiers
   # NB: points along slopes are not discarded
   # Including additional columns to preserve as computed variables,
   # this allows mapping to, for example, aes(linewidth = after_stat(persistence))
-  pd <- as.data.frame(data[, c("birth", "death", "birth", "death", "part", "persistence"), drop = FALSE])
-  colnames(pd) <- c("x", "y", "birth", "death", "part", "persistence")
+  pd <- as.data.frame(data[, c("birth", "death", "birth", "death", "persistence"), drop = FALSE])
+  colnames(pd) <- c("x", "y", "birth", "death", "persistence")
   pl <- list()
   k <- 0L
   
@@ -273,7 +273,7 @@ landscape_path_group <- function(data, n_levels = Inf) {
     peaks <- pd[peak_ids, , drop = FALSE]
     
     # information about feature
-    feature_info <- peaks[1 , c("birth", "death", "part", "persistence")]
+    feature_info <- peaks[1 , c("birth", "death", "persistence")]
     
     # identify col points
     cols <- cbind(
