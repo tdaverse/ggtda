@@ -40,6 +40,8 @@
 #'   persistent homology.
 #' @param engine The computational engine to use (see 'Details'). Reasonable
 #'   defaults are chosen based on `filtration`.
+#' @param infinity_break Where to plot the death of features with infinite
+#'  persistence (i.e. `death == Inf`), defaults to `Inf`.
 #'   
 #' @eval rd_sec_aesthetics(
 #'   stat_persistence = StatPersistence,
@@ -93,6 +95,7 @@ StatPersistence <- ggproto(
     params$field_order <- params$field_order %||% 2L
     params$engine <- params$engine %||% NULL
     params$diagram <- params$diagram %||% "diagonal"
+    params$infinity_break <- params$infinity_break %||% Inf
     
     # pre-process filtration parameters
     
@@ -176,32 +179,32 @@ StatPersistence <- ggproto(
       # TODO -- should this instead be just a factor? Avoid Viridis w/ 2 levels?
       data$dimension <- ordered(data$dimension, c(0, seq_len(params$max_hom_degree)))
     }
-      
-    # TODO -- Cory thinks these should likely be removed?
-    # compute 'part'
-    data$part <- with(data, {
-      part <- NA_character_
-      part[birth >= 0 & death >= 0] <- "ordinary"
-      part[birth <  0 & death <  0] <- "relative"
-      part[birth >= 0 & death <  0] <- "extended"
-      factor(part, levels = c("ordinary", "relative", "extended"))
-    })
     
     # compute 'persistence'
     data$persistence <- data$death - data$birth
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
+   
+    # Computed variable, what features have death at Inf
+    data$infinite_death <- is.infinite(data$death)
+    # TODO: similar computed variable for censored death once {ripserr} PR is finished
     
+    # Temporarily set death as `params$infinity_break`,
+    # this allows plotting death at finite value in {ggplot2} --
+    # we make this change for the positional aesthetics and then reverse it
+    # for the computed aesthetic `death`
+    data$death[data$infinite_death] <- params$infinity_break
+    # TODO: similar trick for censored death once {ripserr} PR is finished
+     
     # Different Stats will derive these in other ways, custom method to handle
     # Note: these must be rowwise, calculated on entire `data`, not group-level
     data <- self$derive_positional_aes(data, params)
     
-    # Computed variable, what features have death at Inf
-    # Temporarily recode infinite death values as 0 to avoid issues 
-    # with filtering by `Stat$compute_layer()`
-    #   -- This is reverse in `compute_group()`.
-    data$infinite_death <- is.infinite(data$death)
-    data$death[data$infinite_death] <- 0
+    # Temporarily set infinite death values to be their features' birth values
+    # to avoid issues with deafult filtering by `Stat$compute_layer()`
+    #   -- This is reverse in `compute_group()`.   
+    data$death[data$infinite_death] <- data$birth[data$infinite_death]
+    # TODO: similar trick for censored death once {ripserr} PR is finished
     
     data
   },
@@ -222,9 +225,11 @@ StatPersistence <- ggproto(
   # Stat$compute_layer is removing points at infinity!
   # Can't access `scales` in compute_layer... how to fix?
   
-  compute_group = function(self, data, scales) {
+  compute_group = function(self, data, scales, infinity_break = Inf) {
+    
     # Reintroduce infinite values of `data$death
-    data$death[data$infinite_death] <- Inf
+    data$death[data$infinite_death] <- infinity_break
+    # TODO: Will need similar re-coding for censored deaths
     
     # Make sure positional aesthetics get back transformed from scales
     fix_positional_aes_scales(data, scales, self$positional_aes)
@@ -268,6 +273,7 @@ stat_persistence <- function(mapping = NULL,
                              field_order = 2L,
                              engine = NULL,
                              diagram = "diagonal",
+                             infinity_break = Inf,
                              na.rm = FALSE,
                              show.legend = NA,
                              inherit.aes = TRUE,
@@ -287,6 +293,7 @@ stat_persistence <- function(mapping = NULL,
       max_hom_degree = max_hom_degree,
       field_order = field_order,
       engine = engine,
+      infinity_break = infinity_break,
       diagram = diagram,
       na.rm = na.rm,
       ...

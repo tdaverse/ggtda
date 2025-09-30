@@ -19,6 +19,7 @@ stat_persistence(
   field_order = 2L,
   engine = NULL,
   diagram = "diagonal",
+  infinity_break = Inf,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -114,6 +115,9 @@ defaults are chosen based on \code{filtration}.}
 
 \item{diagram}{One of \code{"flat"}, \code{"diagonal"}, or \code{"landscape"}; the
 orientation for the diagram should take.}
+
+\item{infinity_break}{Where to plot the death of features with infinite
+persistence (i.e. \code{death == Inf}), defaults to \code{Inf}.}
 
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey

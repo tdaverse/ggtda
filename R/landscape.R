@@ -57,6 +57,10 @@ StatLandscape <- ggproto(
     # StatPersistence doesn't have `n_levels`
     params$n_levels <- params$n_levels %||% Inf
     
+    # StatLandscape doesn't accept `infinity_break` argument
+    # TODO: clean up this error message
+    if (!is.null(params$infinity_break)) stop("StatLandscape doesn't accept the `infinity_break` argument")
+    
     # Continue with `StatPersistence$setup_params()`
     StatPersistence$setup_params(data, params)
   },
