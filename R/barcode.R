@@ -18,6 +18,31 @@ StatBarcode <- ggproto(
   
   positional_aes = c("x", "xend", "y", "yend"),
   
+  extra_params = c(StatPersistence$extra_params, "order_by"),
+  
+  setup_params = function(self, data, params) {
+    
+    # Assign default value for `order_by`
+    params$order_by <- params$order_by %||% c("persistence", "birth")
+    
+    # Check validity of `order_by`, warning if specified incorrectly
+    order_by_options <- c("persistence", "birth", "death")
+    if (! all(params$order_by %in% order_by_options)) {
+      ignore_by <- setdiff(params$order_by, order_by_options)
+      warning(
+        "`order_by` recognizes only: `",
+        paste0(order_by_options, collapse = "`, `"),
+        "`; `",
+        paste0(ignore_by, collapse = "`, `"),
+        "` will be ignored."
+      )
+      params$order_by <- intersect(params$order_by, order_by_options)
+    }
+    
+    # Continue with `StatPersistence$setup_params()`
+    StatPersistence$setup_params(data, params)
+  },
+  
   derive_positional_aes = function(data, params) {
     
     # `x` and `xend` are simply `birth` and `death`
@@ -29,7 +54,7 @@ StatBarcode <- ggproto(
       # first sort by group
       if (! is.null(data$group)) list(data$group),
       # next sort by specified properties in order
-      lapply(params$order_by, \(f) data[[f]]),
+      lapply(params$order_by, function(col) data[[col]]),
       # additional parameters to `interaction`,
       # drop unused levels and use lexicographic order
       list(drop = TRUE, lex.order = TRUE)
@@ -47,8 +72,8 @@ StatBarcode <- ggproto(
   }
 )
 
-#' @rdname persistence
-#' @order 4
+#' @rdname barcode
+#' @order 1
 #' @export
 stat_barcode <- function(mapping = NULL,
                          data = NULL,
@@ -59,6 +84,7 @@ stat_barcode <- function(mapping = NULL,
                          radius_max = NULL,
                          max_hom_degree = 1L,
                          field_order = 2L,
+                         order_by = c("persistence", "start"),
                          engine = NULL,                                                  
                          na.rm = FALSE,
                          show.legend = NA,
@@ -78,6 +104,7 @@ stat_barcode <- function(mapping = NULL,
       radius_max = radius_max,
       max_hom_degree = max_hom_degree,
       field_order = field_order,
+      order_by = order_by,
       engine = engine,      
       na.rm = na.rm,
       ...
