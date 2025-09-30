@@ -1,10 +1,37 @@
 #' @include persistence.R
 NULL
 
-#' @name persistence
+#' @name barcode
+#' @title Barcode Diagrams
+#' 
+#' @description 
+#'   Visualize persistence homologies with barcode diagrams.
+#' 
+#' @details
+#'   *Barcode diagrams* are [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html)
+#'    of persistence data.
+#'   
+#' @template persistence-data  
+#' @template persistence-computed-vars  
+#' 
+#' @template ref-carlsson2004
+#' @template ref-carlsson2014
+#' @template ref-chazal2017
+#' 
 #' @import ggplot2
 #' @family plot layers for persistence data
-#' @inheritParams ggplot2::layer
+#' @param order_by A character vector comprised of (`"persistence"`, `"birth"`, and/or `"end"`)
+#'  by which the features should be ordered (within `group`);
+#'  defaults to `c("persistence", "birth")`.
+#' @inheritParams persistence
+#' @inheritParams ggplot2::geom_segment
+#' 
+#' @eval rd_sec_aesthetics(
+#'   stat_barcode = StatBarcode,
+#'   geom_barcode = GeomBarcode
+#' )
+#' 
+#' @example inst/examples/ex-barcode.R
 NULL
 
 # file.edit("tests/testthat/test-barcode.R")
@@ -119,8 +146,8 @@ GeomBarcode <- ggproto(
   "GeomBarcode", GeomSegment
 )
 
-#' @rdname persistence
-#' @order 4
+#' @rdname barcode
+#' @order 2
 #' @export
 geom_barcode <- function(mapping = NULL,
                          data = NULL,

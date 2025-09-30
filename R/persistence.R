@@ -1,133 +1,23 @@
-#' @title Persistence homologies
+#' @name persistence
+#' @title Persistence Diagrams
 #'
 #' @description 
-#'   Compute persistence homologies with `stat_persistence()` and
-#'   plot different visual representations with
-#'   persistence diagrams, persistence landscapes, and barcode diagrams
-#'   using `geom_persistence()`, `geom_landscape()`, and `geom_barcode()`, respectively.
-#'   
-#'   Briefly, these representations can be understood as follows:
-#'   \itemize{
-#'   
-#'   \item{**Persistence diagrams**}{
-#'   are [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
-#'   persistence data.
-#'   }
-#'   
-#'   \item{**Persistence landscapes**}{
-#'   TODO
-#'   }
-#'   
-#'   \item{**Barcode diagrams**}{
-#'   are [vertical interval
-#'   plots](https://ggplot2.tidyverse.org/reference/geom_linerange.html) of
-#'   persistence data.
-#'   }
-#'   
-#'   }
-#'   
-#'   For a more thorough treatment of these representations,
-#'   refer to the **Details** section below and
-#'   \code{vignette("visualize-persistence", package = "ggtda")}.
-#'   
-#' @eval rd_sec_aesthetics(
-#'   stat_persistence = StatPersistence,
-#'   geom_persistence = GeomPersistence,
-#'   geom_landscape = GeomLandscape,
-#'   geom_barcode = GeomBarcode,
-#'   geom_fundamental_box = GeomFundamentalBox
-#' )
+#'   Visualize persistence homologies with persistence diagrams.
+#'   Also, render fundamental boxes at specified time points with
+#'   `geom_fundamental_box()`. 
 #' 
 #' @details
-#' 
-#' Here we provide clarification on the two ways these functions accept data 
-#' (via the `dataset` aesthetic with `stat_persistence()` and the 
-#' `start` and `end` aesthetics in with `stat_identity()`).
-#' We also provide basic theoretical treatments of the methods for visualizing 
-#' persistent homologies.
-#' 
-#' ## Point cloud data:
-#' 
-#'   TODO - Speak to types of data `dataset` aesthetic accepts, preempting 
-#'   discussion of "persistence data".
+#'   *Persistence diagrams* are 
+#'   [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html) of
+#'   persistence data.
 #'   
-#'   TODO - Include minor details on how **ggtda** accepts point cloud data
-#'   (list column with matrix, dataframe, etc).
-#'   Direct to \code{vignette("grouped-list-data", package = "ggtda")}.
+#' @template persistence-data  
+#' @template persistence-computed-vars  
 #' 
-#' ## Persistence data:
-#' 
-#'   *Persistence data* encode the values of an underlying parameter
-#'   \eqn{\epsilon} at which topological features appear ("birth") and disappear
-#'   ("death"). The difference between the birth and the death of a feature is
-#'   called its *persistence*. As topological features may be of different
-#'   dimensions, persistence data sets usually also include the dimension of
-#'   each feature.
-#'
-#'   Persistence data can be provided to `geom_persistence()`, `geom_landscape()`,
-#'   and `geom_landscape()` by specifying `stat = "identity"` and mapping the
-#'   `start` and `end` aesthetics to the "birth" and "death" values in the layer data.
-#'   It is standard to also map aesthetics such as `color` or `linetype` to
-#'   features' "dimension" values in the layer data.
-#'
-#' ## Persistence diagrams:
-#' 
-#'   Persistence diagrams recognize extended persistence data, with negative
-#'   birth/death values arising from the relative part of the filtration.
-#'
-#'   The original persistence diagrams plotted persistence against birth in what
-#'   we call "flat" diagrams, but most plot death against birth in "diagonal"
-#'   diagrams, often with a diagonal line indicating zero persistence.
-#'   In `geom_persistence()`, these alternatives can be specified with 
-#'   the `diagram` parameter.
-#'
-#'   The `geom_fundamental_box()` layer renders fundamental boxes at specified
-#'   time points (Chung & Lawson, 2020).
-#'   
-#' ## Persistence landscapes:
-#' 
-#' Persistence landscapes, anticipated by some alternative coordinatizations
-#' of persistence diagrams, were proposed as Lipschitz functions that demarcate
-#' the Pareto frontiers of persistence diagrams. They can be averaged over the
-#' diagrams obtained from multiple data sets designed or hypothesized to have
-#' been generated from the same underlying topological structure.
-#' 
-#' Note: `geom_persistence()` does not currently recognize extended persistence data.
-#'   
-#' ## Barcode diagrams:
-#'
-#'   Barcode diagrams traditionally extend along the horizontal axis and are arranged
-#'   vertically in order of group (e.g. dimension) and birth. They may also be
-#'   transposed and juxtaposed with persistence diagrams. While
-#'   topological features of different dimensions are usually plotted together
-#'   in persistence diagrams, barcode diagrams often separate segments corresponding to
-#'   features of different dimension, by vertical grouping or by faceting.
-#'
-#'   
 #' @template ref-edelsbrunner2000
 #' @template ref-edelsbrunner2012
 #' @template ref-chung2020
 #' 
-#' @template ref-bubenik2015
-#' @template ref-chazal2017
-#' 
-#' @template ref-carlsson2004
-#' @template ref-carlsson2014
-#' @template ref-chazal2017
-#'
-#' @eval rd_sec_computed_vars(
-#'   stat = "persistence",
-#'   start = "birth value of each feature (from 'dataset' aesthetic).",
-#'   end = "death value of each feature (from 'dataset' aesthetic).",
-#'   dimension = "integer feature dimension (from 'dataset' aesthetic).",
-#'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
-#'   part =
-#'   "whether features belong to ordinary, relative, or extended homology.",
-#'   persistence =
-#'   "differences between birth and death values of features."
-#' )
-#' 
-#' @name persistence
 #' @import ggplot2
 #' @family plot layers for persistence data
 #' @seealso [ggplot2::layer()] for additional arguments.
@@ -136,9 +26,6 @@
 #'   if `TRUE`, `NA` lodes constitute a separate category, plotted in grey
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
-#' @param order_by A character vector comprised of (`"start"`, `"end"`,
-#'  `"part"`, and/or `"persistence"`) by which the features should be ordered 
-#'  (within `group`); defaults to `c("persistence", "start")`.
 #' @param diagram One of `"flat"`, `"diagonal"`, or `"landscape"`; the
 #'   orientation for the diagram should take.
 #' @param t A numeric vector of time points at which to place fundamental boxes.
@@ -153,10 +40,13 @@
 #'   persistent homology.
 #' @param engine The computational engine to use (see 'Details'). Reasonable
 #'   defaults are chosen based on `filtration`.
+#'   
+#' @eval rd_sec_aesthetics(
+#'   stat_persistence = StatPersistence,
+#'   geom_persistence = GeomPersistence
+#' )#'   
+#'   
 #' @example inst/examples/ex-persistence.R
-#' @example inst/examples/ex-landscape.R
-#' @example inst/examples/ex-barcode.R
-#' @example inst/examples/ex-barcode.R
 #' @example inst/examples/ex-persistence-extended.R
 #' @example inst/examples/ex-persistence-dataset.R
 NULL

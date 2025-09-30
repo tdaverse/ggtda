@@ -1,14 +1,39 @@
 #' @include persistence.R
 NULL
 
-#' @name persistence
-#' @include persistence.R
+#' @name landscape
+#' @title Persistence Landscapes
+#'  
+#' @description Visualize persistence homologies with persistence landscapes.
+#' 
+#' @details
+#' *Persistence landscapes*, anticipated by some alternative coordinatizations
+#' of persistence diagrams, were proposed as Lipschitz functions that demarcate
+#' the Pareto frontiers of persistence diagrams. They can be averaged over the
+#' diagrams obtained from multiple data sets designed or hypothesized to have
+#' been generated from the same underlying topological structure.
+#'   
+#'   Persistence landscapes do not currently recognize extended persistence data.
+#'   
+#' @template persistence-data  
+#' @template persistence-computed-vars  
+#' 
+#' @template ref-bubenik2015
+#' @template ref-chazal2017
+#' 
 #' @import ggplot2
 #' @family plot layers for persistence data
-#' @inheritParams ggplot2::layer
-#' @inheritParams ggplot2::geom_path
+#' @inheritParams persistence
 #' @param n_levels The number of levels to compute and plot. If `Inf` (the
 #'   default), determined to be all levels.
+#' @inheritParams ggplot2::geom_path
+#'   
+#' @eval rd_sec_aesthetics(
+#'   stat_landscape = StatLandscape,
+#'   geom_landscape = GeomLandscape
+#' )
+#' 
+#' @example inst/examples/ex-landscape.R
 NULL
 
 # file.edit("inst/examples/ex-landscape.R")
@@ -45,15 +70,12 @@ StatLandscape <- ggproto(
     data <- diagram_transform(data, params$diagram %||% "landscape")
     data$slope <- diagram_slope(params$diagram %||% "landscape")
     
-    # TODO: If birth + death is specified they're dropped!
-    #       Need to keep them around as they're "required" aesthetics!
-    
     data
   }
 )
 
-#' @rdname persistence
-#' @order 3
+#' @rdname landscape
+#' @order 1
 #' @export
 stat_landscape <- function(mapping = NULL,
                            data = NULL,
@@ -156,8 +178,8 @@ GeomLandscape <- ggproto(
   }
 )
 
-#' @rdname persistence
-#' @order 3
+#' @rdname landscape
+#' @order 2
 #' @export
 geom_landscape <- function(mapping = NULL,
                            data = NULL,
