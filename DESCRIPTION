@@ -3,14 +3,14 @@ Type: Package
 Title: 'ggplot2' Extension to Visualize Topological Persistence
 Version: 0.1.0
 Authors@R: c(
-    person("Jason Cory", "Brunson",
-           role = c("aut", "cre"),
-           email = "cornelioid@gmail.com",
-           comment = c(ORCID = "0000-0003-3126-9494")),
     person("James", "Otto",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "jamesotto852@gmail.com",
            comment = c(ORCID = "0000-0002-0665-2515")),
+    person("Jason Cory", "Brunson",
+           role = c("aut"),
+           email = "cornelioid@gmail.com",
+           comment = c(ORCID = "0000-0003-3126-9494")),
     person("Raoul", "Wadhwa",
            role = c("aut"),
            email = "raoulwadhwa@gmail.com",
