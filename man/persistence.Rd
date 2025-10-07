@@ -215,71 +215,58 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
-
 # toy example
 toy.data <- data.frame(
   birth = c(0, 0, 1, 2, 1.5),
   death = c(5, 3, 5, 3, 6),
   dim = c("0", "0", "2", "1", "1")
 )
-# diagonal persistence diagram, coding persistence to transparency
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence(aes(alpha = after_stat(persistence)),
-                   diagram = "diagonal", size = 3) +
-  geom_abline(intercept = 0, slope = 1) +
-  lims(x = c(0, 6), y = c(0, 6)) +
-  guides(alpha = "none")
-# diagonal persistence diagram with fundamental boxes
-ggplot(toy.data,
-       aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence() +
-  geom_abline(intercept = 0, slope = 1) +
-  geom_fundamental_box(t = c(1.5, 5.5),
-                       color = "goldenrod", fill = "goldenrod") +
-  lims(x = c(0, 6), y = c(0, 6)) +
-  guides(alpha = "none")
-# flat persistence diagram, coding dimension to numeral
-ggplot(toy.data,
-       aes(start = birth, end = death, label = dim)) +
-  theme_persist() +
-  stat_persistence(diagram = "flat", geom = "text") +
-  lims(x = c(0, NA), y = c(0, NA))
-# flat persistence diagram, labeling by feature ID
-ggplot(toy.data, aes(start = birth, end = death, colour = dim, shape = dim)) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence(
-    geom = "text",
-    aes(label = after_stat(id), alpha = after_stat(persistence)),
-    diagram = "flat", size = 3
-  ) +
-  guides(alpha = "none")
 
-# toy extended persistence data, adapted from Carriere & Oudot (2015)
-eph.data <- data.frame(
-  dimension = c(0L, 1L, 0L, 1L),
-  birth = c(1, -9, 1, 8),
-  death = c(5, -7, -11, -3)
-)
-# extended persistence diagram
-ggplot(eph.data,
-       aes(start = birth, end = death, color = factor(dimension))) +
-  theme_persist() +
-  coord_equal() +
-  stat_persistence(aes(shape = after_stat(part)), size = 3) +
+# Basic visualization of persistence
+ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
+  geom_persistence(size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  lims(x = c(0, 11), y = c(0, 11)) +
-  labs(color = "Dimension", shape = "Homology")
-# extended barcode
-ggplot(eph.data,
-       aes(start = birth, end = death, color = factor(dimension))) +
-  theme_barcode() +
-  geom_barcode(aes(linetype = after_stat(part)))
+  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) 
+
+# Stylized visualization, mapping persistence to alpha (opacity)
+ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
+  geom_persistence(aes(alpha = after_stat(persistence)), size = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) +
+  guides(alpha = "none") +
+  theme_persist() +
+  labs(
+    x = "Birth",
+    y = "Death",
+    color = "Dimension",
+    shape = "Dimension"
+  )
+
+# diagonal persistence diagram with fundamental boxes
+ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
+  geom_persistence(aes(alpha = after_stat(persistence)), size = 3) +
+  geom_fundamental_box(t = c(1.5, 5.5), color = "goldenrod", fill = "goldenrod") +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) +
+  guides(alpha = "none") +
+  theme_persist() +
+  labs(
+    x = "Birth",
+    y = "Death",
+    color = "Dimension",
+    shape = "Dimension"
+  )
+
+# flat persistence diagram, mapping dimension to numeral
+ggplot(toy.data, aes(birth = birth, death = death)) +
+  geom_persistence(diagram = "flat") +
+  geom_label(aes(label = dim), stat = "persistence", diagram = "flat", nudge_y = .15) +
+  guides(alpha = "none") +
+  theme_persist() +
+  labs(
+    x = "Birth",
+    y = "Persistence"
+  )
 
 # list-column of data sets to 'dataset' aesthetic
 raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
