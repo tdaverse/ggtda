@@ -166,12 +166,12 @@ called its "persistence". As topological features may be of different
 dimensions, persistence data sets usually also include the dimension of
 each feature.
 
-Persistence data can be specified in two ways in \strong{gtda}:
+Persistence data can be specified in two ways in \strong{ggtda}:
 \enumerate{
 \item \strong{The \code{birth} and \code{death} aesthetics}. Pre-computed persistence homologies
 can be supplied directly to layer functions in \strong{ggtda}, the columns of \code{data}
-with the values of \eqn{\epsilon} for the birth and death for each feature
-must be mapped to the \code{birth} and \code{death} aesthetics, respectively.
+with the birth and death values for each feature must be mapped to the
+\code{birth} and \code{death} aesthetics, respectively.
 \item \strong{The \code{dataset} aesthetic}. Instead of a pre-computed persistence homology,
 \strong{ggtda} will compute the persistence homologies for arbitrary data sets.
 This requires the use of a nested \code{tibble} with list columns, the \code{data}

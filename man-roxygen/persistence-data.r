@@ -7,12 +7,12 @@
 #'   dimensions, persistence data sets usually also include the dimension of
 #'   each feature.
 #' 
-#' Persistence data can be specified in two ways in **gtda**:
+#' Persistence data can be specified in two ways in **ggtda**:
 #' 
 #' 1. **The `birth` and `death` aesthetics**. Pre-computed persistence homologies
 #' can be supplied directly to layer functions in **ggtda**, the columns of `data`
-#' with the values of \eqn{\epsilon} for the birth and death for each feature 
-#' must be mapped to the `birth` and `death` aesthetics, respectively.
+#' with the birth and death values for each feature must be mapped to the 
+#' `birth` and `death` aesthetics, respectively.
 #' 
 #' 2. **The `dataset` aesthetic**. Instead of a pre-computed persistence homology,
 #'  **ggtda** will compute the persistence homologies for arbitrary data sets.

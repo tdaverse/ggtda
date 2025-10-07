@@ -4,7 +4,7 @@
 #'   birth = "birth value of each feature (from 'dataset' aesthetic).",
 #'   death = "death value of each feature (from 'dataset' aesthetic).",
 #'   persistence = "differences between birth and death values of features.",
-#'   infinite_death = "logical, is the feature's death at infinity",
+#'   infinite = "logical, is the feature's death at infinity",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   part =
 #'   "whether features belong to ordinary, relative, or extended homology.",

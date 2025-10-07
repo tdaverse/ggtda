@@ -104,7 +104,8 @@ defaults to \code{c("persistence", "birth")}.}
 defaults are chosen based on \code{filtration}.}
 
 \item{infinity_break}{Where to plot the death of features with infinite
-persistence (i.e. \code{death == Inf}), defaults to \code{Inf}.}
+persistence (i.e. \code{death == Inf}). Defaults to \code{Inf}, corresponding to the edge
+of the plotting window.}
 
 \item{na.rm}{Logical: if \code{FALSE}, the default, \code{NA} lodes are not included;
 if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
@@ -153,12 +154,12 @@ called its "persistence". As topological features may be of different
 dimensions, persistence data sets usually also include the dimension of
 each feature.
 
-Persistence data can be specified in two ways in \strong{gtda}:
+Persistence data can be specified in two ways in \strong{ggtda}:
 \enumerate{
 \item \strong{The \code{birth} and \code{death} aesthetics}. Pre-computed persistence homologies
 can be supplied directly to layer functions in \strong{ggtda}, the columns of \code{data}
-with the values of \eqn{\epsilon} for the birth and death for each feature
-must be mapped to the \code{birth} and \code{death} aesthetics, respectively.
+with the birth and death values for each feature must be mapped to the
+\code{birth} and \code{death} aesthetics, respectively.
 \item \strong{The \code{dataset} aesthetic}. Instead of a pre-computed persistence homology,
 \strong{ggtda} will compute the persistence homologies for arbitrary data sets.
 This requires the use of a nested \code{tibble} with list columns, the \code{data}

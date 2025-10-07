@@ -41,7 +41,8 @@
 #' @param engine The computational engine to use (see 'Details'). Reasonable
 #'   defaults are chosen based on `filtration`.
 #' @param infinity_break Where to plot the death of features with infinite
-#'  persistence (i.e. `death == Inf`), defaults to `Inf`.
+#'  persistence (i.e. `death == Inf`). Defaults to `Inf`, corresponding to the edge
+#'  of the plotting window.
 #'   
 #' @eval rd_sec_aesthetics(
 #'   stat_persistence = StatPersistence,
