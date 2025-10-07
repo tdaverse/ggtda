@@ -180,20 +180,29 @@ StatPersistence <- ggproto(
       data$dimension <- ordered(data$dimension, c(0, seq_len(params$max_hom_degree)))
     }
     
-    # compute 'persistence'
+    # compute `persistence`
     data$persistence <- data$death - data$birth
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
    
+    # Issue warning if any finite `death` values above supplied infinity break
+    if (any(params$infinity_break < setdiff(data$death, Inf))) {
+      warning(
+        "Persistence homology `death` values exceed specified `infinity_break`.\n",
+        "This can result in misleading visuals, consider choosing a larger value.",
+        call. = FALSE
+      )
+    }
+      
     # Computed variable, what features have death at Inf
-    data$infinite_death <- is.infinite(data$death)
+    data$infinite <- is.infinite(data$death)
     # TODO: similar computed variable for censored death once {ripserr} PR is finished
     
     # Temporarily set death as `params$infinity_break`,
     # this allows plotting death at finite value in {ggplot2} --
     # we make this change for the positional aesthetics and then reverse it
     # for the computed aesthetic `death`
-    data$death[data$infinite_death] <- params$infinity_break
+    data$death[data$infinite] <- params$infinity_break
     # TODO: similar trick for censored death once {ripserr} PR is finished
      
     # Different Stats will derive these in other ways, custom method to handle
@@ -203,7 +212,7 @@ StatPersistence <- ggproto(
     # Temporarily set infinite death values to be their features' birth values
     # to avoid issues with deafult filtering by `Stat$compute_layer()`
     #   -- This is reverse in `compute_group()`.   
-    data$death[data$infinite_death] <- data$birth[data$infinite_death]
+    data$death[data$infinite] <- data$birth[data$infinite]
     # TODO: similar trick for censored death once {ripserr} PR is finished
     
     data
@@ -228,7 +237,7 @@ StatPersistence <- ggproto(
   compute_group = function(self, data, scales, infinity_break = Inf) {
     
     # Reintroduce infinite values of `data$death
-    data$death[data$infinite_death] <- infinity_break
+    data$death[data$infinite] <- infinity_break
     # TODO: Will need similar re-coding for censored deaths
     
     # Make sure positional aesthetics get back transformed from scales
