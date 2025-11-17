@@ -16,9 +16,6 @@
 
 #' @section Persistence diagrams:
 
-#'   Persistence diagrams recognize extended persistence data, with negative
-#'   birth/death values arising from the relative part of the filtration.
-#'
 #'   The original persistence diagrams plotted persistence against birth in what
 #'   we call "flat" diagrams, but most plot death against birth in "diagonal"
 #'   diagrams, often with a diagonal line indicating zero persistence.
@@ -44,8 +41,6 @@
 #'   dimension = "integer feature dimension (from 'dataset' aesthetic).",
 #'   group = "interaction of existing 'group', dataset ID, and 'dimension'.",
 #'   id = "character feature identifier (across 'group').",
-#'   part =
-#'   "whether features belong to ordinary, relative, or extended homology.",
 #'   persistence =
 #'   "differences between birth and death values of features."
 #' )
@@ -60,7 +55,7 @@
 #'   (regardless of the color scheme).
 #' @param ... Additional arguments passed to [ggplot2::layer()].
 #' @param order_by A character vector of required or computed variables
-#'   (`"start"`, `"end"`, `"part"`, and/or `"persistence"`) by which the
+#'   (`"start"`, `"end"`, and/or `"persistence"`) by which the
 #'   features should be ordered (within `group`); defaults to `c("persistence",
 #'   "start")`. This will most notably impact the appearance of [barcode]s.
 #' @param decreasing Logical; whether to sort features by decreasing values of
@@ -262,23 +257,14 @@ StatPersistence <- ggproto(
     engine = NULL
   ) {
     
-    # points in cartesian coordinates (un-negated from opposite filtration)
-    data$x <- abs(data$start)
-    data$y <- abs(data$end)
-    
-    # compute 'part'
-    data$part <- with(data, {
-      part <- NA_character_
-      part[start >= 0 & end >= 0] <- "ordinary"
-      part[start <  0 & end <  0] <- "relative"
-      part[start >= 0 & end <  0] <- "extended"
-      factor(part, levels = c("ordinary", "relative", "extended"))
-    })
-    
     # compute 'persistence'
-    data$persistence <- data$end - data$start
+    data$persistence <- abs(data$end - data$start)
     # (negative or infinite for extended points?)
     # data$persistence <- ifelse(data$persistence < 0, Inf, data$persistence)
+    
+    # points in cartesian coordinates
+    data$x <- data$start
+    data$y <- data$end
     
     # computed variable: `id` (sort by `group`, then `order_by`)
     interaction_args <- c(
@@ -452,7 +438,7 @@ geom_fundamental_box <- function(mapping = NULL,
 
 # Helper functions ---------------------------------------------------------
 
-order_by_options <- c("start", "end", "part", "persistence")
+order_by_options <- c("start", "end", "persistence")
 
 diagram_transform <- function(data, diagram) {
   switch(

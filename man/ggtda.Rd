@@ -2,8 +2,8 @@
 % Please edit documentation in R/ggtda.R
 \docType{package}
 \name{ggtda}
-\alias{ggtda-package}
 \alias{ggtda}
+\alias{ggtda-package}
 \title{A \emph{ggplot2} Extension for Persistence Data}
 \description{
 \emph{ggtda} is a user-friendly \emph{ggplot2} extension for visualizing
