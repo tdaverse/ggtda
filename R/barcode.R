@@ -8,12 +8,17 @@ NULL
 #'   Visualize persistence homologies with barcode diagrams.
 #' 
 #' @details
-#'   *Barcode diagrams* are [scatterplots](https://ggplot2.tidyverse.org/reference/geom_point.html)
-#'    of persistence data.
+#'   *Barcode diagrams* represent persistence data with [line segments](https://ggplot2.tidyverse.org/reference/geom_segment.html).
+#'   
+#'   They can be understood as the "persistence analogue of a Betti number",
+#'   visualizing persistence homologies in such a way that significant topological features are made evident
+#'   even in the presence of noise (Ghrist, 2008).
+#'   
 #'   
 #' @template persistence-data  
 #' @template persistence-computed-vars  
 #' 
+#' @template ref-ghrist2008
 #' @template ref-carlsson2004
 #' @template ref-carlsson2014
 #' @template ref-chazal2017

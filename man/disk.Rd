@@ -42,7 +42,7 @@ from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
 \item{stat}{The statistical transformation to use on the data for this layer.
 When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
+argument can be used to override the default coupling between geoms and
 stats. The \code{stat} argument accepts the following:
 \itemize{
 \item A \code{Stat} ggproto subclass, for example \code{StatCount}.
@@ -79,12 +79,14 @@ approximates each disk}
 \code{NA}, the default, includes if any aesthetics are mapped.
 \code{FALSE} never includes, and \code{TRUE} always includes.
 It can also be a named logical vector to finely select the aesthetics to
-display.}
+display. To include legend keys for all levels, even
+when no data exists, use \code{TRUE}.  If \code{NA}, all levels are shown in legend,
+but unobserved levels are omitted.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+the default plot specification, e.g. \code{\link[ggplot2:annotation_borders]{annotation_borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 }
@@ -121,6 +123,31 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
+
+# function to generate noisy 2D circles
+make_noisy_circle <- function(n, sd = .01) {
+  theta <- stats::runif(n = n, min = 0, max = 2*pi)
+  cbind(x = cos(theta) + stats::rnorm(n, 0, sd),
+        y = sin(theta) + stats::rnorm(n, 0, sd))
+}
+
+# generate a noisy 2D circle
+set.seed(1)
+d <- as.data.frame(make_noisy_circle(n = 36L, sd = .15))
+r <- 1/6
+
+# plot disks beneath points
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  geom_disk(radius = r, fill = "aquamarine3") +
+  geom_point()
+# use `diameter` parameter
+ggplot(d, aes(x = x, y = y)) +
+  theme_bw() +
+  coord_fixed() +
+  geom_disk(diameter = 2*r, fill = "aquamarine3") +
+  geom_point()
 
 # generate a noisy 2D circle
 set.seed(2)

@@ -115,18 +115,20 @@ if \code{TRUE}, \code{NA} lodes constitute a separate category, plotted in grey
 \code{NA}, the default, includes if any aesthetics are mapped.
 \code{FALSE} never includes, and \code{TRUE} always includes.
 It can also be a named logical vector to finely select the aesthetics to
-display.}
+display. To include legend keys for all levels, even
+when no data exists, use \code{TRUE}.  If \code{NA}, all levels are shown in legend,
+but unobserved levels are omitted.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+the default plot specification, e.g. \code{\link[ggplot2:annotation_borders]{annotation_borders()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
 \item{stat}{The statistical transformation to use on the data for this layer.
 When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
+argument can be used to override the default coupling between geoms and
 stats. The \code{stat} argument accepts the following:
 \itemize{
 \item A \code{Stat} ggproto subclass, for example \code{StatCount}.
@@ -141,8 +143,11 @@ give the stat as \code{"count"}.
 Visualize persistence homologies with barcode diagrams.
 }
 \details{
-\emph{Barcode diagrams} are \href{https://ggplot2.tidyverse.org/reference/geom_point.html}{scatterplots}
-of persistence data.
+\emph{Barcode diagrams} represent persistence data with \href{https://ggplot2.tidyverse.org/reference/geom_segment.html}{line segments}.
+
+They can be understood as the "persistence analogue of a Betti number",
+visualizing persistence homologies in such a way that significant topological features are made evident
+even in the presence of noise (Ghrist, 2008).
 }
 \section{Persistence data}{
 
@@ -223,6 +228,10 @@ ggplot(circ.phom, aes(start = birth, end = death,
   theme_barcode()
 }
 \references{
+R Ghrist (2008) Barcodes: The persistent topology of data
+\emph{Bulletin of the American Mathematical Society}, \strong{45} 61--75.
+\url{https://ams.org/journals/bull/2008-45-01/S0273-0979-07-01191-3/S0273-0979-07-01191-3.pdf}
+
 G Carlsson, A Zomorodian, A Collins, and L Guibas (2004) Persistence barcodes
 for shapes. \emph{Proceedings of the 2004 Eurographics/ACM SIGGRAPH symposium on
 Geometry processing}, 124--135. \doi{10.1145/1057432.1057449}

@@ -47,7 +47,7 @@
 #' @eval rd_sec_aesthetics(
 #'   stat_persistence = StatPersistence,
 #'   geom_persistence = GeomPersistence
-#' )#'   
+#' )   
 #'   
 #' @example inst/examples/ex-persistence.R
 #' @example inst/examples/ex-persistence-dataset.R
@@ -209,7 +209,7 @@ StatPersistence <- ggproto(
     data <- self$derive_positional_aes(data, params)
     
     # Temporarily set infinite death values to be their features' birth values
-    # to avoid issues with deafult filtering by `Stat$compute_layer()`
+    # to avoid issues with default filtering by `Stat$compute_layer()`
     #   -- This is reverse in `compute_group()`.   
     data$death[data$infinite] <- data$birth[data$infinite]
     # TODO: similar trick for censored death once {ripserr} PR is finished
@@ -218,7 +218,7 @@ StatPersistence <- ggproto(
   },
   
   # Stat-specific positional aesthetics,
-  # must manually handle there scale transforms in $compute_group()
+  # must manually handle their scale transforms in $compute_group()
   positional_aes = c("x", "y"),
   
   derive_positional_aes = function(data, params) {
@@ -229,9 +229,6 @@ StatPersistence <- ggproto(
     
     data
   },
-  
-  # Stat$compute_layer is removing points at infinity!
-  # Can't access `scales` in compute_layer... how to fix?
   
   compute_group = function(self, data, scales, infinity_break = Inf) {
     
