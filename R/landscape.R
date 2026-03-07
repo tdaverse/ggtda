@@ -16,7 +16,8 @@ NULL
 #'   Persistence landscapes do not currently recognize extended persistence data.
 #'   
 #' @template persistence-data  
-#' @template persistence-computed-vars  
+#' 
+#' @inheritSection persistence Computed variables
 #' 
 #' @template ref-bubenik2015
 #' @template ref-chazal2017

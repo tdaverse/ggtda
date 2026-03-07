@@ -49,8 +49,7 @@
 #'   geom_simplicial_complex = GeomSimplicialComplex
 #' )
 
-#' @eval rd_sec_computed_vars(
-#'   stat = "simplicial_complex",
+#' @eval rd_computed_vars(
 #'   dimension = "integer dimension of the corresponding simplex.",
 #'   id = "character simplex identifier within each `dimension`.",
 #'   face = "factor encoding of `dimension` for `>= 2L`-dimensional simplices."

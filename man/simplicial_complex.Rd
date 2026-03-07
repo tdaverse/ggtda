@@ -232,7 +232,7 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 
 \section{Computed variables}{
 
-\code{stat_simplicial_complex} calculates the following variables that can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
+These are calculated by the 'stat' part of layers and can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
 \itemize{
 \item \code{after_stat(dimension)}\cr integer dimension of the corresponding simplex.
 \item \code{after_stat(id)}\cr character simplex identifier within each \code{dimension}.

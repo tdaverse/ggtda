@@ -208,6 +208,19 @@ discussion of the \code{dataset} aesthetic's use.
 Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", package = "ggplot2")}.
 }
 
+\section{Computed variables}{
+
+These are calculated by the 'stat' part of layers and can be accessed with \link[ggplot2:aes_eval]{delayed evaluation}.
+\itemize{
+\item \code{after_stat(dimension)}\cr integer feature dimension.
+\item \code{after_stat(birth)}\cr birth value of each feature.
+\item \code{after_stat(death)}\cr death value of each feature.
+\item \code{after_stat(persistence)}\cr differences between birth and death values of features.
+\item \code{after_stat(infinite)}\cr logical, is the feature's death at infinity
+\item \code{after_stat(group)}\cr interaction of existing 'group', dataset ID, and 'dimension'.
+}
+}
+
 \examples{
 # toy example
 toy.data <- data.frame(

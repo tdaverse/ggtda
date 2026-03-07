@@ -16,7 +16,8 @@ NULL
 #'   
 #'   
 #' @template persistence-data  
-#' @template persistence-computed-vars  
+#' 
+#' @inheritSection persistence Computed variables
 #' 
 #' @template ref-ghrist2008
 #' @template ref-carlsson2004

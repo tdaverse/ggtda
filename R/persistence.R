@@ -12,7 +12,15 @@
 #'   persistence data.
 #'   
 #' @template persistence-data  
-#' @template persistence-computed-vars  
+#' 
+#' @eval rd_computed_vars(
+#'   dimension = "integer feature dimension.",
+#'   birth = "birth value of each feature.",
+#'   death = "death value of each feature.",
+#'   persistence = "differences between birth and death values of features.",
+#'   infinite = "logical, is the feature's death at infinity",
+#'   group = "interaction of existing 'group', dataset ID, and 'dimension'."
+#' ) 
 #' 
 #' @template ref-edelsbrunner2000
 #' @template ref-edelsbrunner2012
