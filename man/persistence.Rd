@@ -230,105 +230,97 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
-# toy example
-toy.data <- data.frame(
-  birth = c(0, 0, 1, 2, 1.5),
-  death = c(5, 3, 5, 3, 6),
-  dim = c("0", "0", "2", "1", "1")
-)
+# 100 points at random intervals on S1
+set.seed(1); angles <- runif(100, 0, 2 * pi)
+circle2d <- cbind(x = cos(angles), y = sin(angles)) 
 
-# Basic visualization of persistence
-ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
+ggplot(circle2d, aes(x, y)) + 
+  geom_point() +
+  coord_fixed()
+
+# Tibble with list column containing S1 pointcloud data 
+df_pointcloud <- tibble::tibble(data = list(circle2d))
+
+# Compute and plot persistence with `dataset` aesthetic of `geom_persistence()`:
+ggplot(df_pointcloud, aes(dataset = data, colour = after_stat(dimension))) +
   geom_persistence(size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) 
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(x = "Birth", y = "Death")
 
-# Stylized visualization, mapping persistence to alpha (opacity)
-ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
-  geom_persistence(aes(alpha = after_stat(persistence)), size = 3) +
+# Alternatively, plot pre-computed filtration with `birth` and `death` aesthetics:
+df_phom <- as.data.frame(ripserr::vietoris_rips(circle2d))
+df_phom$dimension <- ordered(df_phom$dimension, levels = c(0, 1))
+
+ggplot(df_phom, aes(birth = birth, death = death, color = dimension)) +
+  geom_persistence(size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) +
-  guides(alpha = "none") +
-  theme_persist() +
-  labs(
-    x = "Birth",
-    y = "Death",
-    color = "Dimension",
-    shape = "Dimension"
-  )
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(x = "Birth", y = "Death")
 
-# diagonal persistence diagram with fundamental boxes
-ggplot(toy.data, aes(birth = birth, death = death, color = dim, shape = dim)) +
-  geom_persistence(aes(alpha = after_stat(persistence)), size = 3) +
-  geom_fundamental_box(t = c(1.5, 5.5), color = "goldenrod", fill = "goldenrod") +
+# Emphasize regions of interest with `geom_fundamental_box()`:
+ggplot(df_phom, aes(birth = birth, death = death, color = dimension)) +
+  geom_fundamental_box(t = c(.5, 1.5), color = "goldenrod", fill = "goldenrod") +
+  geom_persistence(size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  coord_equal(xlim = c(0, 6), ylim = c(0, 6)) +
-  guides(alpha = "none") +
-  theme_persist() +
-  labs(
-    x = "Birth",
-    y = "Death",
-    color = "Dimension",
-    shape = "Dimension"
-  )
-
-# flat persistence diagram, mapping dimension to numeral
-ggplot(toy.data, aes(birth = birth, death = death)) +
-  geom_persistence(diagram = "flat") +
-  geom_label(aes(label = dim), stat = "persistence", diagram = "flat", nudge_y = .15) +
-  guides(alpha = "none") +
-  theme_persist() +
-  labs(
-    x = "Birth",
-    y = "Persistence"
-  )
-
-# list-column of data sets to 'dataset' aesthetic
-raw_data <- data.frame(obj = I(list(eurodist, 10*swiss, Nile)))
-raw_data$class <- vapply(raw_data$obj, class, "")
-
-if ("TDA" \%in\% rownames(utils::installed.packages())) {
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(x = "Birth", y = "Death")
   
-  # barcodes
-  ggplot(raw_data, aes(dataset = obj)) +
-    geom_barcode(aes(color = factor(after_stat(dimension))),
-                 engine = "TDA") +
-    facet_wrap(facets = vars(class))
-  # persistence diagram
-  ggplot(raw_data, aes(dataset = obj)) +
-    stat_persistence(aes(color = factor(after_stat(dimension)), shape = class),
-                     engine = "GUDHI")
-  # persistence landscape
-  ggplot(raw_data, aes(dataset = obj)) +
-    facet_wrap(facets = vars(class), scales = "free") +
-    stat_landscape(aes(color = factor(after_stat(dimension))),
-                   engine = "Dionysus") +
-    theme(legend.position = "bottom")
-  
+
+# Specify how infinite features are plotted with `infinity_break`:
+ggplot(df_pointcloud, aes(dataset = data, colour = after_stat(dimension))) +
+  geom_hline(yintercept = 3, linetype = "dashed") +
+  geom_persistence(size = 3, infinity_break = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(x = "Birth", y = "Death")
+
+# Further specify with computed variable `after_stat(infinite)`:
+ggplot(df_pointcloud, aes(dataset = data, colour = after_stat(dimension))) +
+  geom_hline(yintercept = 3, linetype = "dashed") +
+  geom_persistence(aes(shape = after_stat(infinite)), infinity_break = 3, size = 3, stroke = 2) +
+  geom_abline(intercept = 0, slope = 1) +
+  scale_shape_manual(values = c("TRUE" = 8, "FALSE" = 20)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  guides(shape = "none") +
+  labs(x = "Birth", y = "Death")
+
+
+# The `dataset` aesthetic allows for the simultaneous plotting of multiple persistences
+sim_s2 <- function(n) {
+  angles <- runif(n, 0, 2 * pi)
+  cbind(x = cos(angles), y = sin(angles)) 
 }
 
-if ("ripserr" \%in\% rownames(utils::installed.packages())) {
-  
-  # exclude time series data if {ripserr} v0.1.1 is installed
-  if (utils::packageVersion("ripserr") == "0.1.1")
-    raw_data <- raw_data[c(1L, 2L), ]
-  # barcodes
-  ggplot(raw_data, aes(dataset = obj)) +
-    geom_barcode(aes(color = factor(after_stat(dimension))),
-                 engine = "ripserr") +
-    facet_wrap(facets = vars(class))
-  # persistence diagram
-  ggplot(raw_data, aes(dataset = obj)) +
-    stat_persistence(aes(color = factor(after_stat(dimension)), shape = class),
-                     engine = "ripserr")
-  # persistence landscape
-  ggplot(raw_data, aes(dataset = obj)) +
-    facet_wrap(facets = vars(class), scales = "free") +
-    stat_landscape(aes(color = factor(after_stat(dimension))),
-                   engine = "ripserr") +
-    theme(legend.position = "bottom")
-  
-}
+set.seed(1)
+df_pointcloud_n <- tibble::tibble(
+  n = c(10, 20, 40),
+  data = lapply(n, sim_s2)
+)
+
+# One facet per `dataset`
+ggplot(df_pointcloud_n, aes(dataset = data, colour = after_stat(dimension))) +
+  geom_persistence(size = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  scale_color_brewer(type = "qual", palette = 2) +
+  facet_wrap(vars(n)) +
+  labs(x = "Birth", y = "Death")
+
+# Plotting together, observe how the persistence of the 1-dimensional feature increases with n
+ggplot(df_pointcloud_n, aes(dataset = data, color = factor(n), shape = after_stat(as.character(dimension)))) +
+  geom_persistence(size = 3) +
+  geom_abline(intercept = 0, slope = 1) +
+  scale_color_brewer(type = "seq", palette = 15) +
+  coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
+  labs(x = "Birth", y = "Death", shape = "Dimension", color = "N")
+
+
 }
 \references{
 H Edelsbrunner, D Letscher, and A Zomorodian (2000) Topological persistence

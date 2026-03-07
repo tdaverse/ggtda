@@ -58,12 +58,10 @@
 #' )   
 #'   
 #' @example inst/examples/ex-persistence.R
-#' @example inst/examples/ex-persistence-dataset.R
 NULL
 
 # file.edit("tests/testthat/test-persistence.R")
 # file.edit("inst/examples/ex-persistence.R")
-# file.edit("inst/examples/ex-persistence-dataset.R")
 
 #' @rdname ggtda-ggproto
 #' @format NULL
@@ -71,10 +69,6 @@ NULL
 #' @export
 StatPersistence <- ggproto(
   "StatPersistence", Stat, 
-  
-  # "StatPersistence", StatIdentity, 
-  # Inhereit from StatIdentity because it allows points at infinity?
-  # But it skips compute_group()...
   
   required_aes = c("dataset|birth", "dataset|death"),
   
