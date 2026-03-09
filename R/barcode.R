@@ -84,9 +84,12 @@ StatBarcode <- ggproto(
     
     # compute vertical position (sort by `group`, then `order_by`)
     interaction_args <- c(
-      # first sort by group
+      # first sort by PANEL 
+      # (ensure all panel IDs are sequential, for facetting with "free_y")
+      if (! is.null(data$PANEL)) list(data$PANEL),
+      # next sort by group
       if (! is.null(data$group)) list(data$group),
-      # next sort by specified properties in order
+      # finally, sort by specified properties in order
       lapply(params$order_by, function(col) data[[col]]),
       # additional parameters to `interaction`,
       # drop unused levels and use lexicographic order
