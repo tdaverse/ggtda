@@ -230,6 +230,8 @@ Learn more about setting these aesthetics in \code{vignette("ggplot2-specs", pac
 }
 
 \examples{
+theme_set(theme_persist())
+
 # 100 points at random intervals on S1
 set.seed(1); angles <- runif(100, 0, 2 * pi)
 circle2d <- cbind(x = cos(angles), y = sin(angles)) 
@@ -316,7 +318,7 @@ ggplot(df_pointcloud_n, aes(dataset = data, colour = after_stat(dimension))) +
 ggplot(df_pointcloud_n, aes(dataset = data, color = factor(n), shape = after_stat(as.character(dimension)))) +
   geom_persistence(size = 3) +
   geom_abline(intercept = 0, slope = 1) +
-  scale_color_brewer(type = "seq", palette = 15) +
+  scale_color_brewer(type = "seq", palette = 'RdPu') +
   coord_fixed(xlim = c(0, 3), ylim = c(0, 3))  +
   labs(x = "Birth", y = "Death", shape = "Dimension", color = "N")
 
