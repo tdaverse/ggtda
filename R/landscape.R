@@ -247,7 +247,10 @@ landscape_path <- function(data, n_levels = Inf) {
   }
   
   # `data$group` encodes both PANEL and group (dimension)
+  # levels of `$group` factors are Cartesian product,
+  # may result in empty data frames after split; remove these with `Filter()`
   data_split <- split(data, data$group)
+  data_split <- Filter(function(df) nrow(df) > 0, data_split)
   data_split <- lapply(data_split, landscape_path_group, n_levels = n_levels)
   data <- do.call(rbind, data_split)
   
@@ -322,7 +325,7 @@ landscape_path_group <- function(data, n_levels = Inf) {
   # data frame
   data <- do.call(rbind, pl)
   data <- as.data.frame(data)
-  data$level <- rep(seq(length(pl)), sapply(pl, nrow))
+  data$level <- rep(seq_along(pl), sapply(pl, nrow))
   
   data <- cbind(data, first_row)
   rownames(data) <- NULL
