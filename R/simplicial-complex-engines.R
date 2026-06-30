@@ -239,9 +239,19 @@ are_edges_maximal <- function(edges, faces) {
   if (nrow(as.matrix(edges)) == 0L) return(logical(0L))
   ! apply(
     apply(
-      outer(as.matrix(edges), as.matrix(faces), `==`),
-      c(1L, 2L), any
-    ), 1L, all
+      apply(
+        outer(as.matrix(edges), as.matrix(faces), `==`),
+        # hold edge index & edge vertices & face index fixed
+        # aggregate over face vertices
+        c(1L, 2L, 3L), any
+      ),
+      # hold edge index & face index fixed
+      # aggregate over edge vertices
+      c(1L, 3L), all
+    ),
+    # hold edge index fixed
+    # aggregate over face indices
+    1L, any
   )
 }
 
